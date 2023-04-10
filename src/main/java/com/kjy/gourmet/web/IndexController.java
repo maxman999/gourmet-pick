@@ -1,4 +1,4 @@
-package com.kjy.gourmetpick.web;
+package com.kjy.gourmet.web;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

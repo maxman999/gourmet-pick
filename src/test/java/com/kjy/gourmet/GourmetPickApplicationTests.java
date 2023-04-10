@@ -1,4 +1,4 @@
-package com.kjy.gourmetpick;
+package com.kjy.gourmet;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

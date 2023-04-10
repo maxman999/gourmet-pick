@@ -1,4 +1,4 @@
-package com.kjy.gourmetpick;
+package com.kjy.gourmet;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
