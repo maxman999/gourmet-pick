@@ -1,0 +1,11 @@
+.menu-title {
+    font-size: 14px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.menu-detail{
+    width: 93%;
+    min-height: 390px;
+    background-color: gray;
+}

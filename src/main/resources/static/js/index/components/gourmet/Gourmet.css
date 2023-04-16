@@ -1,0 +1,19 @@
+.gourmet {
+    min-height: 40px;
+    max-width: 60px;
+}
+
+.gourmet-img {
+    min-height: 40px;
+    border: 1px solid gray;
+}
+
+.vote-light {
+    margin-top: 3px;
+    height: 10px;
+    border: 1px solid gray;
+}
+
+.noName {
+    font-size: 5px;
+}

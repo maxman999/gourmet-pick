@@ -38,3 +38,4 @@ out/
 
 ### properties ###
 application-config.properties
+/src/main/resources/static/dist/

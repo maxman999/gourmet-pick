@@ -1,0 +1,9 @@
+#entranceBtn {
+    max-width: 65px;
+}
+.codeInput-buster{
+    transform: translate(0,-90%);
+    transition-property: transform;
+    transition-duration: 500ms;
+}
+

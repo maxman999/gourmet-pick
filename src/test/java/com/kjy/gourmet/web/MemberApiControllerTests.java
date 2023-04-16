@@ -21,8 +21,7 @@ public class MemberApiControllerTests {
     @Autowired private WebApplicationContext ctx;
     @Autowired private MemberMapper memberMapper;
 
-    private MockMvc mockMvc;
-    Gson gson = new Gson();
+    private MockMvc mockMvc;Gson gson = new Gson();
 
     @BeforeEach
     public void setUp(){
@@ -47,6 +46,7 @@ public class MemberApiControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
+
     @Order(2)
     @Test
     public void getMemberTest() throws Exception{
@@ -57,6 +57,7 @@ public class MemberApiControllerTests {
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print());
     }
+
     @Order(3)
     @Test
     public void signOutTest() throws Exception{
