@@ -6,6 +6,7 @@ import com.kjy.gourmet.service.member.MemberService;
 import com.kjy.gourmet.service.room.RoomService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SpringBootTest
 public class RoomServiceTests {
@@ -52,7 +54,6 @@ public class RoomServiceTests {
         }
         memberService.signOut(memId);
     }
-
     @Test
     public void getRoomTest(){
         for(int i = 0; i < 2; i++){
@@ -60,7 +61,6 @@ public class RoomServiceTests {
             assertThat(roomName).isEqualTo("점심책임방"+i);
         }
     }
-
     @Test
     public void enterRoomTest(){
         long memberId = memberService.getMemberByEmail("test1@naver.com").getId();
