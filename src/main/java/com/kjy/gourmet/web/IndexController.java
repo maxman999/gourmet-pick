@@ -12,10 +12,4 @@ public class IndexController {
     public String index(){
         return "main/index";
     }
-
-    @GetMapping("/room")
-    public String room(){
-        return "main/room";
-    }
-
 }

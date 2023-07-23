@@ -1,6 +1,6 @@
 import {useState} from "react";
-import SignIn from "./components/member/SignIn";
-import Room from "./components/room/Room";
+import SignIn from "./components/Member/SignIn";
+import Room from "./components/Room/Room";
 import './App.css';
 
 const App = () => {

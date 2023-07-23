@@ -1,4 +1,4 @@
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 import './MenuItem.css';
 import * as React from "react";
 import axios from "axios";

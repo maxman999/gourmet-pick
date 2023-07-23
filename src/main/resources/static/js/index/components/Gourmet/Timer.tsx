@@ -20,7 +20,7 @@ const Timer = (props: props) => {
         setTimeout(() => {
             props.onVotingStatusChange('voting');
             setIsPlaying(true);
-        }, 2000);
+        }, 20000);
     }
 
     const timerCompleteHandler = () => {

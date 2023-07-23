@@ -1,18 +1,29 @@
+import {useEffect} from "react";
 import "./MenuDecisionSwiper.css"
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 import MenuItem from "./MenuItem";
 import {Scrollbar, EffectCube} from "swiper";
-import {Swiper, SwiperSlide, useSwiper} from "swiper/react";
+import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-cube";
-import GourmetTable from "../gourmet/GourmetTable";
+import GourmetTable from "../Gourmet/GourmetTable";
 import * as React from "react";
+import {WebSocketUtil} from "../../utils/WebSocketUtil";
 
 interface props {
     menuList: IMenu[];
 }
 
 const MenuDecisionSwiper = (props: props) => {
+
+    useEffect(() => {
+        WebSocketUtil.registerUser('/chatroom/public');
+
+        return () => {
+            WebSocketUtil.disconnect();
+        };
+    }, []);
+
     return (
         <>
             <Swiper
@@ -39,7 +50,7 @@ const MenuDecisionSwiper = (props: props) => {
                     );
                 })}
                 {/* 투표 영역 */}
-                <GourmetTable menuList={props.menuList} />
+                <GourmetTable menuList={props.menuList}/>
             </Swiper>
         </>
     );

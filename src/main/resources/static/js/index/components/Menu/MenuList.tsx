@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import MenuInput from "./MenuInput";
 import {IRoom} from "../../interfaces/IRoom";
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
 import MenuDecisionSwiper from "./MenuDecisionSwiper";

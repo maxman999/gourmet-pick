@@ -2,7 +2,7 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, Scrollbar, EffectCube} from "swiper";
 import "swiper/css";
 import "swiper/css/effect-cube";
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 import MenuItem from "./MenuItem";
 import './MenuDisplaySwiper.css';
 

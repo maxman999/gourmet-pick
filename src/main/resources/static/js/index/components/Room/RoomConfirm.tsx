@@ -8,7 +8,7 @@ interface props {
 }
 
 const RoomConfirm = (props : props) => {
-    const busterCallHandler = (e:React.MouseEvent) => {
+    const busterCallHandler = () => {
         props.onBusterCall(true);
     }
 

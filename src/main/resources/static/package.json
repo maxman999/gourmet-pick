@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/sockjs-client": "^1.5.1",
+    "@types/stompjs": "^2.3.5",
     "axios": "^0.27.2",
     "ejs": "^3.1.8",
     "ejs-loader": "^0.5.0",
@@ -27,9 +29,12 @@
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
     "css-loader": "^6.7.2",
+    "net": "^1.0.2",
     "react": "^18.2.0",
     "react-countdown-circle-timer": "^3.1.0",
     "react-dom": "^18.2.0",
+    "sockjs-client": "^1.5.2",
+    "stompjs": "^2.3.3",
     "style-loader": "^3.3.1",
     "swiper": "^8.4.5"
   }

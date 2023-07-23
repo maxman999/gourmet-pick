@@ -1,10 +1,9 @@
 import * as React from "react";
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 import PanelOnVoting from "./PanelItems/PanelOnVoting";
 import PanelOnWaiting from "./PanelItems/PanelOnWaiting";
 import PanelOnGathering from "./PanelItems/PanelOnGathering";
 import PanelOnClosing from "./PanelItems/PanelOnClosing";
-import Modal from "../UI/Modal";
 
 interface props {
     menuList: IMenu[];

@@ -1,6 +1,6 @@
-import {useEffect, useReducer} from "react";
+import {useReducer} from "react";
 import MenuContext from "./menu-context";
-import {IMenu} from "../interfaces/IMenu.";
+import {IMenu} from "../interfaces/IMenu";
 import axios from "axios";
 import * as React from "react";
 
@@ -26,14 +26,12 @@ const menuReducer = (state: menuState, menuAction: menuAction) => {
         }
     }
 
-
     if (menuAction.type === "REMOVE") {
         const filteredMenuList = state.menuList.filter((menu) => menu.id !== menuAction.menuId);
         return {
             menuList: filteredMenuList,
         };
     }
-
     return state;
 }
 

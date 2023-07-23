@@ -2,7 +2,7 @@ import EntranceInput from "./EntranceInput";
 import {useState} from "react";
 import {IRoom} from "../../interfaces/IRoom";
 import RoomConfirm from "./RoomConfirm";
-import MenuList from "../menu/MenuList";
+import MenuList from "../Menu/MenuList";
 import './Room.css';
 import MenuProvider from "../../store/MenuProvider";
 
@@ -22,7 +22,7 @@ const Room = () => {
         <>
             <EntranceInput isBusterCalled={isBusterCalled} onEntrance={entranceHandler}/>
             {room &&
-                <div className={`row room-container card mt-3 p-3 ${isBusterCalled ? 'room-buster':''}`}>
+                <div className={`room-container ${isBusterCalled ? 'room-buster':''} row card mt-3 p-3`}>
                     <RoomConfirm room={room} onBusterCall={busterCallHandler}/>
                     <MenuProvider>
                         <MenuList room={room} isBusterCalled={isBusterCalled}/>

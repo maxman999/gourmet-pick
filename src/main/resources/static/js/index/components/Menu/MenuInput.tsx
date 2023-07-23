@@ -1,7 +1,7 @@
 import * as React from "react";
 import axios from "axios";
 import {IRoom} from "../../interfaces/IRoom";
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 
 interface props {
     room : IRoom;
@@ -18,16 +18,15 @@ const MenuInput = (props : props)=>{
             alert("메뉴 이름을 입력해주세요.");
             return;
         }
-        const addingResult = await fetchData(newMenu, currentRoomId);
+        await fetchData(newMenu, currentRoomId);
         props.onMenuAdding();
     }
 
     const getInputData = () : IMenu => {
         const menuNameInput = document.getElementById('menuName') as HTMLInputElement;
-        const newMenu : IMenu = {
+        return {
             name:menuNameInput.value,
         }
-        return newMenu;
     }
 
     const fetchData = async (newMenu : IMenu, roomId : number) => {

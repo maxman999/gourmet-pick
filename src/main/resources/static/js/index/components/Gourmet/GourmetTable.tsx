@@ -2,7 +2,7 @@ import './GourmetTable.css';
 import Gourmet from "./Gourmet";
 import VotePanel from "./VotePanel";
 import * as React from "react";
-import {IMenu} from "../../interfaces/IMenu.";
+import {IMenu} from "../../interfaces/IMenu";
 import {useSwiper} from "swiper/react";
 import Timer from "./Timer";
 import {useEffect, useState} from "react";
@@ -13,7 +13,6 @@ interface props {
 }
 
 const GourmetTable = (props: props) => {
-
     const menuObj: { [menuName: string]: number } = {}
     props.menuList.forEach(menu => {
         menuObj[menu.name] = 0;
@@ -58,6 +57,10 @@ const GourmetTable = (props: props) => {
         });
     };
 
+    const votingCloseHandler = () => {
+        setVotingStatus('waiting');
+    }
+
     return (
         <>
             <Timer onVotingStatusChange={votingStatusChangeHandler}/>
@@ -73,7 +76,7 @@ const GourmetTable = (props: props) => {
                 })}
             </div>
             {votingStatus === "closing" &&
-                <Modal onClose={() => {}}>
+                <Modal onClose={votingCloseHandler}>
                     <div>{gourmetsPick}</div>
                 </Modal>
             }
