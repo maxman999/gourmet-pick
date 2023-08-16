@@ -17,7 +17,9 @@ interface props {
 const MenuDecisionSwiper = (props: props) => {
 
     useEffect(() => {
-        WebSocketUtil.registerUser('/chatroom/public');
+        const tempRoomId = 'qwer1234';
+        const tempUserId = 'kjy55&' + Math.random();
+        WebSocketUtil.registerUser('voting', tempUserId, tempRoomId);
 
         return () => {
             WebSocketUtil.disconnect();
