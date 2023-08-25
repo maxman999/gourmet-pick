@@ -47,7 +47,7 @@ const userJoin = (topic: string, userId: string, roomId: string) => {
         senderName: connectionInformation.username,
         status: 'JOIN',
     }
-    stompClient.send(`/app/${topic}/join/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
+    stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
 }
 
 const onError = (err: any) => {
@@ -71,7 +71,7 @@ const onPublicMessageRecieved = (payload: any) => {
         case "JOIN":
             const targetCnt = payloadData.userCnt;
             const targetElement = document.getElementsByClassName('gourmet-img');
-            for(let i = 0; i <= targetCnt; i++){
+            for(let i = 0; i <= targetCnt - 1; i++){
                 const element = targetElement[i] as HTMLElement;
                 element.style.background = 'red';
             }

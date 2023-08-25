@@ -43,13 +43,6 @@ const EntranceInput = (props: props) => {
         props.onEntrance(room);
     };
 
-    const keyDownHandler = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            const entranceBtn = document.getElementById("entranceBtn") as HTMLButtonElement;
-            entranceBtn.click();
-        }
-    }
-
     return (
         <div className={`row card mt-3 p-3 ${props.isBusterCalled ? 'codeInput-buster' : ''}`}>
             <form>
@@ -57,7 +50,7 @@ const EntranceInput = (props: props) => {
                     <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>
                     <div className='row'>
                         <div className='col-sm-11'>
-                            <input type="text" className="form-control" id="invitationCode" onKeyDown={keyDownHandler}/>
+                            <input type="text" className="form-control" id="invitationCode" />
                         </div>
                         <div className='col-sm-1'>
                             <button className='btn btn-outline-secondary' id="entranceBtn" onClick={clickHandler}> $

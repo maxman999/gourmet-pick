@@ -17,7 +17,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public long getMemNoAfterValidation(Member member) {
+    public long getMemberIdAfterValidation(Member member) {
         Member trueMember = memberMapper.selectMemberByEmail(member.getEmail());
         if(trueMember == null) return 0;
         String inputtedPassword = member.getPassword();

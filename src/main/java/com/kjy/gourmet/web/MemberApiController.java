@@ -22,7 +22,7 @@ public class MemberApiController {
 
     @PostMapping("/signIn")
     public long signIn(@RequestBody Member member, HttpServletRequest request){
-        long memNo = memberService.getMemNoAfterValidation(member);
+        long memNo = memberService.getMemberIdAfterValidation(member);
         if(memNo > 0) {
             HttpSession session = request.getSession();
             session.setAttribute("userEmail", member.getEmail());
@@ -39,7 +39,5 @@ public class MemberApiController {
     public Member member(@PathVariable("memberId") Long memberId){
         return memberService.getMemberById(memberId);
     }
-
-
 
 }
