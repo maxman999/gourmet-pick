@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import MenuInput from "./MenuInput";
 import {IRoom} from "../../interfaces/IRoom";
 import {IMenu} from "../../interfaces/IMenu";
@@ -6,6 +6,7 @@ import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
 import MenuDecisionSwiper from "./MenuDecisionSwiper";
 import * as React from "react";
+import menuContext from "../../store/menu-context";
 
 interface props {
     room: IRoom;

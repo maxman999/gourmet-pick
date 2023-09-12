@@ -1,3 +1,5 @@
+// ToDo : 일반적인 모듈이 아닌, React Hook으로 짤 수는 없을까?
+
 import {over, Client} from 'stompjs';
 
 type message = {
@@ -70,12 +72,15 @@ const onPublicMessageRecieved = (payload: any) => {
     switch (payloadData.status) {
         case "JOIN":
             const targetCnt = payloadData.userCnt;
+            //ToDo react 답게 다시 짜자,,,,
             const targetElement = document.getElementsByClassName('gourmet-img');
             for(let i = 0; i <= targetCnt - 1; i++){
                 const element = targetElement[i] as HTMLElement;
                 element.style.background = 'red';
             }
             break;
+        case "READY":
+
         case "MESSAGE":
             console.log("?",JSON.stringify(payloadData))
             break;

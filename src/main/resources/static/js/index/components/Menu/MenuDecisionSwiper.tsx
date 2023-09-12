@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useContext, useEffect} from "react";
 import "./MenuDecisionSwiper.css"
 import {IMenu} from "../../interfaces/IMenu";
 import MenuItem from "./MenuItem";
@@ -9,20 +9,23 @@ import "swiper/css/effect-cube";
 import GourmetTable from "../Gourmet/GourmetTable";
 import * as React from "react";
 import {WebSocketUtil} from "../../utils/WebSocketUtil";
+import websocketContext from "../../store/websocket-context";
 
 interface props {
     menuList: IMenu[];
 }
 
 const MenuDecisionSwiper = (props: props) => {
+    const websocketAPIs = useContext(websocketContext);
 
     useEffect(() => {
         const tempRoomId = 'qwer1234';
         const tempUserId = 'kjy55&' + Math.random();
-        WebSocketUtil.registerUser('voting', tempUserId, tempRoomId);
+        // WebSocketUtil.registerUser('voting', tempUserId, tempRoomId);
+        websocketAPIs.register('voting', tempUserId, tempRoomId);
 
         return () => {
-            WebSocketUtil.disconnect();
+            // WebSocketUtil.disconnect();
         };
     }, []);
 

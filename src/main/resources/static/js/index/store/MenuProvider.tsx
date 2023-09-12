@@ -3,7 +3,6 @@ import MenuContext from "./menu-context";
 import {IMenu} from "../interfaces/IMenu";
 import axios from "axios";
 import * as React from "react";
-
 interface menuState {
     menuList: IMenu[];
 }

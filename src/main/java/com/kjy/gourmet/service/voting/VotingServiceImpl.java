@@ -17,6 +17,7 @@ public class VotingServiceImpl implements VotingService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final Map<String, HashSet<String>> votingSessions = new ConcurrentHashMap<>();
+    private final int ROOM_THRESHOLD = 3;
 
     @Override
     public void addSession(String sessionId, WebSocketSession session) {
@@ -33,6 +34,8 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void memberSeatingHandler(String roomId, String username) {
+        Message tempMsg;
+
         if (votingSessions.containsKey(roomId)) {
             votingSessions.get(roomId).add(username);
         } else {
@@ -41,7 +44,12 @@ public class VotingServiceImpl implements VotingService {
             votingSessions.put(roomId, userNames);
         }
         int userCnt = votingSessions.get(roomId).size();
-        Message tempMsg = new Message("kjy55", "people", "입장!", "20230816", Status.JOIN, userCnt);
+
+        if(userCnt > ROOM_THRESHOLD){
+            tempMsg = new Message("kjy55", "people", "과반 이상 입장!", "20230816", Status.READY, userCnt);
+        } else{
+            tempMsg = new Message("kjy55", "people", "입장!", "20230816", Status.JOIN, userCnt);
+        }
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, tempMsg);
     }
 

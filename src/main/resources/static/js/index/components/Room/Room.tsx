@@ -5,6 +5,7 @@ import RoomConfirm from "./RoomConfirm";
 import MenuList from "../Menu/MenuList";
 import './Room.css';
 import MenuProvider from "../../store/MenuProvider";
+import WebsocketProvider from "../../store/WebsocketProvider";
 
 const Room = () => {
     const [room, setRoom] = useState<IRoom | null>();
@@ -24,9 +25,9 @@ const Room = () => {
             {room &&
                 <div className={`room-container ${isBusterCalled ? 'room-buster':''} row card mt-3 p-3`}>
                     <RoomConfirm room={room} onBusterCall={busterCallHandler}/>
-                    <MenuProvider>
+                    <WebsocketProvider>
                         <MenuList room={room} isBusterCalled={isBusterCalled}/>
-                    </MenuProvider>
+                    </WebsocketProvider>
                 </div>
             }
         </>
