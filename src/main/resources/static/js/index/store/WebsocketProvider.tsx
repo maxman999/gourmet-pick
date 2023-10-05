@@ -8,16 +8,18 @@ type props = {
 }
 
 interface websocketState {
+    isVotingPossible: boolean;
     sessionList: [];
 }
 
 interface websocketAction {
     type: string,
-    sessionInfo: {
+    sessionInfo?: {
         topic: string,
         userId: string,
         roomId: string,
-    }
+    },
+    onMessageHandler?: (payload: any) => void
 }
 
 type message = {
@@ -33,6 +35,7 @@ const WEBSOCKET_SERVER_URL: string = 'http://localhost:8080/ws'
 const SockJS = require('sockjs-client');
 let stompClient: Client = null;
 
+// dummy
 const connectionInformation: message = {
     roomId: "roomCode",
     username: 'kjy',
@@ -40,26 +43,6 @@ const connectionInformation: message = {
     message: 'hello there?',
     connected: false,
     status: '',
-}
-
-const onPublicMessageRecieved = (payload: any) => {
-    let payloadData = JSON.parse(payload.body);
-    switch (payloadData.status) {
-        case "JOIN":
-            const targetCnt = payloadData.userCnt;
-            //ToDo react 답게 다시 짜자,,,,
-            const targetElement = document.getElementsByClassName('gourmet-img');
-            for (let i = 0; i <= targetCnt - 1; i++) {
-                const element = targetElement[i] as HTMLElement;
-                element.style.background = 'red';
-            }
-            break;
-        case "READY":
-
-        case "MESSAGE":
-            console.log("?", JSON.stringify(payloadData))
-            break;
-    }
 }
 
 const userJoin = (topic: string, userId: string, roomId: string) => {
@@ -75,18 +58,26 @@ const onError = (err: any) => {
 }
 
 
-const websocketReducer = (state: websocketState, action: websocketAction) : websocketState => {
+const websocketReducer = (state: websocketState, action: websocketAction): websocketState => {
     if (action.type === "REGISTER") {
         const {topic, userId, roomId} = action.sessionInfo
 
         let Sock = new SockJS(WEBSOCKET_SERVER_URL);
         stompClient = over(Sock);
         stompClient.connect({}, () => {
-            stompClient.subscribe(`/${topic}/${roomId}`, onPublicMessageRecieved);
+            stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
             userJoin(topic, userId, roomId);
         }, onError);
 
         return {
+            isVotingPossible: false,
+            sessionList: [],
+        }
+    }
+
+    if (action.type === "READY") {
+        return {
+            isVotingPossible: true,
             sessionList: [],
         }
     }
@@ -95,22 +86,31 @@ const websocketReducer = (state: websocketState, action: websocketAction) : webs
 }
 
 const defaultWebsocketState: websocketState = {
+    isVotingPossible: false,
     sessionList: []
 }
 
 const WebsocketProvider = (props: props) => {
     const [websocketState, dispatchWebsocketActions] = useReducer(websocketReducer, defaultWebsocketState);
 
-    const registerHandler = async (topic: string, userId: string, roomId: string) => {
+    const registerHandler = (topic: string, userId: string, roomId: string, onMessageHandler: (payload: any) => void) => {
         dispatchWebsocketActions({
             type: 'REGISTER',
-            sessionInfo: {topic, userId, roomId}
+            sessionInfo: {topic, userId, roomId},
+            onMessageHandler: onMessageHandler,
+        });
+    }
+
+    const votingHandler = () => {
+        dispatchWebsocketActions({
+            type: 'READY',
         });
     }
 
     const websocketContext = {
         websocketState: websocketState,
-        register: registerHandler
+        register: registerHandler,
+        ready: votingHandler,
     }
 
     return (

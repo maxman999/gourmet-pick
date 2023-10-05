@@ -5,8 +5,9 @@ import * as React from "react";
 import {IMenu} from "../../interfaces/IMenu";
 import {useSwiper} from "swiper/react";
 import Timer from "./Timer";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Modal from "../UI/Modal";
+import websocketContext from "../../store/websocket-context";
 
 interface props {
     menuList: IMenu[];
@@ -18,19 +19,51 @@ const GourmetTable = (props: props) => {
         menuObj[menu.name] = 0;
     });
 
+    // gathering, voting, closing, waiting
     const [votingStatus, setVotingStatus] = useState("gathering");
     const [votingResult, setVotingResult] = useState(menuObj);
     const [gourmetsPick, setGourmetsPick] = useState([]);
+
+    const websocketAPIs = useContext(websocketContext);
+
+    const onMessageHandler = (payload: any) => {
+        let payloadData = JSON.parse(payload.body);
+        switch (payloadData.status) {
+            case "JOIN":
+                const targetCnt = payloadData.userCnt;
+                //ToDo react 답게 다시 짜자,,,,
+                const targetElement = document.getElementsByClassName('gourmet-img');
+                for (let i = 0; i <= targetCnt - 1; i++) {
+                    const element = targetElement[i] as HTMLElement;
+                    element.style.background = 'red';
+                }
+                break;
+            case "READY":
+                websocketAPIs.ready()
+                setVotingStatus('voting')
+        }
+    }
+
+    useEffect(() => {
+        const tempRoomId = 'qwer1234';
+        const tempUserId = 'kjy55&' + Math.random();
+        websocketAPIs.register('voting', tempUserId, tempRoomId, onMessageHandler);
+
+        return () => {
+            // WebSocketUtil.disconnect();
+        };
+    }, []);
+
 
     const swiper = useSwiper();
     const gourmets = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
     swiper.on("init", () => {
-        console.log(swiper.realIndex);
+        console.log('init', swiper.realIndex);
     });
 
     swiper.on("transitionEnd", () => {
-        console.log(swiper.realIndex);
+        console.log('transitionEnd', swiper.realIndex);
     });
 
     useEffect(() => {
@@ -43,7 +76,7 @@ const GourmetTable = (props: props) => {
             console.log(selected, max);
             setGourmetsPick(selected);
         }
-    },[votingStatus]);
+    }, [votingStatus]);
 
     const votingStatusChangeHandler = (votingStatus: string) => {
         setVotingStatus(votingStatus);

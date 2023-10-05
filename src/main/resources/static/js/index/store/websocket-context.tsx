@@ -1,7 +1,13 @@
 import * as React from "react";
 
 const WebsocketContext = React.createContext({
-    register: (topic:string, userId:string, roomId:string) => {},
+    websocketState: {
+        isVotingPossible: false
+    },
+    register: (topic: string, userId: string, roomId: string, onMessage: (payload: any) => void) => {
+    },
+    ready: () => {
+    },
     // onConnected: () => {},
     // disconnect: () => {},
     // userJoin: () => {},

@@ -4,6 +4,8 @@ import PanelOnVoting from "./PanelItems/PanelOnVoting";
 import PanelOnWaiting from "./PanelItems/PanelOnWaiting";
 import PanelOnGathering from "./PanelItems/PanelOnGathering";
 import PanelOnClosing from "./PanelItems/PanelOnClosing";
+import {useContext} from "react";
+import websocketContext from "../../store/websocket-context";
 
 interface props {
     menuList: IMenu[];
@@ -13,7 +15,6 @@ interface props {
 }
 
 const VotePanel = (props: props) => {
-
     const votingHandler = (gourmetPick: number) => {
         props.onVoting(gourmetPick);
     }
