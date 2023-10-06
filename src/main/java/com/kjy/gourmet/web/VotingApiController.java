@@ -1,5 +1,6 @@
 package com.kjy.gourmet.web;
 
+import com.kjy.gourmet.domain.dto.Ballot;
 import com.kjy.gourmet.service.voting.VotingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,15 @@ public class VotingApiController {
     public void seating(@DestinationVariable String roomId, @DestinationVariable String username) {
         votingService.memberSeatingHandler(roomId, username);
     }
+
+    @MessageMapping("/voting/decide/{username}/{roomId}")
+    public void decide(
+            @DestinationVariable String roomId,
+            @DestinationVariable String username,
+            Ballot ballot) {
+        votingService.decideHandler(roomId,ballot);
+    }
+
 
 //    @MessageMapping("/message")
 //    @SendTo("/chatroom/public")

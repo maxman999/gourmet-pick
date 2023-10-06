@@ -26,6 +26,12 @@ const GourmetTable = (props: props) => {
 
     const websocketAPIs = useContext(websocketContext);
 
+    const sessionInfo = {
+        topic: 'voting',
+        roomId: 'qwer1234',
+        userId: 'kjy55&' + Math.random(),
+    }
+
     const onMessageHandler = (payload: any) => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
@@ -45,9 +51,7 @@ const GourmetTable = (props: props) => {
     }
 
     useEffect(() => {
-        const tempRoomId = 'qwer1234';
-        const tempUserId = 'kjy55&' + Math.random();
-        websocketAPIs.register('voting', tempUserId, tempRoomId, onMessageHandler);
+        websocketAPIs.register(sessionInfo, onMessageHandler);
 
         return () => {
             // WebSocketUtil.disconnect();
@@ -84,10 +88,12 @@ const GourmetTable = (props: props) => {
 
     const votingHandler = (gourmetPick: number) => {
         const menuName = props.menuList[swiper.realIndex].name;
-        setVotingResult((prevState) => {
-            prevState[menuName] += gourmetPick;
-            return prevState;
-        });
+        websocketAPIs.vote(sessionInfo, menuName, gourmetPick);
+
+        // setVotingResult((prevState) => {
+        //     prevState[menuName] += gourmetPick;
+        //     return prevState;
+        // });
     };
 
     const votingCloseHandler = () => {

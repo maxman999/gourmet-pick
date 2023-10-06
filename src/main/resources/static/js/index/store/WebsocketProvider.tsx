@@ -12,14 +12,18 @@ interface websocketState {
     sessionList: [];
 }
 
+type sessionInfo = {
+    topic: string,
+    userId: string,
+    roomId: string,
+}
+
 interface websocketAction {
     type: string,
-    sessionInfo?: {
-        topic: string,
-        userId: string,
-        roomId: string,
-    },
+    sessionInfo?: sessionInfo
     onMessageHandler?: (payload: any) => void
+    menuName?: string
+    preference?: number
 }
 
 type message = {
@@ -57,7 +61,6 @@ const onError = (err: any) => {
     console.log(err)
 }
 
-
 const websocketReducer = (state: websocketState, action: websocketAction): websocketState => {
     if (action.type === "REGISTER") {
         const {topic, userId, roomId} = action.sessionInfo
@@ -68,11 +71,6 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
             stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
             userJoin(topic, userId, roomId);
         }, onError);
-
-        return {
-            isVotingPossible: false,
-            sessionList: [],
-        }
     }
 
     if (action.type === "READY") {
@@ -80,6 +78,17 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
             isVotingPossible: true,
             sessionList: [],
         }
+    }
+
+    if (action.type === "VOTE") {
+        const {topic, userId, roomId} = action.sessionInfo
+        const chatMessage = {
+            senderName: connectionInformation.username,
+            status: 'VOTE',
+            menuName: action.menuName,
+            preference: action.preference,
+        }
+        stompClient.send(`/app/${topic}/decide/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
     }
 
     return state;
@@ -93,24 +102,34 @@ const defaultWebsocketState: websocketState = {
 const WebsocketProvider = (props: props) => {
     const [websocketState, dispatchWebsocketActions] = useReducer(websocketReducer, defaultWebsocketState);
 
-    const registerHandler = (topic: string, userId: string, roomId: string, onMessageHandler: (payload: any) => void) => {
+    const registerHandler = (sessionInfo: sessionInfo, onMessageHandler: (payload: any) => void) => {
         dispatchWebsocketActions({
             type: 'REGISTER',
-            sessionInfo: {topic, userId, roomId},
+            sessionInfo: sessionInfo,
             onMessageHandler: onMessageHandler,
         });
     }
 
-    const votingHandler = () => {
+    const readyHandler = () => {
         dispatchWebsocketActions({
             type: 'READY',
+        });
+    }
+
+    const votingHandler = (sessionInfo: sessionInfo, menuName: string, preference: number) => {
+        dispatchWebsocketActions({
+            type: 'VOTE',
+            sessionInfo: sessionInfo,
+            menuName: menuName,
+            preference: preference,
         });
     }
 
     const websocketContext = {
         websocketState: websocketState,
         register: registerHandler,
-        ready: votingHandler,
+        ready: readyHandler,
+        vote: votingHandler,
     }
 
     return (

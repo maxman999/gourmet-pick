@@ -1,12 +1,15 @@
 package com.kjy.gourmet.service.voting;
 
+import com.kjy.gourmet.domain.dto.Ballot;
 import com.kjy.gourmet.domain.dto.Message;
+import com.kjy.gourmet.domain.dto.SessionStatus;
 import com.kjy.gourmet.domain.dto.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VotingServiceImpl implements VotingService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final Map<String, HashSet<String>> votingSessions = new ConcurrentHashMap<>();
-    private final int ROOM_THRESHOLD = 2;
+    private final Map<String, SessionStatus> votingSessions = new ConcurrentHashMap<>();
+    private final int ROOM_THRESHOLD = 1;
 
     @Override
     public void addSession(String sessionId, WebSocketSession session) {
@@ -28,7 +31,7 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
-    public HashSet<String> getSession(String sessionId) {
+    public SessionStatus getSession(String sessionId) {
         return votingSessions.get(sessionId);
     }
 
@@ -37,25 +40,34 @@ public class VotingServiceImpl implements VotingService {
         Message tempMsg;
 
         if (votingSessions.containsKey(roomId)) {
-            votingSessions.get(roomId).add(username);
+            votingSessions.get(roomId).getUsers().add(username);
         } else {
             HashSet<String> userNames = new HashSet<>();
             userNames.add(username);
-            votingSessions.put(roomId, userNames);
+            votingSessions.put(roomId, new SessionStatus(userNames, new HashMap<>()));
         }
-        int userCnt = votingSessions.get(roomId).size();
 
-        if(userCnt >= ROOM_THRESHOLD){
+        int userCnt = votingSessions.get(roomId).getUsers().size();
+
+        if (userCnt >= ROOM_THRESHOLD) {
             tempMsg = new Message("kjy55", "people", "과반 이상 입장!", "20231004", Status.READY, userCnt);
-        } else{
+        } else {
             tempMsg = new Message("kjy55", "people", "입장!", "20231004", Status.JOIN, userCnt);
         }
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, tempMsg);
     }
 
     @Override
-    public void beginVoting() {
-
+    public void decideHandler(String roomId, Ballot ballot) {
+        HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getVotingStatus();
+        String targetMenu = ballot.getMenuName();
+        if (votingStatus.containsKey(targetMenu)) {
+            int totalPreference = votingStatus.get(targetMenu) + ballot.getPreference();
+            votingStatus.put(targetMenu, totalPreference);
+        } else {
+            votingStatus.put(targetMenu, ballot.getPreference());
+        }
     }
+
 
 }
