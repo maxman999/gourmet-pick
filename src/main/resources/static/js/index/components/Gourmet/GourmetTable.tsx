@@ -11,21 +11,26 @@ import websocketContext from "../../store/websocket-context";
 
 interface props {
     menuList: IMenu[];
+    onBusterCall: (isBusterCalled: boolean) => void;
+    onMenuDecide: (todayPick: string) => void;
+    onModalChange: (isModalPopped: boolean) => void;
 }
 
 const GourmetTable = (props: props) => {
+    const swiper = useSwiper();
+    const seat = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
     const menuObj: { [menuName: string]: number } = {}
     props.menuList.forEach(menu => {
         menuObj[menu.name] = 0;
     });
 
+    const [gourmet, setGourmet] = useState(0);
     // gathering, voting, closing, waiting
     const [votingStatus, setVotingStatus] = useState("gathering");
-    const [votingResult, setVotingResult] = useState(menuObj);
-    const [gourmetsPick, setGourmetsPick] = useState([]);
+
 
     const websocketAPIs = useContext(websocketContext);
-
     const sessionInfo = {
         topic: 'voting',
         roomId: 'qwer1234',
@@ -36,17 +41,21 @@ const GourmetTable = (props: props) => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
             case "JOIN":
-                const targetCnt = payloadData.userCnt;
-                //ToDo react 답게 다시 짜자,,,,
-                const targetElement = document.getElementsByClassName('gourmet-img');
-                for (let i = 0; i <= targetCnt - 1; i++) {
-                    const element = targetElement[i] as HTMLElement;
-                    element.style.background = 'red';
-                }
+                console.log('cnt : ', payloadData.data);
+                setGourmet(Number(payloadData.data));
+                console.log({gourmet})
                 break;
             case "READY":
-                websocketAPIs.ready()
-                setVotingStatus('voting')
+                websocketAPIs.ready();
+                setVotingStatus('voting');
+                break;
+            case "END":
+                props.onMenuDecide([`${payloadData.data}`][0]);
+                props.onModalChange(true);
+                props.onBusterCall(false);
+                break;
+            default :
+                break;
         }
     }
 
@@ -54,13 +63,10 @@ const GourmetTable = (props: props) => {
         websocketAPIs.register(sessionInfo, onMessageHandler);
 
         return () => {
-            // WebSocketUtil.disconnect();
+            websocketAPIs.disconnect();
         };
     }, []);
 
-
-    const swiper = useSwiper();
-    const gourmets = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
     swiper.on("init", () => {
         console.log('init', swiper.realIndex);
@@ -72,13 +78,7 @@ const GourmetTable = (props: props) => {
 
     useEffect(() => {
         if (votingStatus === 'closing') {
-            const quantity = Object.values(votingResult);
-            const max = Math.max(...quantity);
-            const selected = Object.keys(votingResult).filter((key) => {
-                return votingResult[key] === max;
-            });
-            console.log(selected, max);
-            setGourmetsPick(selected);
+            websocketAPIs.finishVoting(sessionInfo);
         }
     }, [votingStatus]);
 
@@ -96,10 +96,6 @@ const GourmetTable = (props: props) => {
         // });
     };
 
-    const votingCloseHandler = () => {
-        setVotingStatus('waiting');
-    }
-
     return (
         <>
             <Timer onVotingStatusChange={votingStatusChangeHandler}/>
@@ -110,15 +106,10 @@ const GourmetTable = (props: props) => {
                 onVoting={votingHandler}
             />
             <div className='row mt-1 p-3'>
-                {gourmets.map((gourmet, index) => {
-                    return <Gourmet key={index}/>
+                {seat.map((cnt, index) => {
+                    return <Gourmet key={index} isActive={index < gourmet}/>
                 })}
             </div>
-            {votingStatus === "closing" &&
-                <Modal onClose={votingCloseHandler}>
-                    <div>{gourmetsPick}</div>
-                </Modal>
-            }
         </>
     );
 }

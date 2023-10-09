@@ -23,10 +23,10 @@ const Room = () => {
         <>
             <EntranceInput isBusterCalled={isBusterCalled} onEntrance={entranceHandler}/>
             {room &&
-                <div className={`room-container ${isBusterCalled ? 'room-buster':''} row card mt-3 p-3`}>
+                <div className={`room-container ${isBusterCalled ? 'room-buster' : ''} row card mt-3 p-3`}>
                     <RoomConfirm room={room} onBusterCall={busterCallHandler}/>
                     <WebsocketProvider>
-                        <MenuList room={room} isBusterCalled={isBusterCalled}/>
+                        <MenuList room={room} isBusterCalled={isBusterCalled} onBusterCall={busterCallHandler}/>
                     </WebsocketProvider>
                 </div>
             }

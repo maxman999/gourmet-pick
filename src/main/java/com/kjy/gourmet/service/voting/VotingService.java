@@ -8,8 +8,14 @@ import java.util.HashSet;
 
 public interface VotingService {
     void addSession(String sessionId, WebSocketSession session);
+
     void removeSession(String sessionId);
+
     SessionStatus getSession(String sessionId);
-    void memberSeatingHandler(String roomId, String username);
+
+    void memberSeatingHandler(String roomId, String userName);
+
     void decideHandler(String roomId, Ballot ballot);
+
+    void finishHandler(String roomId, String userName);
 }

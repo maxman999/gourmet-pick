@@ -1,9 +1,16 @@
 import "./Gourmet.css"
+import * as React from "react";
 
-const Gourmet = () => {
+
+type props = {
+    isActive: boolean
+}
+
+const Gourmet = (props: props) => {
     return (
         <div className='gourmet d-inline m-1'>
-            <div className='gourmet-img'></div>
+            {props.isActive && <div className='gourmet-img active'></div>}
+            {!props.isActive && <div className='gourmet-img'></div>}
             <div className='vote-light'></div>
             <div className='noName text-center'>mr</div>
         </div>

@@ -7,14 +7,18 @@ import MenuDisplaySwiper from "./MenuDisplaySwiper";
 import MenuDecisionSwiper from "./MenuDecisionSwiper";
 import * as React from "react";
 import menuContext from "../../store/menu-context";
+import Modal from "../UI/Modal";
 
 interface props {
     room: IRoom;
     isBusterCalled: boolean;
+    onBusterCall: (isBusterCalled: boolean) => void
 }
 
 const MenuList = (props: props) => {
     const [menuList, setMenuList] = useState<IMenu[]>();
+    const [todayPick, setTodayPick] = useState('');
+    const [isModalPopped, setIsModalPopped] = useState(false)
 
     const getMenuFromServer = async () => {
         const currentRoomId = props.room.id;
@@ -38,18 +42,41 @@ const MenuList = (props: props) => {
         setMenuList(latestMenuList);
     }
 
+    const modalCloseHandler = () => {
+        setIsModalPopped(false);
+    }
+
+    const menuDecisionHandler = (todayPick: string) => {
+        setTodayPick(todayPick);
+    }
+
+    const modalPopHandler = (isModalPopped: boolean) => {
+        setIsModalPopped(isModalPopped)
+    }
+
+
     useEffect(() => {
         setDefaultMenuList();
     }, []);
 
     return (
         <div className='menu-container'>
-            {props.isBusterCalled && <MenuDecisionSwiper menuList={menuList}/>}
+            {props.isBusterCalled &&
+                <MenuDecisionSwiper
+                    menuList={menuList}
+                    onBusterCall={props.onBusterCall}
+                    onMenuDecide={menuDecisionHandler}
+                    onModalChange={modalPopHandler}
+                />}
             {!props.isBusterCalled &&
-            <>
-                <MenuDisplaySwiper menuList={menuList} onDelete={deleteHandler}/>
-                <MenuInput room={props.room} onMenuAdding={menuAddingHandler}/>
-            </>
+                <>
+                    <MenuDisplaySwiper menuList={menuList} onDelete={deleteHandler}/>
+                    <MenuInput room={props.room} onMenuAdding={menuAddingHandler}/>
+                </>}
+            {isModalPopped &&
+                <Modal onClose={modalCloseHandler}>
+                    <div>{todayPick}</div>
+                </Modal>
             }
         </div>
     );

@@ -17,9 +17,12 @@ const WebsocketContext = React.createContext({
     },
     vote: (sessionInfo: sessionInfo, menuName: string, preference: number) => {
     },
+    finishVoting: (sessionInfo: sessionInfo) => {
+    },
+    disconnect: () => {
+    },
 
     // onConnected: () => {},
-    // disconnect: () => {},
     // userJoin: () => {},
     // onError: () => {},
     // sendPublicMessage: () => {},

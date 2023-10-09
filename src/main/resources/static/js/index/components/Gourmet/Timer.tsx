@@ -1,7 +1,7 @@
 import {CountdownCircleTimer} from 'react-countdown-circle-timer'
 import "./Timer.css"
 import {useSwiper} from "swiper/react";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import websocketContext from "../../store/websocket-context";
 
 interface props {

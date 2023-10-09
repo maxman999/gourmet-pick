@@ -3,6 +3,10 @@ import {useReducer} from "react";
 import {Client, over} from "stompjs";
 import WebsocketContext from "./websocket-context";
 
+// ToDo
+//  1. 웹소켓 기능과 투표 기능 분리 시킬것.
+//  2. interface, type 관리,,,
+
 type props = {
     children: React.ReactNode;
 }
@@ -28,7 +32,7 @@ interface websocketAction {
 
 type message = {
     roomId: string,
-    username: string,
+    userName: string,
     receiverName: string,
     message: string,
     connected: boolean,
@@ -42,7 +46,7 @@ let stompClient: Client = null;
 // dummy
 const connectionInformation: message = {
     roomId: "roomCode",
-    username: 'kjy',
+    userName: 'kjy',
     receiverName: 'yjk',
     message: 'hello there?',
     connected: false,
@@ -51,7 +55,7 @@ const connectionInformation: message = {
 
 const userJoin = (topic: string, userId: string, roomId: string) => {
     let chatMessage = {
-        senderName: connectionInformation.username,
+        senderName: connectionInformation.userName,
         status: 'JOIN',
     }
     stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
@@ -83,12 +87,30 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     if (action.type === "VOTE") {
         const {topic, userId, roomId} = action.sessionInfo
         const chatMessage = {
-            senderName: connectionInformation.username,
+            senderName: connectionInformation.userName,
             status: 'VOTE',
             menuName: action.menuName,
             preference: action.preference,
         }
         stompClient.send(`/app/${topic}/decide/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
+    }
+
+    if (action.type === "FINISH") {
+        const {topic, userId, roomId} = action.sessionInfo
+        const chatMessage = {
+            senderName: connectionInformation.userName,
+            status: 'FINISH',
+        }
+        stompClient.send(`/app/${topic}/finish/${userId}/${roomId}`);
+        return {
+            isVotingPossible: false,
+            sessionList: [],
+        }
+    }
+
+    if (action.type === "DISCONNECT") {
+        stompClient.disconnect(() => {
+        });
     }
 
     return state;
@@ -125,11 +147,27 @@ const WebsocketProvider = (props: props) => {
         });
     }
 
+    const finishVotingHandler = (sessionInfo: sessionInfo) => {
+        dispatchWebsocketActions({
+            type: 'FINISH',
+            sessionInfo: sessionInfo,
+        });
+    }
+
+    const disconnectHandler = () => {
+        dispatchWebsocketActions({
+            type: 'DISCONNECT',
+        });
+    }
+
+
     const websocketContext = {
         websocketState: websocketState,
         register: registerHandler,
         ready: readyHandler,
         vote: votingHandler,
+        finishVoting: finishVotingHandler,
+        disconnect: disconnectHandler,
     }
 
     return (
