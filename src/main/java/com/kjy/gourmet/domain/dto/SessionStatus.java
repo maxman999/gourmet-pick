@@ -12,7 +12,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 public class SessionStatus {
     private HashSet<String> users = new HashSet<>();
-    private HashMap<String, Integer> votingStatus = new HashMap<>();
+    private HashMap<String, Integer> aggregation = new HashMap<>();
     private HashSet<String> finishCalls = new HashSet<>();
 
     public SessionStatus(String users) {

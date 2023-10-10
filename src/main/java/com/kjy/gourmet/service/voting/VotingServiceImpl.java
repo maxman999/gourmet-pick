@@ -1,9 +1,6 @@
 package com.kjy.gourmet.service.voting;
 
-import com.kjy.gourmet.domain.dto.Ballot;
-import com.kjy.gourmet.domain.dto.Message;
-import com.kjy.gourmet.domain.dto.SessionStatus;
-import com.kjy.gourmet.domain.dto.Status;
+import com.kjy.gourmet.domain.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -18,6 +15,7 @@ public class VotingServiceImpl implements VotingService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final Map<String, SessionStatus> votingSessions = new ConcurrentHashMap<>();
+    private final Map<String, SessionInfo> sessionMapper = new ConcurrentHashMap<>();
     private final int ROOM_CAPACITY = 2;
 
     @Override
@@ -29,17 +27,19 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
-    public SessionStatus getSession(String sessionId) {
-        return votingSessions.get(sessionId);
+    public boolean getRoomState(String rooId) {
+        return votingSessions.containsKey(rooId);
     }
 
     @Override
-    public void memberSeatingHandler(String roomId, String userName) {
+    public void memberSeatingHandler(String roomId, String sessionId, String userId) {
+        // 세션 정보 등록
+        sessionMapper.put(sessionId, new SessionInfo(userId, roomId));
         // 투표 세션 생성/추가
         if (votingSessions.containsKey(roomId)) {
-            votingSessions.get(roomId).getUsers().add(userName);
+            votingSessions.get(roomId).getUsers().add(sessionId);
         } else {
-            votingSessions.put(roomId, new SessionStatus(userName));
+            votingSessions.put(roomId, new SessionStatus(sessionId));
         }
         // 입장 유저 수 집계
         int userCnt = votingSessions.get(roomId).getUsers().size();
@@ -55,8 +55,8 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
-    public void decideHandler(String roomId, Ballot ballot) {
-        HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getVotingStatus();
+    public void decidePreference(String roomId, Ballot ballot) {
+        HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
         String targetMenu = ballot.getMenuName();
         if (votingStatus.containsKey(targetMenu)) {
             int totalPreference = votingStatus.get(targetMenu) + ballot.getPreference();
@@ -67,20 +67,32 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
-    public void finishHandler(String roomId, String userName) {
+    public void finishVoting(String roomId, String sessionId, String userName) {
         HashSet<String> finishCalls = votingSessions.get(roomId).getFinishCalls();
         int userCnt = votingSessions.get(roomId).getUsers().size();
 
         finishCalls.add(userName);
         if (finishCalls.size() >= userCnt) {
             // 투표 집계
-            HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getVotingStatus();
+            HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
             String maxKey = Collections.max(votingStatus.entrySet(), Map.Entry.comparingByValue()).getKey();
             // 집계 결과 송출
             Message endMessage = new Message("server", "people", "투표완료", "20231004", Status.END, maxKey);
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
             // session cleanup
             votingSessions.remove(roomId);
+            sessionMapper.remove(sessionId);
         }
+    }
+
+    @Override
+    public void disconnectSession(String sessionId) {
+        SessionInfo sessionInfo = sessionMapper.get(sessionId);
+        SessionStatus targetRoomSessionStatus = votingSessions.get(sessionInfo.getRoomId());
+        targetRoomSessionStatus.getUsers().remove(sessionId);
+        sessionMapper.remove(sessionId);
+        Message message = new Message("server", "people", "유저이탈", "20231004", Status.DISCONNECT, targetRoomSessionStatus.getUsers().size());
+        simpMessagingTemplate.convertAndSend("/voting/" + sessionInfo.getRoomId(), message);
+        System.out.println("Session disconnected: " + sessionId);
     }
 }

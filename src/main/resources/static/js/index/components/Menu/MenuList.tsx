@@ -11,8 +11,8 @@ import Modal from "../UI/Modal";
 
 interface props {
     room: IRoom;
-    isBusterCalled: boolean;
-    onBusterCall: (isBusterCalled: boolean) => void
+    isGourmetCalled: boolean;
+    onGourmetCall: (isGourmetCalled: boolean) => void
 }
 
 const MenuList = (props: props) => {
@@ -54,21 +54,20 @@ const MenuList = (props: props) => {
         setIsModalPopped(isModalPopped)
     }
 
-
     useEffect(() => {
         setDefaultMenuList();
     }, []);
 
     return (
         <div className='menu-container'>
-            {props.isBusterCalled &&
+            {props.isGourmetCalled &&
                 <MenuDecisionSwiper
                     menuList={menuList}
-                    onBusterCall={props.onBusterCall}
+                    onGourmetCall={props.onGourmetCall}
                     onMenuDecide={menuDecisionHandler}
                     onModalChange={modalPopHandler}
                 />}
-            {!props.isBusterCalled &&
+            {!props.isGourmetCalled &&
                 <>
                     <MenuDisplaySwiper menuList={menuList} onDelete={deleteHandler}/>
                     <MenuInput room={props.room} onMenuAdding={menuAddingHandler}/>
@@ -76,8 +75,7 @@ const MenuList = (props: props) => {
             {isModalPopped &&
                 <Modal onClose={modalCloseHandler}>
                     <div>{todayPick}</div>
-                </Modal>
-            }
+                </Modal>}
         </div>
     );
 }

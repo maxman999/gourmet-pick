@@ -9,8 +9,10 @@
     </insert>
 
     <select id="selectMenuList" resultType="com.kjy.gourmet.domain.menu.Menu">
-        select * from menu
+        select *
+        from menu
         where room_id = #{roomId}
+        order by id desc /* 성능 봐서 역순 인덱스 */
     </select>
 
     <delete id="deleteMenuById" parameterType="long">

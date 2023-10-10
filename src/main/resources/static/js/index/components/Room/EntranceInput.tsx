@@ -5,7 +5,7 @@ import './EntranceInput.css';
 
 interface props {
     onEntrance: (room: IRoom) => void;
-    isBusterCalled: boolean;
+    isGourmetCalled: boolean;
 }
 
 const EntranceInput = (props: props) => {
@@ -44,7 +44,7 @@ const EntranceInput = (props: props) => {
     };
 
     return (
-        <div className={`row card mt-3 p-3 ${props.isBusterCalled ? 'codeInput-buster' : ''}`}>
+        <div className={`row card mt-3 p-3 ${props.isGourmetCalled ? 'codeInput-buster' : ''}`}>
             <form>
                 <div className="mb-3">
                     <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>

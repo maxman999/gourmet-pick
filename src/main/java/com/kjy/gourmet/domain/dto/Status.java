@@ -4,6 +4,6 @@ public enum Status {
     JOIN,
     READY,
     MESSAGE,
-    LEAVE,
+    DISCONNECT,
     END,
 }

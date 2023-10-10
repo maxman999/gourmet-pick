@@ -10,7 +10,7 @@ import * as React from "react";
 
 interface props {
     menuList: IMenu[];
-    onBusterCall: (isBusterCalled: boolean) => void;
+    onGourmetCall: (isGourmetCalled: boolean) => void;
     onMenuDecide: (todayPick: string) => void;
     onModalChange: (isModalPopped: boolean) => void;
 }
@@ -44,7 +44,7 @@ const MenuDecisionSwiper = (props: props) => {
                 {/* 투표 영역 */}
                 <GourmetTable
                     menuList={props.menuList}
-                    onBusterCall={props.onBusterCall}
+                    onGourmetCall={props.onGourmetCall}
                     onMenuDecide={props.onMenuDecide}
                     onModalChange={props.onModalChange}
                 />
