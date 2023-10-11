@@ -1,15 +1,17 @@
 import * as React from "react";
+import {useContext} from "react";
+import roomContext from "../../../store/room-context";
 
 interface props{
-    onVotingStatusChange : (votingStatus:string) => void;
     onVoting : (gourmetPick:number) => void;
 }
 
 const PanelOnVoting = (props:props) => {
+    const roomCtx = useContext(roomContext);
 
     const votingHandler = (e:React.MouseEvent) => {
         const weight = Number(e.currentTarget.getAttribute('data-weight'));
-        props.onVotingStatusChange('waiting');
+        roomCtx.changeVotingStatus('waiting');
         props.onVoting(weight);
     }
 

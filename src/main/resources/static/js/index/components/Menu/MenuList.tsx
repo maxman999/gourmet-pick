@@ -6,19 +6,16 @@ import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
 import MenuDecisionSwiper from "./MenuDecisionSwiper";
 import * as React from "react";
-import menuContext from "../../store/menu-context";
-import Modal from "../UI/Modal";
+import roomContext from "../../store/room-context";
 
 interface props {
     room: IRoom;
-    isGourmetCalled: boolean;
-    onGourmetCall: (isGourmetCalled: boolean) => void
+    gourmet: number;
 }
 
 const MenuList = (props: props) => {
+    const roomCtx = useContext(roomContext)
     const [menuList, setMenuList] = useState<IMenu[]>();
-    const [todayPick, setTodayPick] = useState('');
-    const [isModalPopped, setIsModalPopped] = useState(false)
 
     const getMenuFromServer = async () => {
         const currentRoomId = props.room.id;
@@ -42,40 +39,22 @@ const MenuList = (props: props) => {
         setMenuList(latestMenuList);
     }
 
-    const modalCloseHandler = () => {
-        setIsModalPopped(false);
-    }
-
-    const menuDecisionHandler = (todayPick: string) => {
-        setTodayPick(todayPick);
-    }
-
-    const modalPopHandler = (isModalPopped: boolean) => {
-        setIsModalPopped(isModalPopped)
-    }
-
     useEffect(() => {
-        setDefaultMenuList();
+        setDefaultMenuList().then();
     }, []);
 
     return (
         <div className='menu-container'>
-            {props.isGourmetCalled &&
+            {!(roomCtx.roomPhase === 'default') &&
                 <MenuDecisionSwiper
                     menuList={menuList}
-                    onGourmetCall={props.onGourmetCall}
-                    onMenuDecide={menuDecisionHandler}
-                    onModalChange={modalPopHandler}
+                    gourmet={props.gourmet}
                 />}
-            {!props.isGourmetCalled &&
+            {roomCtx.roomPhase === 'default' &&
                 <>
                     <MenuDisplaySwiper menuList={menuList} onDelete={deleteHandler}/>
                     <MenuInput room={props.room} onMenuAdding={menuAddingHandler}/>
                 </>}
-            {isModalPopped &&
-                <Modal onClose={modalCloseHandler}>
-                    <div>{todayPick}</div>
-                </Modal>}
         </div>
     );
 }

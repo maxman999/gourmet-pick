@@ -4,7 +4,6 @@ import com.kjy.gourmet.domain.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,22 +18,23 @@ public class VotingServiceImpl implements VotingService {
     private final int ROOM_CAPACITY = 2;
 
     @Override
-    public void addSession(String sessionId, WebSocketSession session) {
+    public void syncHandler(String roomId, String userId) {
+        // 방 동기화
+        if (votingSessions.containsKey(roomId)) {
+            int userCnt = votingSessions.get(roomId).getUsers().size();
+            Message endMessage = new Message("server", "people", "동기화", "20231004", Status.SYNC, userCnt);
+            simpMessagingTemplate.convertAndSendToUser(userId, "/private", endMessage);
+        }
     }
 
     @Override
-    public void removeSession(String sessionId) {
-    }
-
-    @Override
-    public boolean getRoomState(String rooId) {
-        return votingSessions.containsKey(rooId);
+    public void memberRegisterHandler(String roomId, String sessionId, String userId) {
+        // 세션 정보 등록
+        sessionMapper.put(sessionId, new SessionInfo(userId, roomId));
     }
 
     @Override
     public void memberSeatingHandler(String roomId, String sessionId, String userId) {
-        // 세션 정보 등록
-        sessionMapper.put(sessionId, new SessionInfo(userId, roomId));
         // 투표 세션 생성/추가
         if (votingSessions.containsKey(roomId)) {
             votingSessions.get(roomId).getUsers().add(sessionId);
@@ -45,13 +45,19 @@ public class VotingServiceImpl implements VotingService {
         int userCnt = votingSessions.get(roomId).getUsers().size();
         System.out.println("userCnt : " + userCnt);
 
-        Message userJoinMsg = new Message("kjy55", "people", "입장!", "20231004", Status.JOIN, userCnt);
+        Message userJoinMsg = new Message("server", "people", "입장!", "20231004", Status.JOIN, userCnt);
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, userJoinMsg);
 
         if (userCnt >= ROOM_CAPACITY) {
-            Message votingStartMsg = new Message("kjy55", "people", "과반 이상 입장!", "20231004", Status.READY, userCnt);
-            simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingStartMsg);
+            Message votingReadyMsg = new Message("kjy55", "people", "과반 이상 입장!", "20231004", Status.READY, userCnt);
+            simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
         }
+    }
+
+    @Override
+    public void startVoting(String roomId, String userName) {
+        Message votingStartMsg = new Message("server", "people", "투표 시작!", "20231004", Status.START, 0);
+        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingStartMsg);
     }
 
     @Override
@@ -84,6 +90,7 @@ public class VotingServiceImpl implements VotingService {
             sessionMapper.remove(sessionId);
         }
     }
+
 
     @Override
     public void disconnectSession(String sessionId) {

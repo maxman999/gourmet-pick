@@ -3,22 +3,20 @@ import "./Timer.css"
 import {useSwiper} from "swiper/react";
 import {useContext} from "react";
 import websocketContext from "../../store/websocket-context";
+import roomContext from "../../store/room-context";
 
-interface props {
-    onVotingStatusChange: (votingStatus: string) => void
-}
-
-const Timer = (props: props) => {
+const Timer = () => {
     const swiper = useSwiper();
     const websocketAPIs = useContext(websocketContext);
+    const roomCtx = useContext(roomContext)
 
     const timerCompleteHandler = () => {
         let shouldRepeat = true;
         if (swiper.isEnd) {
-            props.onVotingStatusChange('closing');
+            roomCtx.changeVotingStatus('closing');
             shouldRepeat = false;
         } else {
-            props.onVotingStatusChange('voting');
+            roomCtx.changeVotingStatus('voting');
         }
         swiper.slideNext();
         return {shouldRepeat: shouldRepeat, delay: 0.5}

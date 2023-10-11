@@ -4,33 +4,30 @@ import PanelOnVoting from "./PanelItems/PanelOnVoting";
 import PanelOnWaiting from "./PanelItems/PanelOnWaiting";
 import PanelOnGathering from "./PanelItems/PanelOnGathering";
 import PanelOnClosing from "./PanelItems/PanelOnClosing";
+import {useContext} from "react";
+import roomContext from "../../store/room-context";
 
 interface props {
     menuList: IMenu[];
-    votingStatus: string;
-    onVotingStatusChange: (votingStatus: string) => void;
     onVoting: (gourmetPick: number) => void;
 }
 
 const VotePanel = (props: props) => {
+    const roomCtx  = useContext(roomContext)
+
     const votingHandler = (gourmetPick: number) => {
         props.onVoting(gourmetPick);
     }
 
-    const votingStatusChangeHandler = (votingStatus: string) => {
-        props.onVotingStatusChange(votingStatus);
-    }
-
     return (
         <>
-            {props.votingStatus === 'gathering' && <PanelOnGathering/>}
-            {props.votingStatus === 'voting' &&
+            {roomCtx.votingStatus === 'gathering' && <PanelOnGathering/>}
+            {roomCtx.votingStatus === 'voting' &&
             <PanelOnVoting
-                onVotingStatusChange={votingStatusChangeHandler}
                 onVoting={votingHandler}
             />}
-            {props.votingStatus === 'waiting' && <PanelOnWaiting/>}
-            {props.votingStatus === 'closing' && <PanelOnClosing/>}
+            {roomCtx.votingStatus === 'waiting' && <PanelOnWaiting/>}
+            {roomCtx.votingStatus === 'closing' && <PanelOnClosing/>}
         </>
     );
 }

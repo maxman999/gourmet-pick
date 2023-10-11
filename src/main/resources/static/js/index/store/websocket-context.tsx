@@ -7,26 +7,29 @@ type sessionInfo = {
 }
 
 const WebsocketContext = React.createContext({
-
     websocketState: {
+        sessionInfo: {},
         isVotingPossible: false
     },
-    register: (sessionInfo: sessionInfo, onMessage: (payload: any) => void) => {
+    register: (
+        sessionInfo: sessionInfo,
+        onMessage: (payload: any) => void,
+        onPrivateMessage: (payload: any) => void
+    ) => {
     },
-    ready: () => {
+    sync: () => {
     },
-    vote: (sessionInfo: sessionInfo, menuName: string, preference: number) => {
+    seat: () => {
     },
-    finishVoting: (sessionInfo: sessionInfo) => {
+    boot: () => {
+    },
+    start: () => {
+    },
+    vote: (menuName: string, preference: number) => {
+    },
+    finishVoting: () => {
     },
     disconnect: () => {
     },
-
-    // onConnected: () => {},
-    // userJoin: () => {},
-    // onError: () => {},
-    // sendPublicMessage: () => {},
-    // onPublicMessageRecieved: () => {},
-    // onPrivateMessageRecieved: () => {},
 });
 export default WebsocketContext;

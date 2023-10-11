@@ -12,8 +12,8 @@ type props = {
 }
 
 interface websocketState {
+    sessionInfo: sessionInfo,
     isVotingPossible: boolean;
-    sessionList: [];
 }
 
 type sessionInfo = {
@@ -26,43 +26,18 @@ interface websocketAction {
     type: string,
     sessionInfo?: sessionInfo
     onMessageHandler?: (payload: any) => void
+    onPrivateMessageHandler?: (payload: any) => void
     menuName?: string
     preference?: number
-}
-
-type message = {
-    roomId: string,
-    userName: string,
-    receiverName: string,
-    message: string,
-    connected: boolean,
-    status: string
 }
 
 const WEBSOCKET_SERVER_URL: string = 'http://localhost:8080/ws'
 const SockJS = require('sockjs-client');
 let stompClient: Client = null;
 
-// dummy
-const connectionInformation: message = {
-    roomId: "roomCode",
-    userName: 'kjy',
-    receiverName: 'yjk',
-    message: 'hello there?',
-    connected: false,
-    status: '',
-}
-
-const userJoin = (topic: string, userId: string, roomId: string) => {
-    let chatMessage = {
-        senderName: connectionInformation.userName,
-        status: 'JOIN',
-    }
-    stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
-}
-
 const onError = (err: any) => {
-    console.log(err)
+    alert("에러 발생 잠시 후 다시 시도해주세요");
+    document.location.reload();
 }
 
 const websocketReducer = (state: websocketState, action: websocketAction): websocketState => {
@@ -73,21 +48,44 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
         stompClient = over(Sock);
         stompClient.connect({}, () => {
             stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
-            userJoin(topic, userId, roomId);
+            stompClient.subscribe(`/user/${userId}/private`, action.onPrivateMessageHandler);
+
+            stompClient.send(`/app/${topic}/register/${userId}/${roomId}`, {});
         }, onError);
+
+        return {
+            sessionInfo: action.sessionInfo,
+            isVotingPossible: state.isVotingPossible
+        }
     }
 
-    if (action.type === "READY") {
+    if (action.type === "SYNC") {
+        const {topic, userId, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/sync/${userId}/${roomId}`, {});
+    }
+
+    if (action.type === "SEAT") {
+        const {topic, userId, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {});
+        // stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
+    }
+
+    if (action.type === "BOOTING") {
+        const {topic, userId, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/start/${userId}/${roomId}`, {});
+    }
+
+    if (action.type === "START") {
         return {
+            sessionInfo: state.sessionInfo,
             isVotingPossible: true,
-            sessionList: [],
         }
     }
 
     if (action.type === "VOTE") {
-        const {topic, userId, roomId} = action.sessionInfo
+        const {topic, userId, roomId} = state.sessionInfo
         const chatMessage = {
-            senderName: connectionInformation.userName,
+            senderName: userId,
             status: 'VOTE',
             menuName: action.menuName,
             preference: action.preference,
@@ -96,15 +94,11 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "FINISH") {
-        const {topic, userId, roomId} = action.sessionInfo
-        const chatMessage = {
-            senderName: connectionInformation.userName,
-            status: 'FINISH',
-        }
+        const {topic, userId, roomId} = state.sessionInfo;
         stompClient.send(`/app/${topic}/finish/${userId}/${roomId}`);
         return {
+            sessionInfo: state.sessionInfo,
             isVotingPossible: false,
-            sessionList: [],
         }
     }
 
@@ -117,40 +111,64 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
 }
 
 const defaultWebsocketState: websocketState = {
+    sessionInfo: {
+        topic: '',
+        roomId: '',
+        userId: '',
+    },
     isVotingPossible: false,
-    sessionList: []
 }
 
 const WebsocketProvider = (props: props) => {
     const [websocketState, dispatchWebsocketActions] = useReducer(websocketReducer, defaultWebsocketState);
 
-    const registerHandler = (sessionInfo: sessionInfo, onMessageHandler: (payload: any) => void) => {
+    const registerHandler = (
+        sessionInfo: sessionInfo,
+        onMessageHandler: (payload: any) => void,
+        onPrivateMessageHandler: (payload: any) => void) => {
         dispatchWebsocketActions({
             type: 'REGISTER',
             sessionInfo: sessionInfo,
             onMessageHandler: onMessageHandler,
+            onPrivateMessageHandler: onPrivateMessageHandler,
         });
     }
 
-    const readyHandler = () => {
+    const syncHandler = () => {
         dispatchWebsocketActions({
-            type: 'READY',
+            type: 'SYNC',
         });
     }
 
-    const votingHandler = (sessionInfo: sessionInfo, menuName: string, preference: number) => {
+    const seatHandler = () => {
+        dispatchWebsocketActions({
+            type: 'SEAT',
+        });
+    }
+
+    const bootHandler = () => {
+        dispatchWebsocketActions({
+            type: 'BOOTING',
+        });
+    }
+
+    const startHandler = () => {
+        dispatchWebsocketActions({
+            type: 'START',
+        });
+    }
+
+    const votingHandler = (menuName: string, preference: number) => {
         dispatchWebsocketActions({
             type: 'VOTE',
-            sessionInfo: sessionInfo,
             menuName: menuName,
             preference: preference,
         });
     }
 
-    const finishVotingHandler = (sessionInfo: sessionInfo) => {
+    const finishVotingHandler = () => {
         dispatchWebsocketActions({
             type: 'FINISH',
-            sessionInfo: sessionInfo,
         });
     }
 
@@ -160,11 +178,13 @@ const WebsocketProvider = (props: props) => {
         });
     }
 
-
     const websocketContext = {
         websocketState: websocketState,
         register: registerHandler,
-        ready: readyHandler,
+        sync: syncHandler,
+        seat: seatHandler,
+        boot: bootHandler,
+        start: startHandler,
         vote: votingHandler,
         finishVoting: finishVotingHandler,
         disconnect: disconnectHandler,
@@ -175,7 +195,6 @@ const WebsocketProvider = (props: props) => {
             {props.children}
         </WebsocketContext.Provider>
     )
-
 }
 
 export default WebsocketProvider

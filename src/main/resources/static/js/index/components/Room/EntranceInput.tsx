@@ -2,10 +2,12 @@ import * as React from "react";
 import {IRoom} from "../../interfaces/IRoom";
 import axios from "axios";
 import './EntranceInput.css';
+import {useContext} from "react";
+import websocketContext from "../../store/websocket-context";
 
 interface props {
     onEntrance: (room: IRoom) => void;
-    isGourmetCalled: boolean;
+    roomPhase: string;
 }
 
 const EntranceInput = (props: props) => {
@@ -44,7 +46,7 @@ const EntranceInput = (props: props) => {
     };
 
     return (
-        <div className={`row card mt-3 p-3 ${props.isGourmetCalled ? 'codeInput-buster' : ''}`}>
+        <div className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? '' : 'codeInput-buster'}`}>
             <form>
                 <div className="mb-3">
                     <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>

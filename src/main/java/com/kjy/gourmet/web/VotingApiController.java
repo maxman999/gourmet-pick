@@ -22,25 +22,41 @@ public class VotingApiController {
 
     private final VotingService votingService;
 
-    @GetMapping("/voting/room/status/{roomId}")
-    public boolean getRoomStatus(@PathVariable("roomId") String roomID) {
-        return votingService.getRoomState(roomID);
-    }
-
-    @MessageMapping("/voting/seating/{userName}/{roomId}")
-    public void seating(
+    @MessageMapping("/voting/register/{userName}/{roomId}")
+    public void register(
             @DestinationVariable String roomId,
             @DestinationVariable String userName,
             SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        votingService.memberSeatingHandler(roomId, sessionId, userName);
+        votingService.memberRegisterHandler(roomId, sessionId, userName);
         log.info("{}방에 {}님 입장", roomId, userName);
     }
 
-    @MessageMapping("/voting/decide/{userName}/{roomId}")
-    public void decide(
+    @MessageMapping("/voting/sync/{userName}/{roomId}")
+    public void sync(
             @DestinationVariable String roomId,
-            Ballot ballot) {
+            @DestinationVariable String userName) {
+        votingService.syncHandler(roomId, userName);
+    }
+
+    @MessageMapping("/voting/seating/{userName}/{roomId}")
+    public void seating(
+            SimpMessageHeaderAccessor headerAccessor,
+            @DestinationVariable String roomId,
+            @DestinationVariable String userName) {
+        String sessionId = headerAccessor.getSessionId();
+        votingService.memberSeatingHandler(roomId, sessionId, userName);
+    }
+
+    @MessageMapping("/voting/start/{userName}/{roomId}")
+    public void start(
+            @DestinationVariable String roomId,
+            @DestinationVariable String userName) {
+        votingService.startVoting(roomId, userName);
+    }
+
+    @MessageMapping("/voting/decide/{userName}/{roomId}")
+    public void decide(@DestinationVariable String roomId, Ballot ballot) {
         votingService.decidePreference(roomId, ballot);
     }
 

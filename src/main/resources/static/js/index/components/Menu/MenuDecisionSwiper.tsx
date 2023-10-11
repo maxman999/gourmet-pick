@@ -7,15 +7,15 @@ import "swiper/css";
 import "swiper/css/effect-cube";
 import GourmetTable from "../Gourmet/GourmetTable";
 import * as React from "react";
+import Timer from "../Gourmet/Timer";
+import {memo} from "react";
 
 interface props {
     menuList: IMenu[];
-    onGourmetCall: (isGourmetCalled: boolean) => void;
-    onMenuDecide: (todayPick: string) => void;
-    onModalChange: (isModalPopped: boolean) => void;
+    gourmet: number;
 }
 
-const MenuDecisionSwiper = (props: props) => {
+const MenuDecisionSwiper = memo((props: props) => {
     return (
         <>
             <Swiper
@@ -42,15 +42,14 @@ const MenuDecisionSwiper = (props: props) => {
                     );
                 })}
                 {/* 투표 영역 */}
+                <Timer/>
                 <GourmetTable
                     menuList={props.menuList}
-                    onGourmetCall={props.onGourmetCall}
-                    onMenuDecide={props.onMenuDecide}
-                    onModalChange={props.onModalChange}
+                    gourmet={props.gourmet}
                 />
             </Swiper>
         </>
     );
-}
+})
 
 export default MenuDecisionSwiper;
