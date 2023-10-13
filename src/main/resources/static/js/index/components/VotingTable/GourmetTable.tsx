@@ -1,12 +1,10 @@
 import './GourmetTable.css';
 import Gourmet from "./Gourmet";
 import VotePanel from "./VotePanel";
-import * as React from "react";
 import {IMenu} from "../../interfaces/IMenu";
 import {useSwiper} from "swiper/react";
 import {useContext} from "react";
 import websocketContext from "../../store/websocket-context";
-import roomContext from "../../store/room-context";
 
 interface props {
     menuList: IMenu[];

@@ -1,4 +1,4 @@
-.room-buster{
+.room-active{
     transform: translate(0, -17%);
     transition-property: transform;
     transition-duration: 800ms;

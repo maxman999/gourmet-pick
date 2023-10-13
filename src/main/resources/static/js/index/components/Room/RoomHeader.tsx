@@ -1,6 +1,5 @@
 import {IRoom} from "../../interfaces/IRoom";
-import './RoomConfirm.css';
-import * as React from "react";
+import './RoomHeader.css';
 import {useContext} from "react";
 import websocketContext from "../../store/websocket-context";
 import roomContext from "../../store/room-context";
@@ -9,24 +8,21 @@ interface props {
     room: IRoom;
 }
 
-const RoomConfirm = (props: props) => {
+const RoomHeader = (props: props) => {
     const websocketAPIs = useContext(websocketContext);
     const roomCtx = useContext(roomContext)
 
-    const gourmetCallHandler = (e: React.MouseEvent) => {
-        const clickedBtn = e.currentTarget as HTMLElement;
-        const targetData = clickedBtn.dataset?.phase;
-        roomCtx.changeRoomPhase(targetData);
-    }
-
-    const gourmetSeatingHandler = (e: React.MouseEvent) => {
-        const clickedBtn = e.currentTarget as HTMLElement;
-        const targetData = clickedBtn.dataset?.phase;
-        roomCtx.changeRoomPhase(targetData);
+    const gourmetCallHandler = () => {
+        roomCtx.changeRoomPhase('seating');
         websocketAPIs.seat();
     }
 
-    const gourmetVotingHandler = (e: React.MouseEvent) => {
+    const gourmetSeatingHandler = () => {
+        roomCtx.changeRoomPhase('seating');
+        websocketAPIs.seat();
+    }
+
+    const gourmetVotingHandler = () => {
         websocketAPIs.boot();
     }
 
@@ -35,19 +31,19 @@ const RoomConfirm = (props: props) => {
             <div className='col-md-8'>
                 <button
                     className='btn phase-call-btn'
-                    data-phase='calling'
+                    data-next-phase='calling'
                     disabled={roomCtx.roomPhase !== 'default'}
                     onClick={gourmetCallHandler}> 미 식 콜
                 </button>
                 <button
                     className='btn phase-seat-btn'
-                    data-phase='seating'
+                    data-next-phase='seating'
                     disabled={roomCtx.roomPhase !== 'calling'}
                     onClick={gourmetSeatingHandler}> 착 석
                 </button>
                 <button
                     className='btn phase-start-btn'
-                    data-phase='starting'
+                    data-next-phase='starting'
                     disabled={roomCtx.roomPhase !== 'ready'}
                     onClick={gourmetVotingHandler}> 투 표 시 작
                 </button>
@@ -62,4 +58,4 @@ const RoomConfirm = (props: props) => {
     );
 }
 
-export default RoomConfirm;
+export default RoomHeader;

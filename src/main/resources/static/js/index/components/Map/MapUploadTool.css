@@ -1,0 +1,25 @@
+#search-wrapper{
+    padding-left: 0;
+}
+.search-area {
+    padding-left: 0;
+    max-height: 400px;
+    overflow: scroll;
+}
+
+#placeSearchInput {
+    font-size: 14px;
+}
+
+.search-item {
+    border: 1px solid gray;
+}
+
+.place-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.place-location {
+    font-size: 10px;
+}

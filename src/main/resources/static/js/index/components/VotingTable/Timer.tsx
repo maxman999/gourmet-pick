@@ -13,8 +13,11 @@ const Timer = () => {
     const timerCompleteHandler = () => {
         let shouldRepeat = true;
         if (swiper.isEnd) {
-            roomCtx.changeVotingStatus('closing');
             shouldRepeat = false;
+            // 방 상태 초기화
+            websocketAPIs.finishVoting();
+            roomCtx.changeRoomPhase('default');
+            roomCtx.changeVotingStatus('gathering');
         } else {
             roomCtx.changeVotingStatus('voting');
         }

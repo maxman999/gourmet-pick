@@ -1,7 +1,8 @@
-import * as React from "react";
 import {useReducer} from "react";
 import {Client, over} from "stompjs";
 import WebsocketContext from "./websocket-context";
+
+const SockJS = require('sockjs-client');
 
 // ToDo
 //  1. 웹소켓 기능과 투표 기능 분리 시킬것.
@@ -11,7 +12,7 @@ type props = {
     children: React.ReactNode;
 }
 
-interface websocketState {
+type websocketState = {
     sessionInfo: sessionInfo,
     isVotingPossible: boolean;
 }
@@ -22,17 +23,22 @@ type sessionInfo = {
     roomId: string,
 }
 
-interface websocketAction {
-    type: string,
-    sessionInfo?: sessionInfo
-    onMessageHandler?: (payload: any) => void
-    onPrivateMessageHandler?: (payload: any) => void
-    menuName?: string
-    preference?: number
+type websocketAction =
+    | {
+    type: "REGISTER";
+    sessionInfo: sessionInfo;
+    onMessageHandler: (payload: any) => void;
+    onPrivateMessageHandler: (payload: any) => void
 }
+    | { type: "SYNC" }
+    | { type: "SEAT" }
+    | { type: "BOOTING" }
+    | { type: "START" }
+    | { type: "VOTE"; menuName: string; preference: number }
+    | { type: "FINISH" }
+    | { type: "DISCONNECT" };
 
 const WEBSOCKET_SERVER_URL: string = 'http://localhost:8080/ws'
-const SockJS = require('sockjs-client');
 let stompClient: Client = null;
 
 const onError = (err: any) => {
@@ -54,8 +60,8 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
         }, onError);
 
         return {
+            ...state,
             sessionInfo: action.sessionInfo,
-            isVotingPossible: state.isVotingPossible
         }
     }
 
@@ -77,7 +83,7 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
 
     if (action.type === "START") {
         return {
-            sessionInfo: state.sessionInfo,
+            ...state,
             isVotingPossible: true,
         }
     }
@@ -97,7 +103,7 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
         const {topic, userId, roomId} = state.sessionInfo;
         stompClient.send(`/app/${topic}/finish/${userId}/${roomId}`);
         return {
-            sessionInfo: state.sessionInfo,
+            ...state,
             isVotingPossible: false,
         }
     }

@@ -1,5 +1,6 @@
 .menu-title {
-    font-size: 14px;
+    padding-left: 20px;
+    font-size: 18px;
     font-weight: bold;
     align-self: center;
 }
@@ -7,5 +8,5 @@
 .menu-detail{
     width: 93%;
     min-height: 390px;
-    background-color: gray;
+    background-color: whitesmoke;
 }

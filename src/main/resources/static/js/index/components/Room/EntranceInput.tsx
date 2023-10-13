@@ -1,9 +1,7 @@
-import * as React from "react";
 import {IRoom} from "../../interfaces/IRoom";
 import axios from "axios";
 import './EntranceInput.css';
-import {useContext} from "react";
-import websocketContext from "../../store/websocket-context";
+import {useRef} from "react";
 
 interface props {
     onEntrance: (room: IRoom) => void;
@@ -11,6 +9,8 @@ interface props {
 }
 
 const EntranceInput = (props: props) => {
+    const invitationCodeRef = useRef(null);
+
     const getRoom = async (code: string = "") => {
         const fetchRes = await axios.get(`/api/room/${code}`);
         if (fetchRes.status === 200) {
@@ -36,8 +36,7 @@ const EntranceInput = (props: props) => {
     const clickHandler = async (e: React.MouseEvent) => {
         e.preventDefault();
         const memberId = Number(sessionStorage.getItem("memNo"));
-        const codeInput = document.getElementById("invitationCode") as HTMLInputElement;
-        const room = await getRoom(codeInput.value || "noCode");
+        const room = await getRoom(invitationCodeRef.current.value || "noCode");
         if (room !== "") {
             const isAlreadyIn = await checkRoom(memberId, room.id);
             if (!isAlreadyIn) await enterRoom(memberId, room.id);
@@ -46,13 +45,17 @@ const EntranceInput = (props: props) => {
     };
 
     return (
-        <div className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? '' : 'codeInput-buster'}`}>
+        <div className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? '' : 'codeInput-hide'}`}>
             <form>
                 <div className="mb-3">
                     <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>
                     <div className='row'>
                         <div className='col-sm-11'>
-                            <input type="text" className="form-control" id="invitationCode" />
+                            <input type="text"
+                                   className="form-control"
+                                   id="invitationCode"
+                                   ref={invitationCodeRef}
+                            />
                         </div>
                         <div className='col-sm-1'>
                             <button className='btn btn-outline-secondary' id="entranceBtn" onClick={clickHandler}> $

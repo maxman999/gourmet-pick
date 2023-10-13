@@ -5,9 +5,8 @@ import {Scrollbar, EffectCube} from "swiper";
 import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-cube";
-import GourmetTable from "../Gourmet/GourmetTable";
-import * as React from "react";
-import Timer from "../Gourmet/Timer";
+import GourmetTable from "../VotingTable/GourmetTable";
+import Timer from "../VotingTable/Timer";
 import {memo} from "react";
 
 interface props {

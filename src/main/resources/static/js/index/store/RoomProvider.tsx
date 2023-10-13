@@ -1,46 +1,62 @@
-import {useReducer} from "react";
 import * as React from "react";
+import {useReducer} from "react";
 import RoomContext from "./room-context";
+import {IRoom} from "../interfaces/IRoom";
 
-interface roomState {
+type roomState = {
+    roomInfo: IRoom;
     roomPhase: string;
     votingStatus: string;
 }
 
-interface roomAction {
-    type: string;
-    roomPhase?: string;
-    votingStatus?: string;
-}
+type roomAction =
+    | { type: "DEFAULT_ROOM_SETTING"; roomInfo: IRoom; }
+    | { type: "SET_ROOM_PHASE"; roomPhase: string; }
+    | { type: "SET_VOTING_STATUS"; votingStatus: string; }
 
 type props = {
     children: React.ReactNode;
 }
 
 const roomReducer = (state: roomState, roomAction: roomAction) => {
+    if (roomAction.type === "DEFAULT_ROOM_SETTING") {
+        return {
+            ...state,
+            roomInfo: roomAction.roomInfo
+        };
+    }
+
     if (roomAction.type === "SET_ROOM_PHASE") {
         return {
-            roomPhase: roomAction.roomPhase,
-            votingStatus: state.votingStatus,
-        }
+            ...state,
+            roomPhase: roomAction.roomPhase
+        };
     }
 
     if (roomAction.type === "SET_VOTING_STATUS") {
         return {
-            roomPhase: state.roomPhase,
-            votingStatus: roomAction.votingStatus,
-        }
+            ...state,
+            votingStatus: roomAction.votingStatus
+        };
     }
     return state;
 }
 
 const defaultRoomState: roomState = {
+    roomInfo: undefined,
     roomPhase: 'default',
     votingStatus: 'gathering',
 }
 
 const RoomProvider = (props: props) => {
     const [roomState, dispatchMenuActions] = useReducer(roomReducer, defaultRoomState);
+
+    const roomSettingHandler = (room: IRoom) => {
+        dispatchMenuActions({
+            type: 'DEFAULT_ROOM_SETTING',
+            roomInfo: room,
+        });
+    }
 
     const roomPhaseChangeHandler = (roomPhase: string) => {
         dispatchMenuActions({
@@ -58,6 +74,8 @@ const RoomProvider = (props: props) => {
 
 
     const roomContext = {
+        roomInfo: roomState.roomInfo,
+        setRoomInfo: roomSettingHandler,
         roomPhase: roomState.roomPhase,
         votingStatus: roomState.votingStatus,
         changeRoomPhase: roomPhaseChangeHandler,

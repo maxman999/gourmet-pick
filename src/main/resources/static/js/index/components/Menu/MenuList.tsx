@@ -5,7 +5,6 @@ import {IMenu} from "../../interfaces/IMenu";
 import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
 import MenuDecisionSwiper from "./MenuDecisionSwiper";
-import * as React from "react";
 import roomContext from "../../store/room-context";
 
 interface props {
@@ -21,11 +20,6 @@ const MenuList = (props: props) => {
         const currentRoomId = props.room.id;
         const fetchRes = await axios.get(`/api/menu/${currentRoomId}`);
         return fetchRes.data;
-    }
-
-    const menuAddingHandler = async () => {
-        const latestMenuList = await getMenuFromServer();
-        setMenuList(latestMenuList);
     }
 
     const deleteHandler = (menuId: number) => {
@@ -53,7 +47,7 @@ const MenuList = (props: props) => {
             {roomCtx.roomPhase === 'default' &&
                 <>
                     <MenuDisplaySwiper menuList={menuList} onDelete={deleteHandler}/>
-                    <MenuInput room={props.room} onMenuAdding={menuAddingHandler}/>
+                    <MenuInput/>
                 </>}
         </div>
     );

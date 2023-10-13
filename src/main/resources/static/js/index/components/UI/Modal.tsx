@@ -1,14 +1,15 @@
 import "./Modal.css";
 import * as ReactDOM from 'react-dom';
-import * as React from "react";
 
 interface ModalProps {
     children: React.ReactNode;
     onClose: () => void;
+    height?: string;
 }
 
 interface ModalOverlayProps {
     children: React.ReactNode;
+    height?: string;
 }
 
 interface BackdropProps {
@@ -16,15 +17,17 @@ interface BackdropProps {
 }
 
 
-const Backdrop = (props:BackdropProps) => {
+const Backdrop = (props: BackdropProps) => {
     return (
         <div className="backdrop" onClick={props.onClose}></div>
     )
 }
 
-const ModalOverlay = (props : ModalOverlayProps) => {
+const ModalOverlay = (props: ModalOverlayProps) => {
     return (
-        <div className="modal">
+        <div className="modal"
+             style={{'height': props.height}}
+        >
             <div className="content">{props.children}</div>
         </div>
     )
@@ -32,11 +35,11 @@ const ModalOverlay = (props : ModalOverlayProps) => {
 
 const portalElement = document.getElementById("overlays");
 
-const Modal = (props:ModalProps) => {
+const Modal = (props: ModalProps) => {
     return (
         <>
             {ReactDOM.createPortal(<Backdrop onClose={props.onClose}/>, portalElement)}
-            {ReactDOM.createPortal(<ModalOverlay>{props.children}</ModalOverlay>, portalElement)}
+            {ReactDOM.createPortal(<ModalOverlay height={props.height}>{props.children}</ModalOverlay>, portalElement)}
         </>
     )
 }

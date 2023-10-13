@@ -9,9 +9,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
@@ -23,35 +20,31 @@ public class VotingApiController {
     private final VotingService votingService;
 
     @MessageMapping("/voting/register/{userName}/{roomId}")
-    public void register(
-            @DestinationVariable String roomId,
-            @DestinationVariable String userName,
-            SimpMessageHeaderAccessor headerAccessor) {
+    public void register(@DestinationVariable String roomId,
+                         @DestinationVariable String userName,
+                         SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         votingService.memberRegisterHandler(roomId, sessionId, userName);
         log.info("{}방에 {}님 입장", roomId, userName);
     }
 
     @MessageMapping("/voting/sync/{userName}/{roomId}")
-    public void sync(
-            @DestinationVariable String roomId,
-            @DestinationVariable String userName) {
+    public void sync(@DestinationVariable String roomId,
+                     @DestinationVariable String userName) {
         votingService.syncHandler(roomId, userName);
     }
 
     @MessageMapping("/voting/seating/{userName}/{roomId}")
-    public void seating(
-            SimpMessageHeaderAccessor headerAccessor,
-            @DestinationVariable String roomId,
-            @DestinationVariable String userName) {
+    public void seating(SimpMessageHeaderAccessor headerAccessor,
+                        @DestinationVariable String roomId,
+                        @DestinationVariable String userName) {
         String sessionId = headerAccessor.getSessionId();
         votingService.memberSeatingHandler(roomId, sessionId, userName);
     }
 
     @MessageMapping("/voting/start/{userName}/{roomId}")
-    public void start(
-            @DestinationVariable String roomId,
-            @DestinationVariable String userName) {
+    public void start(@DestinationVariable String roomId,
+                      @DestinationVariable String userName) {
         votingService.startVoting(roomId, userName);
     }
 
@@ -61,11 +54,9 @@ public class VotingApiController {
     }
 
     @MessageMapping("/voting/finish/{userName}/{roomId}")
-    public void finish(
-            @DestinationVariable String roomId,
-            @DestinationVariable String userName,
-            SimpMessageHeaderAccessor headerAccessor) {
-
+    public void finish(@DestinationVariable String roomId,
+                       @DestinationVariable String userName,
+                       SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
         votingService.finishVoting(roomId, sessionId, userName);
     }
@@ -76,18 +67,4 @@ public class VotingApiController {
         String sessionId = headerAccessor.getSessionId();
         votingService.disconnectSession(sessionId);
     }
-
-
-//    @MessageMapping("/message")
-//    @SendTo("/chatroom/public")
-//    public Message receviePublicMessage(@Payload Message message) {
-//        return message;
-//    }
-//
-//    @MessageMapping("/private-message")
-//    public Message receviePrivateMessage(@Payload Message message) {
-//        simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(), "/private", message);
-//        return message;
-//    }
-
 }

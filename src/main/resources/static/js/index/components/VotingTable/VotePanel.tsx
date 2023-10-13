@@ -1,4 +1,3 @@
-import * as React from "react";
 import {IMenu} from "../../interfaces/IMenu";
 import PanelOnVoting from "./PanelItems/PanelOnVoting";
 import PanelOnWaiting from "./PanelItems/PanelOnWaiting";

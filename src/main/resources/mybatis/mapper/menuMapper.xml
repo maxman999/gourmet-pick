@@ -4,8 +4,8 @@
 
 <mapper namespace="com.kjy.gourmet.mapper.MenuMapper">
     <insert id="insertMenu" parameterType="com.kjy.gourmet.domain.menu.Menu">
-        insert into menu(room_id,name)
-        values (#{roomId},#{name});
+        insert into menu(room_id, name, thumbnail, sober_comment, longitude, latitude)
+        values (#{roomId}, #{name}, #{thumbnail}, #{soberComment}, #{longitude}, #{latitude});
     </insert>
 
     <select id="selectMenuList" resultType="com.kjy.gourmet.domain.menu.Menu">

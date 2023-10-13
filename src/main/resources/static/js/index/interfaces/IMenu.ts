@@ -1,5 +1,9 @@
 export interface IMenu {
-    id? : number;
-    roomId? : number;
-    name : string;
+    id?: number;
+    name: string;
+    thumbnail?: string;
+    soberComment?: string;
+    longitude?: number;
+    latitude?: number;
+    roomId: number;
 }

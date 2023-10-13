@@ -1,6 +1,4 @@
 import "./Gourmet.css"
-import * as React from "react";
-
 
 type props = {
     isActive: boolean

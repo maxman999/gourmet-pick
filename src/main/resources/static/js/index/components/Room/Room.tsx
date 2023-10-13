@@ -1,13 +1,13 @@
 import EntranceInput from "./EntranceInput";
 import {useContext, useEffect, useState} from "react";
 import {IRoom} from "../../interfaces/IRoom";
-import RoomConfirm from "./RoomConfirm";
+import RoomHeader from "./RoomHeader";
 import MenuList from "../Menu/MenuList";
 import './Room.css';
 import websocketContext from "../../store/websocket-context";
 import Modal from "../UI/Modal";
-import * as React from "react";
 import roomContext from "../../store/room-context";
+import MenuUpdateForm from "../Menu/MenuUpdateForm";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
@@ -85,6 +85,13 @@ const Room = () => {
     }, []);
 
     useEffect(() => {
+        if(room){
+            roomCtx.setRoomInfo(room)
+            console.log(roomCtx.roomInfo)
+        }
+    }, [room]);
+
+    useEffect(() => {
         if (roomCtx.votingStatus === 'closing') {
             websocketAPIs.finishVoting();
             roomCtx.changeVotingStatus('gathering');
@@ -95,12 +102,15 @@ const Room = () => {
     return (
         <>
             <EntranceInput roomPhase={roomCtx.roomPhase} onEntrance={entranceHandler}/>
-            {room &&
+            {room && (roomCtx.roomPhase !== 'updating') &&
                 <div
-                    className={`room-container ${roomCtx.roomPhase === 'default' ? '' : 'room-buster'} row card mt-3 p-3`}>
-                    <RoomConfirm room={room}/>
+                    className={`room-container row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? '' : 'room-active'}`}>
+                    <RoomHeader room={room}/>
                     <MenuList room={room} gourmet={gourmet}/>
                 </div>
+            }
+            {room && (roomCtx.roomPhase === 'updating') &&
+                <MenuUpdateForm/>
             }
             {isModalPopped &&
                 <Modal onClose={modalCloseHandler}>

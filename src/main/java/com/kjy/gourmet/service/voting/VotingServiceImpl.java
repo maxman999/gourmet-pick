@@ -87,8 +87,9 @@ public class VotingServiceImpl implements VotingService {
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
             // session cleanup
             votingSessions.remove(roomId);
-            sessionMapper.remove(sessionId);
         }
+        sessionMapper.remove(sessionId);
+        votingSessions.get(roomId).getUsers().remove(sessionId);
     }
 
 

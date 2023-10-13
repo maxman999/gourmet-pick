@@ -3,7 +3,6 @@ import SignIn from "./components/Member/SignIn";
 import Room from "./components/Room/Room";
 import './App.css';
 import WebsocketProvider from "./store/WebsocketProvider";
-import * as React from "react";
 import RoomProvider from "./store/RoomProvider";
 
 const App = () => {
