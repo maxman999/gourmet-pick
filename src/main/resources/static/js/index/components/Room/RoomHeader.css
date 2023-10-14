@@ -9,6 +9,13 @@
 }
 
 .phaseBtn {
-    min-width: 25%;
-    margin-right: 0.5rem;
+    width: 100px;
+    margin-right: 15px;
+}
+
+.phaseBtn:disabled {
+    border-color: darkgray;
+    color: darkgray;
+    opacity: 0.5;
+    cursor: not-allowed;
 }

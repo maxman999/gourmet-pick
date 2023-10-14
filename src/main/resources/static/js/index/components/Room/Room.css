@@ -1,5 +1,11 @@
+.room-show {
+    transform: translate(0, 0%);
+    transition-property: transform;
+    transition-duration: 500ms;
+}
+
 .room-active{
     transform: translate(0, -17%);
     transition-property: transform;
-    transition-duration: 800ms;
+    transition-duration: 500ms;
 }

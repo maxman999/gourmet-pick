@@ -28,10 +28,21 @@ public class VotingApiController {
         log.info("{}방에 {}님 입장", roomId, userName);
     }
 
+    @MessageMapping("/voting/create/{userName}/{roomId}")
+    public void create(@DestinationVariable String roomId) {
+        votingService.creatVotingSession(roomId);
+        log.info("{}방에 투표세션이 생성되었습니다.", roomId);
+    }
+
     @MessageMapping("/voting/sync/{userName}/{roomId}")
     public void sync(@DestinationVariable String roomId,
                      @DestinationVariable String userName) {
         votingService.syncHandler(roomId, userName);
+    }
+
+    @MessageMapping("/voting/cancel/{userName}/{roomId}")
+    public void cancel(@DestinationVariable String roomId) {
+        votingService.cancelHandler(roomId);
     }
 
     @MessageMapping("/voting/seating/{userName}/{roomId}")

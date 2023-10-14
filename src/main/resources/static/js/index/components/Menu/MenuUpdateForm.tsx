@@ -17,7 +17,7 @@ const MenuUpdateForm = () => {
     const [menuName, setMenuName] = useState('');
     const [isMenuNameValid, setIsMenuNameValid] = useState(false);
     const [location, setLocation] = useState({placeName: '', longitude: 0, latitude: 0});
-    const [thumbnail, setThumbnail] = useState('');
+    const [thumbnail, setThumbnail] = useState<any>();
     const [soberComment, setSoberComment] = useState('');
     const [isSoberCommentValid, setIsSoberCommentValid] = useState(false);
     const [isUpdateModalPopped, setIsUpdateModalPopped] = useState(false);
@@ -27,6 +27,7 @@ const MenuUpdateForm = () => {
     const menuNameInputRef = useRef(null);
     const soberCommentInputRef = useRef(null);
     const submitButtonRef = useRef(null);
+    const imageUploadRef = useRef(null);
 
     const isPlaceSelected = location.longitude + location.latitude > 0;
 
@@ -56,6 +57,20 @@ const MenuUpdateForm = () => {
         setIsUpdateModalPopped(true);
     }
 
+    const thumbnailUploadHandler = () => {
+        imageUploadRef.current.click();
+    }
+
+    const thumbnailChangeHandler = async () => {
+        const file = imageUploadRef.current.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const imageData = e.target.result;
+            setThumbnail(imageData);
+        }
+        reader.readAsDataURL(file);
+    }
+
     const locationChangeHandler = (placeName: string, longitude: number, latitude: number) => {
         setLocation({
             placeName: placeName,
@@ -78,9 +93,9 @@ const MenuUpdateForm = () => {
             isUploadPossible = false;
         }
 
-        // if (!thumbnail) {
-        //     btnMsg = "메뉴 사진을 등록해주세요."
-        // }
+        if (!thumbnail) {
+            btnMsg = "메뉴 사진을 등록해주세요."
+        }
 
         if (!isMenuNameValid) {
             btnMsg = "메뉴이름을 입력해주세요.";
@@ -99,6 +114,14 @@ const MenuUpdateForm = () => {
             soberComment: soberComment,
             thumbnail: thumbnail,
             roomId: roomCtx.roomInfo?.id,
+        }
+        // 사진 스토리지에 저장
+        const formData = new FormData();
+        formData.append('uploadFiles', imageUploadRef.current.files[0]);
+        const {data: result} = await axios.post('/api/menu/uploadMenuImage', formData);
+        if (result) {
+            console.log({result})
+            newMenu.thumbnail = result[0].thumbnailURL;
         }
         const {data: res} = await axios.post("/api/menu/add", newMenu);
         roomCtx.changeRoomPhase('default');
@@ -120,9 +143,8 @@ const MenuUpdateForm = () => {
         observeFormValidity();
     }, [menuName, soberComment, location, thumbnail]);
 
-
     return (
-        <div className={`menu-update-container row card mt-3 p-3 room-active`}>
+        <div className={`menu-update-container row card mt-3 p-3 menu-update-active`}>
             <div className='row m-0 p-0"'>
                 <div className='text-end'>
                     <span className='room-title'> # {roomCtx.roomInfo?.name} </span>
@@ -130,10 +152,10 @@ const MenuUpdateForm = () => {
                 </div>
             </div>
             <div className='row'>
-                <div className='col-4 menu-title'>
+                <div className='col menu-title'>
                     <div className="input-group">
                         <input id='menuNameInput'
-                               className={'form-control'}
+                               className={'form-control pt-0'}
                                type='text'
                                placeholder='메뉴 이름을 입력해주세요.'
                                onChange={menuNameChangeHandler}
@@ -144,15 +166,21 @@ const MenuUpdateForm = () => {
             <div className='row justify-content-center'>
                 <div className='menu-detail card mt-2 p-3'>
                     <div className='row'>
-                        <div className='thumbnailCover col-md-5'>
-                            {!thumbnail && <EmptyBox minHeight={'250px'} clickHandler={() => {
-                            }}/>}
-                            {thumbnail &&
-                                <img id='menuThumbnail'
-                                     src='https://gimhaemall.kr/thumb/d593060f9bf1cef1b7c8c1e58464c59a/620_620_6f146781c02c0462629148479637.jpg'
-                                     alt='메뉴 썸네일'>
-                                </img>
-                            }
+                        <div className='col-md-5'>
+
+                            <>
+                                {thumbnail &&
+                                    <img id='menuThumbnail'
+                                         src={thumbnail}
+                                         alt='메뉴 썸네일 미리보기'>
+                                    </img>
+                                }
+                                {!thumbnail &&
+                                    <EmptyBox minHeight={'250px'} clickHandler={thumbnailUploadHandler}/>
+                                }
+                                <input onChange={thumbnailChangeHandler} type={'file'} ref={imageUploadRef}
+                                       style={{display: 'none'}}/>
+                            </>
                             <hr/>
                             <div>
                                 <div id={'soberCommentTitle'}>냉정한 한줄평</div>

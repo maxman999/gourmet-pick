@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class SessionInfo {
+public class SessionMapper {
     private String userId;
     private String roomId;
 }

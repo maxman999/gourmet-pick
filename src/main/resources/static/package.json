@@ -39,6 +39,7 @@
     "react-countdown-circle-timer": "^3.1.0",
     "react-dom": "^18.2.0",
     "react-kakao-maps-sdk": "^1.1.21",
+    "react-tooltip": "^5.21.5",
     "sockjs-client": "^1.5.2",
     "stompjs": "^2.3.3",
     "style-loader": "^3.3.1",

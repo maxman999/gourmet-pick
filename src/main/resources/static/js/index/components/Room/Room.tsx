@@ -29,6 +29,8 @@ const Room = () => {
     }
 
     const modalCloseHandler = () => {
+        roomCtx.changeVotingStatus('gathering');
+        roomCtx.changeRoomPhase('default');
         setIsModalPopped(false);
     }
 
@@ -39,8 +41,14 @@ const Room = () => {
     const onMessageHandler = (payload: any) => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
-            case 'JOIN':
+            case "CREATE":
+                roomCtx.changeRoomPhase('calling');
+                break;
+            case 'SEATING':
                 setGourmet(Number(payloadData.data));
+                break;
+            case 'CANCEL':
+                roomCtx.changeRoomPhase('default');
                 break;
             case 'READY':
                 roomCtx.changeRoomPhase('ready');
@@ -50,7 +58,7 @@ const Room = () => {
                 roomCtx.changeVotingStatus('voting');
                 websocketAPIs.start();
                 break
-            case 'END':
+            case 'FINISH':
                 setTodayPick([`${payloadData.data}`][0]);
                 setGourmet(0);
                 modalPopHandler(true);
@@ -67,10 +75,8 @@ const Room = () => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
             case 'SYNC':
-                if (Number(payloadData.data) >= 1) {
-                    roomCtx.changeRoomPhase('calling');
-                    setGourmet(Number(payloadData.data));
-                }
+                roomCtx.changeRoomPhase('calling');
+                setGourmet(Number(payloadData.data));
                 break
             default :
                 break;
@@ -85,26 +91,17 @@ const Room = () => {
     }, []);
 
     useEffect(() => {
-        if(room){
+        if (room) {
             roomCtx.setRoomInfo(room)
-            console.log(roomCtx.roomInfo)
         }
     }, [room]);
-
-    useEffect(() => {
-        if (roomCtx.votingStatus === 'closing') {
-            websocketAPIs.finishVoting();
-            roomCtx.changeVotingStatus('gathering');
-            roomCtx.changeRoomPhase('default');
-        }
-    }, [roomCtx.votingStatus]);
 
     return (
         <>
             <EntranceInput roomPhase={roomCtx.roomPhase} onEntrance={entranceHandler}/>
             {room && (roomCtx.roomPhase !== 'updating') &&
                 <div
-                    className={`room-container row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? '' : 'room-active'}`}>
+                    className={`room-container row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? 'room-show' : 'room-active'}`}>
                     <RoomHeader room={room}/>
                     <MenuList room={room} gourmet={gourmet}/>
                 </div>

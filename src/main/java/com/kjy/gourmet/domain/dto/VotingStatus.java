@@ -1,11 +1,12 @@
 package com.kjy.gourmet.domain.dto;
 
-public enum Status {
-    JOIN,
+public enum VotingStatus {
+    SEATING,
+    CREATE,
     SYNC,
+    CANCEL,
     READY,
     START,
-    MESSAGE,
+    FINISH,
     DISCONNECT,
-    END,
 }

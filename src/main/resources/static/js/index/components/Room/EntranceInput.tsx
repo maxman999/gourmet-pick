@@ -45,7 +45,8 @@ const EntranceInput = (props: props) => {
     };
 
     return (
-        <div className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? '' : 'codeInput-hide'}`}>
+        <div id={'invitationCodeInput'}
+             className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? 'codeInput-show' : 'codeInput-hide'}`}>
             <form>
                 <div className="mb-3">
                     <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>

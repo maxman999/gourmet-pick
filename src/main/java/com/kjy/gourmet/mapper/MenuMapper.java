@@ -11,6 +11,6 @@ import java.util.List;
 public interface MenuMapper {
     int insertMenu(Menu menu);
     List<Menu> selectMenuList(long roomId);
-    int deleteMenuById(long menuId);
+    int deleteMenu(long menuId);
     int deleteAllMenu();
 }

@@ -1,13 +1,17 @@
 package com.kjy.gourmet.service.voting;
 
 import com.kjy.gourmet.domain.dto.Ballot;
-import com.kjy.gourmet.domain.dto.SessionStatus;
-import org.springframework.web.socket.WebSocketSession;
 
 public interface VotingService {
+
     void memberRegisterHandler(String roomId, String sessionId, String userId);
 
+    void creatVotingSession(String roomId);
+
     void syncHandler(String roomId, String userId);
+
+
+    void cancelHandler(String roomId);
 
     void memberSeatingHandler(String roomId, String sessionId, String userId);
 

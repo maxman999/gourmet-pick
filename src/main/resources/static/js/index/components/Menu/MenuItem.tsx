@@ -2,6 +2,7 @@ import {IMenu} from "../../interfaces/IMenu";
 import './MenuItem.css';
 import axios from "axios";
 import {StaticMap, MapMarker} from "react-kakao-maps-sdk";
+import {useRef} from "react";
 
 interface props {
     menu: IMenu;
@@ -9,11 +10,13 @@ interface props {
 }
 
 const MenuItem = (props: props) => {
+    const deleteBtnRef = useRef(null);
 
-    const deleteClickHandler = async (e: React.MouseEvent) => {
-        const clickedBtn = e.currentTarget as HTMLElement;
-        const targetMenuId = Number(clickedBtn.dataset?.id);
-        await axios.delete(`/api/menu/${targetMenuId}`);
+
+    const deleteClickHandler = async () => {
+        const targetMenuId = Number(deleteBtnRef.current.dataset.id);
+        const targetMenuThumbnail = Number(deleteBtnRef.current.dataset.thumbnail);
+        await axios.delete(`/api/menu/${targetMenuId}/${targetMenuThumbnail}`);
         props.onDelete(targetMenuId);
     }
 
@@ -28,6 +31,8 @@ const MenuItem = (props: props) => {
                         <button
                             className='btn btn-sm btn-outline-secondary'
                             data-id={props.menu.id}
+                            data-thumbnail={props.menu.thumbnail}
+                            ref={deleteBtnRef}
                             onClick={deleteClickHandler}
                         >X
                         </button>
@@ -37,9 +42,9 @@ const MenuItem = (props: props) => {
             <div className='row justify-content-center'>
                 <div className='menu-detail card mt-2 p-3'>
                     <div className='row'>
-                        <div className='thumbnailCover col-md-5'>
+                        <div className='col-md-5'>
                             <img id='menuThumbnail'
-                                 src='https://gimhaemall.kr/thumb/d593060f9bf1cef1b7c8c1e58464c59a/620_620_6f146781c02c0462629148479637.jpg'
+                                 src={`/api/menu/getMenuImageURL?fileName=${props.menu.thumbnail}`}
                                  alt='메뉴 썸네일'/>
                             <hr/>
                             <div>

@@ -17,7 +17,11 @@ const WebsocketContext = React.createContext({
         onPrivateMessage: (payload: any) => void
     ) => {
     },
+    create: () => {
+    },
     sync: () => {
+    },
+    cancel: () => {
     },
     seat: () => {
     },

@@ -1,3 +1,16 @@
+.menu-update-active {
+    animation: slide 600ms ease-in-out forwards;
+}
+
+@keyframes slide {
+    from {
+        transform: translateY(0%);
+    }
+    to {
+        transform: translateY(-20%);
+    }
+}
+
 #menuNameInput {
     padding-left: 20px;
     font-size: 18px;
@@ -12,6 +25,7 @@
 #menuThumbnail {
     object-fit: cover;
     width: 100%;
+    height: 250px;
 }
 
 #soberCommentTitle {

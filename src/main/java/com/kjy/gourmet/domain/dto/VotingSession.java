@@ -10,12 +10,12 @@ import java.util.HashSet;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SessionStatus {
+public class VotingSession {
     private HashSet<String> users = new HashSet<>();
     private HashMap<String, Integer> aggregation = new HashMap<>();
     private HashSet<String> finishCalls = new HashSet<>();
 
-    public SessionStatus(String users) {
+    public VotingSession(String users) {
         this.users.add(users);
     }
 

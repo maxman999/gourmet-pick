@@ -15,7 +15,7 @@
         order by id desc /* 성능 봐서 역순 인덱스 */
     </select>
 
-    <delete id="deleteMenuById" parameterType="long">
+    <delete id="deleteMenu" parameterType="long">
         delete from menu
         where id = #{menuId}
     </delete>

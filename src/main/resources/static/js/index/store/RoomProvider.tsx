@@ -7,11 +7,13 @@ type roomState = {
     roomInfo: IRoom;
     roomPhase: string;
     votingStatus: string;
+    callerFlag: boolean;
 }
 
 type roomAction =
     | { type: "DEFAULT_ROOM_SETTING"; roomInfo: IRoom; }
     | { type: "SET_ROOM_PHASE"; roomPhase: string; }
+    | { type: "SET_CALLER_FLAG"; callerFlag: boolean; }
     | { type: "SET_VOTING_STATUS"; votingStatus: string; }
 
 type props = {
@@ -33,6 +35,14 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
         };
     }
 
+    if (roomAction.type === "SET_CALLER_FLAG") {
+        console.log("this")
+        return {
+            ...state,
+            callerFlag: roomAction.callerFlag
+        };
+    }
+
     if (roomAction.type === "SET_VOTING_STATUS") {
         return {
             ...state,
@@ -45,6 +55,7 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
 const defaultRoomState: roomState = {
     roomInfo: undefined,
     roomPhase: 'default',
+    callerFlag: false,
     votingStatus: 'gathering',
 }
 
@@ -65,6 +76,13 @@ const RoomProvider = (props: props) => {
         });
     }
 
+    const callerFlagChangeHandler = (callerFlag: boolean) => {
+        dispatchMenuActions({
+            type: 'SET_CALLER_FLAG',
+            callerFlag: callerFlag,
+        });
+    }
+
     const votingStatusChangeHandler = (votingStatus: string) => {
         dispatchMenuActions({
             type: 'SET_VOTING_STATUS',
@@ -77,6 +95,8 @@ const RoomProvider = (props: props) => {
         roomInfo: roomState.roomInfo,
         setRoomInfo: roomSettingHandler,
         roomPhase: roomState.roomPhase,
+        callerFlag: roomState.callerFlag,
+        setCallerFlag: callerFlagChangeHandler,
         votingStatus: roomState.votingStatus,
         changeRoomPhase: roomPhaseChangeHandler,
         changeVotingStatus: votingStatusChangeHandler,

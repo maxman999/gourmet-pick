@@ -16,8 +16,7 @@ const Timer = () => {
             shouldRepeat = false;
             // 방 상태 초기화
             websocketAPIs.finishVoting();
-            roomCtx.changeRoomPhase('default');
-            roomCtx.changeVotingStatus('gathering');
+            roomCtx.changeVotingStatus('finishing');
         } else {
             roomCtx.changeVotingStatus('voting');
         }

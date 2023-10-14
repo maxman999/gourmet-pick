@@ -11,6 +11,6 @@ public class Message {
     private String receiverName;
     private String message;
     private String date;
-    private Status status;
+    private VotingStatus status;
     private Object data;
 }

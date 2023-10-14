@@ -8,6 +8,9 @@ const RoomContext = React.createContext({
     roomPhase: 'default',
     changeRoomPhase: (roomPhase: string) => {
     },
+    callerFlag: false,
+    setCallerFlag: (callerFlag: boolean) => {
+    },
     votingStatus: 'gathering',
     changeVotingStatus: (votingStatus: string) => {
     },

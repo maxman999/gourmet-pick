@@ -1,8 +1,16 @@
 #entranceBtn {
     max-width: 65px;
 }
-.codeInput-hide{
-    transform: translate(0,-90%);
+
+.codeInput-show {
+    transform: translate(0, 0%);
+    transition-property: transform;
+    transition-duration: 500ms;
+}
+
+
+.codeInput-hide {
+    transform: translate(0, -90%);
     transition-property: transform;
     transition-duration: 500ms;
 }

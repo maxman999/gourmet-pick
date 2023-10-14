@@ -2,61 +2,83 @@ package com.kjy.gourmet.service.voting;
 
 import com.kjy.gourmet.domain.dto.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class VotingServiceImpl implements VotingService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final Map<String, SessionStatus> votingSessions = new ConcurrentHashMap<>();
-    private final Map<String, SessionInfo> sessionMapper = new ConcurrentHashMap<>();
+    private final Map<String, VotingSession> votingSessions = new ConcurrentHashMap<>();
+    private final Map<String, SessionMapper> sessionMapper = new ConcurrentHashMap<>();
     private final int ROOM_CAPACITY = 2;
+
+
+    @Override
+    public void memberRegisterHandler(String roomId, String sessionId, String userId) {
+        sessionMapper.put(sessionId, new SessionMapper(userId, roomId));
+    }
+
+    @Override
+    public void creatVotingSession(String roomId) {
+        if (!votingSessions.containsKey(roomId)) {
+            votingSessions.put(roomId, new VotingSession());
+        } else {
+            log.warn("기존에 지워지지 않은 투표 세션이 있었음 =====> 방번호 : {}", roomId);
+            log.warn("세션 정보 : {}", votingSessions.get(roomId));
+            votingSessions.put(roomId, new VotingSession());
+        }
+        Message votingReadyMsg = new Message("server", "people", "투표 세션 생성", "20231004", VotingStatus.CREATE, 0);
+        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
+    }
 
     @Override
     public void syncHandler(String roomId, String userId) {
         // 방 동기화
         if (votingSessions.containsKey(roomId)) {
             int userCnt = votingSessions.get(roomId).getUsers().size();
-            Message endMessage = new Message("server", "people", "동기화", "20231004", Status.SYNC, userCnt);
+            Message endMessage = new Message("server", "people", "동기화", "20231004", VotingStatus.SYNC, userCnt);
             simpMessagingTemplate.convertAndSendToUser(userId, "/private", endMessage);
         }
     }
 
     @Override
-    public void memberRegisterHandler(String roomId, String sessionId, String userId) {
-        // 세션 정보 등록
-        sessionMapper.put(sessionId, new SessionInfo(userId, roomId));
+    public void cancelHandler(String roomId) {
+        votingSessions.remove(roomId);
+        Message votingReadyMsg = new Message("kjy55", "people", "투표 강제 종료", "20231004", VotingStatus.CANCEL, 0);
+        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
     }
 
     @Override
     public void memberSeatingHandler(String roomId, String sessionId, String userId) {
         // 투표 세션 생성/추가
-        if (votingSessions.containsKey(roomId)) {
-            votingSessions.get(roomId).getUsers().add(sessionId);
-        } else {
-            votingSessions.put(roomId, new SessionStatus(sessionId));
+        if (!votingSessions.containsKey(roomId)) {
+            throw new RuntimeException();
         }
+        // 투표 세션에 유저 등록
+        votingSessions.get(roomId).getUsers().add(sessionId);
         // 입장 유저 수 집계
         int userCnt = votingSessions.get(roomId).getUsers().size();
         System.out.println("userCnt : " + userCnt);
 
-        Message userJoinMsg = new Message("server", "people", "입장!", "20231004", Status.JOIN, userCnt);
-        simpMessagingTemplate.convertAndSend("/voting/" + roomId, userJoinMsg);
+        Message userSeatingMsg = new Message("server", "people", "입장!", "20231004", VotingStatus.SEATING, userCnt);
+        simpMessagingTemplate.convertAndSend("/voting/" + roomId, userSeatingMsg);
 
         if (userCnt >= ROOM_CAPACITY) {
-            Message votingReadyMsg = new Message("kjy55", "people", "과반 이상 입장!", "20231004", Status.READY, userCnt);
+            Message votingReadyMsg = new Message("kjy55", "people", "과반 이상 입장!", "20231004", VotingStatus.READY, userCnt);
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
         }
     }
 
     @Override
     public void startVoting(String roomId, String userName) {
-        Message votingStartMsg = new Message("server", "people", "투표 시작!", "20231004", Status.START, 0);
+        Message votingStartMsg = new Message("server", "people", "투표 시작!", "20231004", VotingStatus.START, 0);
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingStartMsg);
     }
 
@@ -76,14 +98,13 @@ public class VotingServiceImpl implements VotingService {
     public void finishVoting(String roomId, String sessionId, String userName) {
         HashSet<String> finishCalls = votingSessions.get(roomId).getFinishCalls();
         int userCnt = votingSessions.get(roomId).getUsers().size();
-
         finishCalls.add(userName);
         if (finishCalls.size() >= userCnt) {
             // 투표 집계
             HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
             String maxKey = Collections.max(votingStatus.entrySet(), Map.Entry.comparingByValue()).getKey();
             // 집계 결과 송출
-            Message endMessage = new Message("server", "people", "투표완료", "20231004", Status.END, maxKey);
+            Message endMessage = new Message("server", "people", "투표완료", "20231004", VotingStatus.FINISH, maxKey);
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
             // session cleanup
             votingSessions.remove(roomId);
@@ -95,11 +116,15 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void disconnectSession(String sessionId) {
-        SessionInfo sessionInfo = sessionMapper.get(sessionId);
-        SessionStatus targetRoomSessionStatus = votingSessions.get(sessionInfo.getRoomId());
+        SessionMapper sessionInfo = sessionMapper.get(sessionId);
+        VotingSession targetRoomSessionStatus = votingSessions.get(sessionInfo.getRoomId());
         targetRoomSessionStatus.getUsers().remove(sessionId);
         sessionMapper.remove(sessionId);
-        Message message = new Message("server", "people", "유저이탈", "20231004", Status.DISCONNECT, targetRoomSessionStatus.getUsers().size());
+        // 투표 세션에 참여중인 유저의 연결이 모두 끊어지면 투표 세션 자체를 없애버림
+        if (targetRoomSessionStatus.getUsers().isEmpty()) {
+            votingSessions.remove(sessionInfo.getRoomId());
+        }
+        Message message = new Message("server", "people", "유저이탈", "20231004", VotingStatus.DISCONNECT, targetRoomSessionStatus.getUsers().size());
         simpMessagingTemplate.convertAndSend("/voting/" + sessionInfo.getRoomId(), message);
         System.out.println("Session disconnected: " + sessionId);
     }

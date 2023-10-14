@@ -30,7 +30,9 @@ type websocketAction =
     onMessageHandler: (payload: any) => void;
     onPrivateMessageHandler: (payload: any) => void
 }
+    | { type: "CREATE" }
     | { type: "SYNC" }
+    | { type: "CANCEL" }
     | { type: "SEAT" }
     | { type: "BOOTING" }
     | { type: "START" }
@@ -49,7 +51,6 @@ const onError = (err: any) => {
 const websocketReducer = (state: websocketState, action: websocketAction): websocketState => {
     if (action.type === "REGISTER") {
         const {topic, userId, roomId} = action.sessionInfo
-
         let Sock = new SockJS(WEBSOCKET_SERVER_URL);
         stompClient = over(Sock);
         stompClient.connect({}, () => {
@@ -65,9 +66,19 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
         }
     }
 
+    if (action.type === "CREATE") {
+        const {topic, userId, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/create/${userId}/${roomId}`, {});
+    }
+
     if (action.type === "SYNC") {
         const {topic, userId, roomId} = state.sessionInfo
         stompClient.send(`/app/${topic}/sync/${userId}/${roomId}`, {});
+    }
+
+    if (action.type === "CANCEL") {
+        const {topic, userId, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/cancel/${userId}/${roomId}`, {});
     }
 
     if (action.type === "SEAT") {
@@ -140,9 +151,21 @@ const WebsocketProvider = (props: props) => {
         });
     }
 
+    const createHandler = () => {
+        dispatchWebsocketActions({
+            type: 'CREATE',
+        });
+    }
+
     const syncHandler = () => {
         dispatchWebsocketActions({
             type: 'SYNC',
+        });
+    }
+
+    const cancelHandler = () => {
+        dispatchWebsocketActions({
+            type: 'CANCEL',
         });
     }
 
@@ -187,7 +210,9 @@ const WebsocketProvider = (props: props) => {
     const websocketContext = {
         websocketState: websocketState,
         register: registerHandler,
+        create: createHandler,
         sync: syncHandler,
+        cancel: cancelHandler,
         seat: seatHandler,
         boot: bootHandler,
         start: startHandler,
