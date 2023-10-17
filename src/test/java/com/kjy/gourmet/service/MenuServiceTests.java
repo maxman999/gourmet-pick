@@ -45,8 +45,7 @@ public class MenuServiceTests {
         List<Menu> menuList = menuService.getMenuList(roomId);
         for (Menu menu : menuList) {
             long menuId = menu.getId();
-            String imgURL = menu.getThumbnail();
-            menuService.deleteMenu(menuId, imgURL);
+            menuService.deleteMenu(menuId);
         }
         roomService.deleteRoomById(roomId);
     }

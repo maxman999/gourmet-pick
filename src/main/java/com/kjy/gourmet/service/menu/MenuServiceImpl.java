@@ -41,13 +41,18 @@ public class MenuServiceImpl implements MenuService {
     private String uploadPath;
 
     @Override
+    public Menu getMenuById(long menuId) {
+        return menuMapper.selectMenu(menuId);
+    }
+
+    @Override
     public int addMenu(Menu menu) {
         return menuMapper.insertMenu(menu);
     }
 
     @Override
-    public int deleteMenu(long menuId, String imgUrl) {
-        removeMenuImage(imgUrl);
+    public int deleteMenu(long menuId) {
+        removeMenuImage(getMenuById(menuId).getThumbnail());
         return menuMapper.deleteMenu(menuId);
     }
 
@@ -69,7 +74,7 @@ public class MenuServiceImpl implements MenuService {
             String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "." + fileExtension;
             try {
                 File thumbnailFile = new File(saveName); // 원본을 썸네일 파일로 저장
-                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 300, 300);
+                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 400, 400);
                 resultDTOList.add(new MenuThumbnail(uuid, folderPath, fileExtension));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -115,8 +120,7 @@ public class MenuServiceImpl implements MenuService {
         String srcFileName = null;
         srcFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
         File file = new File(uploadPath + File.separator + srcFileName);
-        File thumbnail = new File(file.getParent(), "s_" + file.getName());
-        return file.delete() && thumbnail.delete();
+        return file.delete();
     }
 
 

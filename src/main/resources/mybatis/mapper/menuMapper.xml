@@ -8,6 +8,12 @@
         values (#{roomId}, #{name}, #{thumbnail}, #{soberComment}, #{longitude}, #{latitude});
     </insert>
 
+    <select id="selectMenu" parameterType="long" resultType="com.kjy.gourmet.domain.menu.Menu">
+        select *
+        from menu
+        where id = #{menuId}
+    </select>
+
     <select id="selectMenuList" resultType="com.kjy.gourmet.domain.menu.Menu">
         select *
         from menu
@@ -16,12 +22,14 @@
     </select>
 
     <delete id="deleteMenu" parameterType="long">
-        delete from menu
+        delete
+        from menu
         where id = #{menuId}
     </delete>
 
     <delete id="deleteAllMenu">
-       delete from menu;
+        delete
+        from menu;
     </delete>
 
 

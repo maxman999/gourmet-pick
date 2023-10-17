@@ -187,7 +187,7 @@ const MenuUpdateForm = () => {
                                 <textarea id={'soberCommentInput'}
                                           className={'w-100'}
                                           placeholder={"냉정한 미식가의 평가를 입력해주세요."}
-                                          maxLength={40}
+                                          maxLength={30}
                                           onChange={soberCommentChangeHandler}
                                           ref={soberCommentInputRef}
                                 />

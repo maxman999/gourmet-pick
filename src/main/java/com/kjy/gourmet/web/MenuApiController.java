@@ -29,9 +29,9 @@ public class MenuApiController {
         return menuService.getMenuList(roomId);
     }
 
-    @DeleteMapping("/{menuId}/{imgURL}")
-    public int removeMenu(@PathVariable("menuId") long menuId, @PathVariable("imgURL") String imgURL) {
-        return menuService.deleteMenu(menuId, imgURL);
+    @DeleteMapping("/{menuId}")
+    public int removeMenu(@PathVariable("menuId") long menuId) {
+        return menuService.deleteMenu(menuId);
     }
 
     @PostMapping("/uploadMenuImage")
@@ -42,11 +42,6 @@ public class MenuApiController {
     @GetMapping("/getMenuImageURL")
     public ResponseEntity<byte[]> getFile(String fileName) {
         return menuService.getMenuImageURL(fileName);
-    }
-
-    @DeleteMapping("/removeMenuImage")
-    public boolean removeMenuImage(String fileName) {
-        return menuService.removeMenuImage(fileName);
     }
 
 

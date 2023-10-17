@@ -15,8 +15,8 @@ const MenuItem = (props: props) => {
 
     const deleteClickHandler = async () => {
         const targetMenuId = Number(deleteBtnRef.current.dataset.id);
-        const targetMenuThumbnail = Number(deleteBtnRef.current.dataset.thumbnail);
-        await axios.delete(`/api/menu/${targetMenuId}/${targetMenuThumbnail}`);
+        // const targetMenuThumbnail = deleteBtnRef.current.dataset.thumbnail;
+        await axios.delete(`/api/menu/${targetMenuId}`);
         props.onDelete(targetMenuId);
     }
 

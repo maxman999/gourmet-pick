@@ -10,7 +10,12 @@ import java.util.List;
 @Mapper
 public interface MenuMapper {
     int insertMenu(Menu menu);
+
+    Menu selectMenu(long menuId);
+
     List<Menu> selectMenuList(long roomId);
+
     int deleteMenu(long menuId);
+
     int deleteAllMenu();
 }

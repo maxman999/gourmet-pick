@@ -10,7 +10,9 @@ import java.util.List;
 public interface MenuService {
     int addMenu(Menu menu);
 
-    int deleteMenu(long menuId, String imgUrl);
+    Menu getMenuById(long menuId);
+
+    int deleteMenu(long menuId);
 
     List<Menu> getMenuList(long roomId);
 
