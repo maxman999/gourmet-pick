@@ -12,16 +12,17 @@ import MenuUpdateForm from "../Menu/MenuUpdateForm";
 const Room = () => {
     const roomCtx = useContext(roomContext);
     const websocketAPIs = useContext(websocketContext);
-    const sessionInfo = {
-        topic: 'voting',
-        roomId: 'qwer1234',
-        userId: 'kjy55&' + Math.random(),
-    }
 
     const [room, setRoom] = useState<IRoom | null>();
     const [gourmet, setGourmet] = useState(0);
     const [isModalPopped, setIsModalPopped] = useState(false)
     const [todayPick, setTodayPick] = useState('');
+
+    const sessionInfo = {
+        topic: 'voting',
+        roomId: room?.id,
+        userId: Number(sessionStorage.getItem('userId')),
+    }
 
     const entranceHandler = (room: IRoom) => {
         setRoom(room);
@@ -38,53 +39,54 @@ const Room = () => {
         setIsModalPopped(isModalPopped)
     }
 
-    const onMessageHandler = (payload: any) => {
-        let payloadData = JSON.parse(payload.body);
-        switch (payloadData.status) {
-            case "CREATE":
-                roomCtx.changeRoomPhase('calling');
-                break;
-            case 'SEATING':
-                setGourmet(Number(payloadData.data));
-                break;
-            case 'CANCEL':
-                roomCtx.changeRoomPhase('default');
-                break;
-            case 'READY':
-                roomCtx.changeRoomPhase('ready');
-                break;
-            case 'START':
-                roomCtx.changeRoomPhase('starting');
-                roomCtx.changeVotingStatus('voting');
-                websocketAPIs.start();
-                break
-            case 'FINISH':
-                setTodayPick([`${payloadData.data}`][0]);
-                setGourmet(0);
-                modalPopHandler(true);
-                break;
-            case 'DISCONNECT':
-                setGourmet(Number(payloadData.data));
-                break
-            default :
-                break;
-        }
-    }
-
-    const onPrivateMessageHandler = (payload: any) => {
-        let payloadData = JSON.parse(payload.body);
-        switch (payloadData.status) {
-            case 'SYNC':
-                roomCtx.changeRoomPhase('calling');
-                setGourmet(Number(payloadData.data));
-                break
-            default :
-                break;
-        }
-    }
-
     useEffect(() => {
+        const onMessageHandler = (payload: any) => {
+            let payloadData = JSON.parse(payload.body);
+            switch (payloadData.status) {
+                case "CREATE":
+                    roomCtx.changeRoomPhase('calling');
+                    break;
+                case 'SEATING':
+                    setGourmet(Number(payloadData.data));
+                    break;
+                case 'CANCEL':
+                    roomCtx.changeRoomPhase('default');
+                    break;
+                case 'READY':
+                    roomCtx.changeRoomPhase('ready');
+                    break;
+                case 'START':
+                    roomCtx.changeRoomPhase('starting');
+                    roomCtx.changeVotingStatus('voting');
+                    websocketAPIs.start();
+                    break
+                case 'FINISH':
+                    setTodayPick([`${payloadData.data}`][0]);
+                    setGourmet(0);
+                    modalPopHandler(true);
+                    break;
+                case 'DISCONNECT':
+                    setGourmet(Number(payloadData.data));
+                    break
+                default :
+                    break;
+            }
+        }
+
+        const onPrivateMessageHandler = (payload: any) => {
+            let payloadData = JSON.parse(payload.body);
+            switch (payloadData.status) {
+                case 'SYNC':
+                    roomCtx.changeRoomPhase('calling');
+                    setGourmet(Number(payloadData.data));
+                    break
+                default :
+                    break;
+            }
+        }
+
         websocketAPIs.register(sessionInfo, onMessageHandler, onPrivateMessageHandler);
+
         return () => {
             websocketAPIs.disconnect();
         };

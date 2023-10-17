@@ -9,7 +9,7 @@ public interface RoomService {
     int deleteRoomById(long roomId);
     Room getRoomById(long roomId);
     Room getRoomByCode(String invitationCode);
-    int enterRoom(long memberId, long roomId);
-    int exitRoom(long memberId, long roomId);
-    List<Room> getMyRoomList(long memberId);
+    int enterRoom(long userId, long roomId);
+    int exitRoom(long userId, long roomId);
+    List<Room> getMyRoomList(long userId);
 }

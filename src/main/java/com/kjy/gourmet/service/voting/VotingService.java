@@ -4,7 +4,7 @@ import com.kjy.gourmet.domain.dto.Ballot;
 
 public interface VotingService {
 
-    void memberRegisterHandler(String roomId, String sessionId, String userId);
+    void userRegisterHandler(String roomId, String sessionId, String userId);
 
     void creatVotingSession(String roomId);
 
@@ -13,7 +13,7 @@ public interface VotingService {
 
     void cancelHandler(String roomId);
 
-    void memberSeatingHandler(String roomId, String sessionId, String userId);
+    void userSeatingHandler(String roomId, String sessionId, String userId);
 
     void startVoting(String roomId, String userName);
 

@@ -1,12 +1,12 @@
 package com.kjy.gourmet.service;
 
-import com.kjy.gourmet.domain.member.Member;
+import com.kjy.gourmet.domain.user.Role;
+import com.kjy.gourmet.domain.user.User;
 import com.kjy.gourmet.domain.room.Room;
-import com.kjy.gourmet.service.member.MemberService;
+import com.kjy.gourmet.service.user.UserService;
 import com.kjy.gourmet.service.room.RoomService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,19 +20,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class RoomServiceTests {
 
-    @Autowired MemberService memberService;
+    @Autowired
+    UserService userService;
     @Autowired RoomService roomService;
 
     List<String> invitationCodes = new ArrayList<>();
 
     @BeforeEach
     public void setUp(){
-        Member newbie = Member.builder()
+        User newbie = User.builder()
                 .email("test1@naver.com")
-                .password("123456")
                 .nickname("고든램지")
+                .role(Role.USER)
                 .build();
-        memberService.signUp(newbie);
+        userService.signUp(newbie);
 
         for(int i = 0; i < 2; i++){
             Room room = Room.builder()
@@ -46,13 +47,13 @@ public class RoomServiceTests {
 
     @AfterEach
     public void cleanUp(){
-        long memId = memberService.getMemberByEmail("test1@naver.com").getId();
+        long memId = userService.getUserByEmail("test1@naver.com").getId();
         for(int i = 0; i < 2; i++){
             long roomId = roomService.getRoomByCode("123ZXCa"+i).getId();
             roomService.exitRoom(memId,roomId);
             roomService.deleteRoomById(roomId);
         }
-        memberService.signOut(memId);
+        userService.signOut(memId);
     }
     @Test
     public void getRoomTest(){
@@ -63,12 +64,12 @@ public class RoomServiceTests {
     }
     @Test
     public void enterRoomTest(){
-        long memberId = memberService.getMemberByEmail("test1@naver.com").getId();
+        long userId = userService.getUserByEmail("test1@naver.com").getId();
         for(int i = 0; i < 2; i++){
             long roomId = roomService.getRoomByCode("123ZXCa"+i).getId();
-            roomService.enterRoom(memberId, roomId);
+            roomService.enterRoom(userId, roomId);
         }
-        List<Room> myRoomList = roomService.getMyRoomList(memberId);
+        List<Room> myRoomList = roomService.getMyRoomList(userId);
         for(int i = 0; i < 2; i++){
             String roomName = myRoomList.get(i).getName();
             assertThat(roomName).isEqualTo("점심책임방"+i);

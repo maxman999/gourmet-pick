@@ -2,47 +2,56 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kjy.gourmet.mapper.RoomMapper" >
+<mapper namespace="com.kjy.gourmet.mapper.RoomMapper">
     <insert id="insertRoom" parameterType="com.kjy.gourmet.domain.room.Room">
-        insert into room(name,invitation_code)
+        insert into room(name, invitation_code)
         values (#{name}, #{invitationCode});
     </insert>
 
     <select id="selectRoomById" parameterType="String" resultType="com.kjy.gourmet.domain.room.Room">
-        select * from room where id = #{id};
+        select *
+        from room
+        where id = #{id};
     </select>
 
     <select id="selectRoomByCode" parameterType="String" resultType="com.kjy.gourmet.domain.room.Room">
-        select * from room where invitation_code = #{invitationCode};
+        select *
+        from room
+        where invitation_code = #{invitationCode};
     </select>
 
     <delete id="deleteRoomById">
-        delete from room where id = #{roomId}
+        delete
+        from room
+        where id = #{roomId}
     </delete>
 
     <insert id="insertFavoriteRoom" parameterType="long">
-        insert into room_favorites(member_id,room_id)
-        values (#{memberId},#{roomId});
+        insert ignore into room_favorites(user_id, room_id)
+        values (#{userId}, #{roomId});
     </insert>
 
     <select id="selectFavoriteRoomList" parameterType="long" resultType="com.kjy.gourmet.domain.room.Room">
-        select member_id, room_id as id, name, invitation_code
+        select user_id, room_id as id, name, invitation_code
         from room_favorites
-        join room on room_favorites.room_id = room.id
-        where member_id = #{memberId};
+                 join room on room_favorites.room_id = room.id
+        where user_id = #{userId};
     </select>
 
     <delete id="deleteFavoriteRoom" parameterType="long">
-        delete from room_favorites
-        where member_id = #{memberId}
-        and room_id = #{roomId};
+        delete
+        from room_favorites
+        where user_id = #{userId}
+          and room_id = #{roomId};
     </delete>
 
     <delete id="deleteAllRoom">
-        delete from room;
+        delete
+        from room;
     </delete>
 
     <delete id="deleteAllRoomFavorites">
-        delete from room_favorites;
+        delete
+        from room_favorites;
     </delete>
 </mapper>

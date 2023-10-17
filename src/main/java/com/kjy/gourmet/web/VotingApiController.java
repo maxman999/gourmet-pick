@@ -24,7 +24,7 @@ public class VotingApiController {
                          @DestinationVariable String userName,
                          SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        votingService.memberRegisterHandler(roomId, sessionId, userName);
+        votingService.userRegisterHandler(roomId, sessionId, userName);
         log.info("{}방에 {}님 입장", roomId, userName);
     }
 
@@ -50,7 +50,7 @@ public class VotingApiController {
                         @DestinationVariable String roomId,
                         @DestinationVariable String userName) {
         String sessionId = headerAccessor.getSessionId();
-        votingService.memberSeatingHandler(roomId, sessionId, userName);
+        votingService.userSeatingHandler(roomId, sessionId, userName);
     }
 
     @MessageMapping("/voting/start/{userName}/{roomId}")

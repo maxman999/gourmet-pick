@@ -11,12 +11,20 @@ import java.util.List;
 @Mapper
 public interface RoomMapper {
     int insertRoom(Room room);
+
     Room selectRoomByCode(String invitationCode);
+
     Room selectRoomById(long id);
+
     int deleteRoomById(long roomId);
-    int insertFavoriteRoom(@Param("memberId") long memberId,@Param("roomId") long roomId);
-    List<Room> selectFavoriteRoomList(long memberId);
-    int deleteFavoriteRoom(@Param("memberId") long memberId,@Param("roomId") long roomId);
+
+    int insertFavoriteRoom(@Param("userId") long userId, @Param("roomId") long roomId);
+
+    List<Room> selectFavoriteRoomList(long userId);
+
+    int deleteFavoriteRoom(@Param("userId") long userId, @Param("roomId") long roomId);
+
     int deleteAllRoom();
+
     int deleteAllRoomFavorites();
 }

@@ -29,21 +29,21 @@ public class RoomApiController {
         return roomService.deleteRoomById(roomId);
     }
 
-    @PostMapping("/enter/{memberId}/{roomId}")
-    public int enterRoom(@PathVariable("memberId") long memberId,
+    @PostMapping("/enter/{userId}/{roomId}")
+    public int enterRoom(@PathVariable("userId") long userId,
                          @PathVariable("roomId") long roomId){
-        return roomService.enterRoom(memberId,roomId);
+        return roomService.enterRoom(userId,roomId);
     }
 
-    @PostMapping("/exit/{memberId}/{roomId}")
-    public int exitRoom(@PathVariable("memberId") long memberId,
+    @PostMapping("/exit/{userId}/{roomId}")
+    public int exitRoom(@PathVariable("userId") long userId,
                         @PathVariable("roomId") long roomId){
-        return roomService.exitRoom(memberId, roomId);
+        return roomService.exitRoom(userId, roomId);
     }
 
     @GetMapping("/getList")
-    public List<Room> getMyRoomList(@RequestParam("memberId") long memberId){
-        return roomService.getMyRoomList(memberId);
+    public List<Room> getMyRoomList(@RequestParam("userId") long userId){
+        return roomService.getMyRoomList(userId);
     }
 
     @DeleteMapping("/remove/{roomId}")

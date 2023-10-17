@@ -1,8 +1,9 @@
 package com.kjy.gourmet.web;
 
-import com.kjy.gourmet.domain.member.Member;
+import com.kjy.gourmet.domain.user.Role;
+import com.kjy.gourmet.domain.user.User;
 import com.kjy.gourmet.domain.room.Room;
-import com.kjy.gourmet.service.member.MemberService;
+import com.kjy.gourmet.service.user.UserService;
 import com.kjy.gourmet.service.room.RoomService;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
@@ -21,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class RoomApiControllerTests {
 
     @Autowired private WebApplicationContext ctx;
-    @Autowired private MemberService memberService;
+    @Autowired private UserService userService;
     @Autowired private RoomService roomService;
 
     private MockMvc mockMvc;
@@ -31,23 +32,23 @@ public class RoomApiControllerTests {
     public void setUp(){
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 
-        Member newbie = Member.builder()
+        User newbie = User.builder()
                 .email("roomApiTest@naver.com")
-                .password("123456")
                 .nickname("김램지")
+                .role(Role.USER)
                 .build();
-        memberService.signUp(newbie);
+        userService.signUp(newbie);
     }
 
     @AfterEach
     public void cleanUp(){
-        long memberId = memberService.getMemberByEmail("roomApiTest@naver.com").getId();
-        memberService.signOut(memberId);
+        long userId = userService.getUserByEmail("roomApiTest@naver.com").getId();
+        userService.signOut(userId);
     }
 
     @Test
-    public void a_roomManagementTest() throws Exception {
-        long memberId = memberService.getMemberByEmail("roomApiTest@naver.com").getId();
+    public void roomManagementTest() throws Exception {
+        long userId = userService.getUserByEmail("roomApiTest@naver.com").getId();
         long roomId;
         // make room
         Room room = Room.builder()
@@ -68,19 +69,19 @@ public class RoomApiControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         // enter room
-        String enterUrl = "/api/room/enter/" + memberId + "/" + roomId;
+        String enterUrl = "/api/room/enter/" + userId + "/" + roomId;
         mockMvc.perform(MockMvcRequestBuilders.post(enterUrl)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         //lookup user's roomList
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/room/getList?memberId="+memberId)
+                        MockMvcRequestBuilders.get("/api/room/getList?userId="+userId)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         //exit room
-        String exitUrl = "/api/room/exit/" + memberId + "/" + roomId;
+        String exitUrl = "/api/room/exit/" + userId + "/" + roomId;
         mockMvc.perform(MockMvcRequestBuilders.post(exitUrl)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())

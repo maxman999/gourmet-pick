@@ -21,7 +21,7 @@ public class VotingServiceImpl implements VotingService {
 
 
     @Override
-    public void memberRegisterHandler(String roomId, String sessionId, String userId) {
+    public void userRegisterHandler(String roomId, String sessionId, String userId) {
         sessionMapper.put(sessionId, new SessionMapper(userId, roomId));
     }
 
@@ -56,7 +56,7 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
-    public void memberSeatingHandler(String roomId, String sessionId, String userId) {
+    public void userSeatingHandler(String roomId, String sessionId, String userId) {
         // 투표 세션 생성/추가
         if (!votingSessions.containsKey(roomId)) {
             throw new RuntimeException();
@@ -118,14 +118,19 @@ public class VotingServiceImpl implements VotingService {
     public void disconnectSession(String sessionId) {
         SessionMapper sessionInfo = sessionMapper.get(sessionId);
         VotingSession targetRoomSessionStatus = votingSessions.get(sessionInfo.getRoomId());
-        targetRoomSessionStatus.getUsers().remove(sessionId);
-        sessionMapper.remove(sessionId);
-        // 투표 세션에 참여중인 유저의 연결이 모두 끊어지면 투표 세션 자체를 없애버림
-        if (targetRoomSessionStatus.getUsers().isEmpty()) {
-            votingSessions.remove(sessionInfo.getRoomId());
+        int targetRoomUserCnt = 0;
+        // 해당 유저와 관련된 투표 세션이 있다면 정리해줌
+        if (targetRoomSessionStatus != null) {
+            targetRoomSessionStatus.getUsers().remove(sessionId);
+            targetRoomUserCnt = targetRoomSessionStatus.getUsers().size();
+            // 투표 세션에 참여중인 유저의 연결이 모두 끊어지면 투표 세션 자체를 없애버림
+            if (targetRoomUserCnt == 0) {
+                votingSessions.remove(sessionInfo.getRoomId());
+            }
         }
-        Message message = new Message("server", "people", "유저이탈", "20231004", VotingStatus.DISCONNECT, targetRoomSessionStatus.getUsers().size());
+        sessionMapper.remove(sessionId);
+        Message message = new Message("server", "people", "유저이탈", "20231004", VotingStatus.DISCONNECT, targetRoomUserCnt);
         simpMessagingTemplate.convertAndSend("/voting/" + sessionInfo.getRoomId(), message);
-        System.out.println("Session disconnected: " + sessionId);
+        log.info("Session disconnected : {}", sessionId);
     }
 }

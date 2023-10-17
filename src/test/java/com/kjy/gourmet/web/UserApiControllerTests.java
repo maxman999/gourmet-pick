@@ -1,7 +1,8 @@
 package com.kjy.gourmet.web;
 
-import com.kjy.gourmet.domain.member.Member;
-import com.kjy.gourmet.mapper.MemberMapper;
+import com.kjy.gourmet.domain.user.Role;
+import com.kjy.gourmet.domain.user.User;
+import com.kjy.gourmet.mapper.UserMapper;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class MemberApiControllerTests {
+public class UserApiControllerTests {
 
     @Autowired private WebApplicationContext ctx;
-    @Autowired private MemberMapper memberMapper;
+    @Autowired private UserMapper userMapper;
 
     private MockMvc mockMvc;Gson gson = new Gson();
 
@@ -31,14 +32,14 @@ public class MemberApiControllerTests {
     @Order(1)
     @Test
     public void signUpTest() throws Exception{
-        Member newbie = Member.builder()
+        User newbie = User.builder()
                 .email("test1@naver.com")
-                .password("123456")
                 .nickname("웹램지")
+                .role(Role.USER)
                 .build();
         String newbieJson = gson.toJson(newbie);
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/member/signUp")
+                        MockMvcRequestBuilders.post("/api/user/signUp")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(newbieJson)
 
@@ -49,10 +50,10 @@ public class MemberApiControllerTests {
 
     @Order(2)
     @Test
-    public void getMemberTest() throws Exception{
-        long memberId =  memberMapper.selectMemberByEmail("test1@naver.com").getId();
+    public void getUserTest() throws Exception{
+        long userId =  userMapper.selectUserByEmail("test1@naver.com").getId();
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/member/"+memberId)
+            MockMvcRequestBuilders.get("/api/user/"+userId)
         )
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print());
@@ -61,10 +62,10 @@ public class MemberApiControllerTests {
     @Order(3)
     @Test
     public void signOutTest() throws Exception{
-        long memberId = memberMapper.selectMemberByEmail("test1@naver.com").getId();
+        long userId = userMapper.selectUserByEmail("test1@naver.com").getId();
 
         mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/member/"+memberId)
+                MockMvcRequestBuilders.delete("/api/user/"+userId)
         )
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andDo(MockMvcResultHandlers.print());

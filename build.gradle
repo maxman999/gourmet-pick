@@ -21,15 +21,20 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
-    implementation 'mysql:mysql-connector-java:8.0.28'
-    compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.session:spring-session-jdbc'
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'mysql:mysql-connector-java:8.0.28'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     // assertJ
     testImplementation "org.assertj:assertj-core:3.20.2"
     //Gson

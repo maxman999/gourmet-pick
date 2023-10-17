@@ -34,18 +34,18 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
-    public int enterRoom(long memberId, long roomId) {
-        return roomMapper.insertFavoriteRoom(memberId, roomId);
+    public int enterRoom(long userId, long roomId) {
+        return roomMapper.insertFavoriteRoom(userId, roomId);
     }
 
     @Override
-    public int exitRoom(long memberId, long roomId) {
-        return roomMapper.deleteFavoriteRoom(memberId, roomId);
+    public int exitRoom(long userId, long roomId) {
+        return roomMapper.deleteFavoriteRoom(userId, roomId);
     }
 
     @Override
-    public List<Room> getMyRoomList(long memberId) {
-        return roomMapper.selectFavoriteRoomList(memberId);
+    public List<Room> getMyRoomList(long userId) {
+        return roomMapper.selectFavoriteRoomList(userId);
     }
 
 }

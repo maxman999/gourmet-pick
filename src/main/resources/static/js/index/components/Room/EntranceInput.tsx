@@ -2,6 +2,7 @@ import {IRoom} from "../../interfaces/IRoom";
 import axios from "axios";
 import './EntranceInput.css';
 import {useRef} from "react";
+import * as _ from "lodash";
 
 interface props {
     onEntrance: (room: IRoom) => void;
@@ -21,51 +22,42 @@ const EntranceInput = (props: props) => {
         }
     };
 
-    const checkRoom = async (memberId: number, roomId: number): Promise<boolean> => {
-        const fetchRes = await axios.get(`api/room/getList?memberId=${memberId}`);
-        const result = [...fetchRes.data].filter(room => {
-            return room.id == roomId;
-        });
-        return result.length > 0;
-    }
-
-    const enterRoom = async (memberId: number, roomId: number) => {
-        await axios.post(`api/room/enter/${memberId}/${roomId}`);
+    const enterRoom = async (userId: number, roomId: number) => {
+        const fetchResult = await axios.post(`api/room/enter/${userId}/${roomId}`);
+        return Number(fetchResult.data) >= 0;
     };
 
-    const clickHandler = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        const memberId = Number(sessionStorage.getItem("memNo"));
-        const room = await getRoom(invitationCodeRef.current.value || "noCode");
-        if (room !== "") {
-            const isAlreadyIn = await checkRoom(memberId, room.id);
-            if (!isAlreadyIn) await enterRoom(memberId, room.id);
+    const clickHandler = async () => {
+        const userId = Number(sessionStorage.getItem("userId"));
+        const room: IRoom = await getRoom(invitationCodeRef.current.value || "noCode");
+        if (!_.isEmpty(room)) {
+            const isEntranceSuccess = await enterRoom(userId, room.id);
+            isEntranceSuccess ? props.onEntrance(room) : alert("방 입장 실패");
+        } else {
+            alert("해당 방이 존재하지 않습니다.");
         }
-        props.onEntrance(room);
     };
 
     return (
         <div id={'invitationCodeInput'}
              className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? 'codeInput-show' : 'codeInput-hide'}`}>
-            <form>
-                <div className="mb-3">
-                    <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>
-                    <div className='row'>
-                        <div className='col-sm-11'>
-                            <input type="text"
-                                   className="form-control"
-                                   id="invitationCode"
-                                   ref={invitationCodeRef}
-                            />
-                        </div>
-                        <div className='col-sm-1'>
-                            <button className='btn btn-outline-secondary' id="entranceBtn" onClick={clickHandler}> $
-                            </button>
-                        </div>
+            <div className="mb-3">
+                <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>
+                <div className='row'>
+                    <div className='col-sm-11'>
+                        <input type="text"
+                               className="form-control"
+                               id="invitationCode"
+                               ref={invitationCodeRef}
+                        />
                     </div>
-                    <div id="emailHelp" className="form-text">enter room code for service</div>
+                    <div className='col-sm-1'>
+                        <button className='btn btn-outline-secondary' id="entranceBtn" onClick={clickHandler}> $
+                        </button>
+                    </div>
                 </div>
-            </form>
+                <div id="emailHelp" className="form-text">enter room code for service</div>
+            </div>
         </div>
     );
 };

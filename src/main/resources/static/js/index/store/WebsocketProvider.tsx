@@ -19,8 +19,8 @@ type websocketState = {
 
 type sessionInfo = {
     topic: string,
-    userId: string,
-    roomId: string,
+    userId: number,
+    roomId: number,
 }
 
 type websocketAction =
@@ -40,7 +40,7 @@ type websocketAction =
     | { type: "FINISH" }
     | { type: "DISCONNECT" };
 
-const WEBSOCKET_SERVER_URL: string = 'http://localhost:8080/ws'
+const WEBSOCKET_SERVER_URL: string = 'http://127.0.0.1:8080/ws'
 let stompClient: Client = null;
 
 const onError = (err: any) => {
@@ -130,8 +130,8 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
 const defaultWebsocketState: websocketState = {
     sessionInfo: {
         topic: '',
-        roomId: '',
-        userId: '',
+        roomId: null,
+        userId: null,
     },
     isVotingPossible: false,
 }

@@ -36,5 +36,8 @@ out/
 node_modules
 
 ### properties ###
+application-oauth.properties
 application-config.properties
+
 /src/main/resources/static/dist/
+/src/main/resources/static/img/
