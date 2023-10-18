@@ -19,8 +19,6 @@ const WebsocketContext = React.createContext({
     },
     create: () => {
     },
-    sync: () => {
-    },
     cancel: () => {
     },
     seat: () => {

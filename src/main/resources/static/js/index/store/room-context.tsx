@@ -2,7 +2,7 @@ import * as React from "react";
 import {IRoom} from "../interfaces/IRoom";
 
 const RoomContext = React.createContext({
-    roomInfo: undefined,
+    roomInfo: null,
     setRoomInfo: (room: IRoom) => {
     },
     roomPhase: 'default',

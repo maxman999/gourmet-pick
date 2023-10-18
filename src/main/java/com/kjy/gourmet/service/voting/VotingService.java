@@ -6,10 +6,11 @@ public interface VotingService {
 
     void userRegisterHandler(String roomId, String sessionId, String userId);
 
+    boolean isSessionDuplicated(String sessionId);
+
     void creatVotingSession(String roomId);
 
     void syncHandler(String roomId, String userId);
-
 
     void cancelHandler(String roomId);
 

@@ -1,6 +1,5 @@
 package com.kjy.gourmet.domain.user;
 
-import com.kjy.gourmet.config.auth.OAuthAttributes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

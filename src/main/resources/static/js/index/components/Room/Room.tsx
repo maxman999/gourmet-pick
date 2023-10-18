@@ -1,6 +1,4 @@
-import EntranceInput from "./EntranceInput";
 import {useContext, useEffect, useState} from "react";
-import {IRoom} from "../../interfaces/IRoom";
 import RoomHeader from "./RoomHeader";
 import MenuList from "../Menu/MenuList";
 import './Room.css';
@@ -13,21 +11,16 @@ const Room = () => {
     const roomCtx = useContext(roomContext);
     const websocketAPIs = useContext(websocketContext);
 
-    const [room, setRoom] = useState<IRoom | null>();
     const [gourmet, setGourmet] = useState(0);
     const [isModalPopped, setIsModalPopped] = useState(false)
     const [todayPick, setTodayPick] = useState('');
 
     const sessionInfo = {
         topic: 'voting',
-        roomId: room?.id,
+        roomId: roomCtx.roomInfo.id,
         userId: Number(sessionStorage.getItem('userId')),
     }
-
-    const entranceHandler = (room: IRoom) => {
-        setRoom(room);
-        websocketAPIs.sync();
-    }
+    console.log({sessionInfo});
 
     const modalCloseHandler = () => {
         roomCtx.changeVotingStatus('gathering');
@@ -39,52 +32,57 @@ const Room = () => {
         setIsModalPopped(isModalPopped)
     }
 
+    const onMessageHandler = (payload: any) => {
+        let payloadData = JSON.parse(payload.body);
+        switch (payloadData.status) {
+            case "CREATE":
+                roomCtx.changeRoomPhase('calling');
+                break;
+            case 'SEATING':
+                setGourmet(Number(payloadData.data));
+                break;
+            case 'CANCEL':
+                roomCtx.changeRoomPhase('default');
+                setGourmet(0);
+                break;
+            case 'READY':
+                roomCtx.changeRoomPhase('ready');
+                break;
+            case 'START':
+                roomCtx.changeRoomPhase('starting');
+                roomCtx.changeVotingStatus('voting');
+                websocketAPIs.start();
+                break
+            case 'FINISH':
+                setTodayPick([`${payloadData.data}`][0]);
+                setGourmet(0);
+                modalPopHandler(true);
+                break;
+            case 'DISCONNECT':
+                setGourmet(Number(payloadData.data));
+                break
+            default :
+                break;
+        }
+    }
+
+    const onPrivateMessageHandler = (payload: any) => {
+        let payloadData = JSON.parse(payload.body);
+        switch (payloadData.status) {
+            case 'SYNC':
+                roomCtx.changeRoomPhase('calling');
+                setGourmet(Number(payloadData.data));
+                break
+            default :
+                break;
+        }
+    }
+
     useEffect(() => {
-        const onMessageHandler = (payload: any) => {
-            let payloadData = JSON.parse(payload.body);
-            switch (payloadData.status) {
-                case "CREATE":
-                    roomCtx.changeRoomPhase('calling');
-                    break;
-                case 'SEATING':
-                    setGourmet(Number(payloadData.data));
-                    break;
-                case 'CANCEL':
-                    roomCtx.changeRoomPhase('default');
-                    break;
-                case 'READY':
-                    roomCtx.changeRoomPhase('ready');
-                    break;
-                case 'START':
-                    roomCtx.changeRoomPhase('starting');
-                    roomCtx.changeVotingStatus('voting');
-                    websocketAPIs.start();
-                    break
-                case 'FINISH':
-                    setTodayPick([`${payloadData.data}`][0]);
-                    setGourmet(0);
-                    modalPopHandler(true);
-                    break;
-                case 'DISCONNECT':
-                    setGourmet(Number(payloadData.data));
-                    break
-                default :
-                    break;
-            }
+        if (!sessionInfo.userId) {
+            alert("인증 정보를 받아올 수 없습니다. 다시 시도해주세요.")
+            location.reload();
         }
-
-        const onPrivateMessageHandler = (payload: any) => {
-            let payloadData = JSON.parse(payload.body);
-            switch (payloadData.status) {
-                case 'SYNC':
-                    roomCtx.changeRoomPhase('calling');
-                    setGourmet(Number(payloadData.data));
-                    break
-                default :
-                    break;
-            }
-        }
-
         websocketAPIs.register(sessionInfo, onMessageHandler, onPrivateMessageHandler);
 
         return () => {
@@ -92,23 +90,17 @@ const Room = () => {
         };
     }, []);
 
-    useEffect(() => {
-        if (room) {
-            roomCtx.setRoomInfo(room)
-        }
-    }, [room]);
 
     return (
         <>
-            <EntranceInput roomPhase={roomCtx.roomPhase} onEntrance={entranceHandler}/>
-            {room && (roomCtx.roomPhase !== 'updating') &&
+            {roomCtx.roomInfo && (roomCtx.roomPhase !== 'updating') &&
                 <div
                     className={`room-container row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? 'room-show' : 'room-active'}`}>
-                    <RoomHeader room={room}/>
-                    <MenuList room={room} gourmet={gourmet}/>
+                    <RoomHeader room={roomCtx.roomInfo}/>
+                    <MenuList room={roomCtx.roomInfo} gourmet={gourmet}/>
                 </div>
             }
-            {room && (roomCtx.roomPhase === 'updating') &&
+            {roomCtx.roomInfo && (roomCtx.roomPhase === 'updating') &&
                 <MenuUpdateForm/>
             }
             {isModalPopped &&

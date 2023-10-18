@@ -31,7 +31,6 @@ type websocketAction =
     onPrivateMessageHandler: (payload: any) => void
 }
     | { type: "CREATE" }
-    | { type: "SYNC" }
     | { type: "CANCEL" }
     | { type: "SEAT" }
     | { type: "BOOTING" }
@@ -58,6 +57,7 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
             stompClient.subscribe(`/user/${userId}/private`, action.onPrivateMessageHandler);
 
             stompClient.send(`/app/${topic}/register/${userId}/${roomId}`, {});
+            stompClient.send(`/app/${topic}/sync/${userId}/${roomId}`, {});
         }, onError);
 
         return {
@@ -69,11 +69,6 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     if (action.type === "CREATE") {
         const {topic, userId, roomId} = state.sessionInfo
         stompClient.send(`/app/${topic}/create/${userId}/${roomId}`, {});
-    }
-
-    if (action.type === "SYNC") {
-        const {topic, userId, roomId} = state.sessionInfo
-        stompClient.send(`/app/${topic}/sync/${userId}/${roomId}`, {});
     }
 
     if (action.type === "CANCEL") {
@@ -157,12 +152,6 @@ const WebsocketProvider = (props: props) => {
         });
     }
 
-    const syncHandler = () => {
-        dispatchWebsocketActions({
-            type: 'SYNC',
-        });
-    }
-
     const cancelHandler = () => {
         dispatchWebsocketActions({
             type: 'CANCEL',
@@ -211,7 +200,6 @@ const WebsocketProvider = (props: props) => {
         websocketState: websocketState,
         register: registerHandler,
         create: createHandler,
-        sync: syncHandler,
         cancel: cancelHandler,
         seat: seatHandler,
         boot: bootHandler,

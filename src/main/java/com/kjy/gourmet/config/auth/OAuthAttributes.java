@@ -1,6 +1,5 @@
 package com.kjy.gourmet.config.auth;
 
-import com.kjy.gourmet.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,11 +7,11 @@ import java.util.Map;
 
 @Getter
 public class OAuthAttributes {
-    private Map<String, Object> attributes;
-    private String nameAttributeKey;
-    private String name;
-    private String email;
-    private String picture;
+    private final Map<String, Object> attributes;
+    private final String nameAttributeKey;
+    private final String name;
+    private final String email;
+    private final String picture;
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey, String name, String email, String picture) {
@@ -34,12 +33,6 @@ public class OAuthAttributes {
                 .picture((String) attributes.get("picture"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
-                .build();
-    }
-
-    public User toEntity(){
-        return User.builder()
-                .nickname(name)
                 .build();
     }
 

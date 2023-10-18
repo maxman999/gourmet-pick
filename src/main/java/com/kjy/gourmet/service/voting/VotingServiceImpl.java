@@ -26,6 +26,12 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
+    public boolean isSessionDuplicated(String sessionId) {
+        return sessionMapper.containsKey(sessionId);
+    }
+
+
+    @Override
     public void creatVotingSession(String roomId) {
         if (!votingSessions.containsKey(roomId)) {
             votingSessions.put(roomId, new VotingSession());

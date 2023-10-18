@@ -1,3 +1,69 @@
-.signIn-container{
-    top: 30vh;
+.signIn-container {
+    height: 100vh;
+}
+
+.signIn-wrap {
+    height: 100%;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+.signIn-form {
+    width: 40%;
+    align-items: center;
+}
+
+.signIn-form hr {
+    width: 70%;
+}
+
+.signIn-header {
+    font-size: 55px;
+}
+
+.signIn-hint {
+    font-size: 13px;
+    color: gray;
+}
+
+.catchphrase {
+    justify-content: center;
+    margin-bottom: 40px;
+    font-family: 'Arial', sans-serif;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #333333;
+    letter-spacing: 3px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.social-btn {
+    padding: 12px;
+    margin-bottom: 5px;
+    background-color: transparent;
+    border: 1px solid black;
+    width: 45%;
+}
+
+.social-btn svg {
+    margin-top: 5px;
+    margin-left: 10px;
+    float: left;
+}
+
+.social-btn-text {
+    font-size: 17px;
+}
+
+.google-btn {
+    color: red;
+}
+
+.kakao-btn {
+    color: #fabe43;
+}
+
+.guest-btn {
+    color: gray;
 }

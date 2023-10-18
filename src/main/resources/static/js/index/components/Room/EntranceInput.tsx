@@ -1,15 +1,13 @@
 import {IRoom} from "../../interfaces/IRoom";
 import axios from "axios";
 import './EntranceInput.css';
-import {useRef} from "react";
+import {useContext, useRef} from "react";
 import * as _ from "lodash";
+import roomContext from "../../store/room-context";
 
-interface props {
-    onEntrance: (room: IRoom) => void;
-    roomPhase: string;
-}
 
-const EntranceInput = (props: props) => {
+const EntranceInput = () => {
+    const roomCtx = useContext(roomContext);
     const invitationCodeRef = useRef(null);
 
     const getRoom = async (code: string = "") => {
@@ -22,6 +20,12 @@ const EntranceInput = (props: props) => {
         }
     };
 
+    const inspectSessionDuplication = async () => {
+        // 세션 검사
+        const {data: isSessionDuplicated} = await axios.get("/voting/isSessionDuplicated");
+        return isSessionDuplicated;
+    }
+
     const enterRoom = async (userId: number, roomId: number) => {
         const fetchResult = await axios.post(`api/room/enter/${userId}/${roomId}`);
         return Number(fetchResult.data) >= 0;
@@ -29,10 +33,17 @@ const EntranceInput = (props: props) => {
 
     const clickHandler = async () => {
         const userId = Number(sessionStorage.getItem("userId"));
+
+        const isSessionDuplicated = await inspectSessionDuplication();
+        if (isSessionDuplicated) {
+            alert("이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.");
+            return;
+        }
+
         const room: IRoom = await getRoom(invitationCodeRef.current.value || "noCode");
         if (!_.isEmpty(room)) {
             const isEntranceSuccess = await enterRoom(userId, room.id);
-            isEntranceSuccess ? props.onEntrance(room) : alert("방 입장 실패");
+            isEntranceSuccess ? roomCtx.setRoomInfo(room) : alert("방 입장 실패");
         } else {
             alert("해당 방이 존재하지 않습니다.");
         }
@@ -40,7 +51,7 @@ const EntranceInput = (props: props) => {
 
     return (
         <div id={'invitationCodeInput'}
-             className={`row card mt-3 p-3 ${props.roomPhase === 'default' ? 'codeInput-show' : 'codeInput-hide'}`}>
+             className={`row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? 'codeInput-show' : 'codeInput-hide'}`}>
             <div className="mb-3">
                 <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>
                 <div className='row'>
