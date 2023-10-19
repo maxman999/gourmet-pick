@@ -50,19 +50,20 @@ const EntranceInput = () => {
     };
 
     return (
-        <div id={'invitationCodeInput'}
-             className={`row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? 'codeInput-show' : 'codeInput-hide'}`}>
-            <div className="mb-3">
-                <label htmlFor="invitationCode" className="form-label"># INVITATION CODE</label>
+        <div id={'invitationCodeContainer'}
+             className={`container ${roomCtx.roomInfo ? 'codeInput-hide' : 'codeInput-show'}`}
+        >
+            <div id={"invitationCodeInputWrapper"} className="card p-3">
+                <label htmlFor="invitationCodeInput" className="form-label"># INVITATION CODE</label>
                 <div className='row'>
-                    <div className='col-sm-11'>
+                    <div className='col-sm-11 p-1'>
                         <input type="text"
                                className="form-control"
-                               id="invitationCode"
+                               id="invitationCodeInput"
                                ref={invitationCodeRef}
                         />
                     </div>
-                    <div className='col-sm-1'>
+                    <div className='col-sm-1 p-1'>
                         <button className='btn btn-outline-secondary' id="entranceBtn" onClick={clickHandler}> $
                         </button>
                     </div>

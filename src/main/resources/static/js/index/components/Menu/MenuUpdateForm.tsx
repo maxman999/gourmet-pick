@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import CommonUtils from "../../utils/websocket/CommonUtils";
 import {IMenu} from "../../interfaces/IMenu";
 import axios from "axios";
+import MenuContainer from "./MenuContainer";
 
 const MenuUpdateForm = () => {
 
@@ -144,56 +145,23 @@ const MenuUpdateForm = () => {
     }, [menuName, soberComment, location, thumbnail]);
 
     return (
-        <div className={`menu-update-container row card mt-3 p-3 menu-update-active`}>
-            <div className='row m-0 p-0"'>
-                <div className='text-end'>
-                    <span className='room-title'> # {roomCtx.roomInfo?.name} </span>
-                    <span className='room-code'>({roomCtx.roomInfo?.invitationCode})</span>
-                </div>
-            </div>
-            <div className='row'>
-                <div className='col menu-title'>
-                    <div className="input-group">
-                        <input id='menuNameInput'
-                               className={'form-control pt-0'}
-                               type='text'
-                               placeholder='메뉴 이름을 입력해주세요.'
-                               onChange={menuNameChangeHandler}
-                               ref={menuNameInputRef}/>
-                    </div>
-                </div>
-            </div>
-            <div className='row justify-content-center'>
-                <div className='menu-detail card mt-2 p-3'>
-                    <div className='row'>
-                        <div className='col-md-5'>
-
-                            <>
-                                {thumbnail &&
-                                    <img id='menuThumbnail'
-                                         src={thumbnail}
-                                         alt='메뉴 썸네일 미리보기'>
-                                    </img>
-                                }
-                                {!thumbnail &&
-                                    <EmptyBox minHeight={'250px'} clickHandler={thumbnailUploadHandler}/>
-                                }
-                                <input onChange={thumbnailChangeHandler} type={'file'} ref={imageUploadRef}
-                                       style={{display: 'none'}}/>
-                            </>
-                            <hr/>
-                            <div>
-                                <div id={'soberCommentTitle'}>냉정한 한줄평</div>
-                                <textarea id={'soberCommentInput'}
-                                          className={'w-100'}
-                                          placeholder={"냉정한 미식가의 평가를 입력해주세요."}
-                                          maxLength={30}
-                                          onChange={soberCommentChangeHandler}
-                                          ref={soberCommentInputRef}
-                                />
+        <MenuContainer>
+            <div className={"menu-update-active"}>
+                <div className='card mt-3 p-3'>
+                    <div className='row mb-2'>
+                        <div className='col menu-title'>
+                            <div className="input-group">
+                                <input id='menuNameInput'
+                                       className={'form-control'}
+                                       type='text'
+                                       placeholder='메뉴 이름을 입력해주세요.'
+                                       onChange={menuNameChangeHandler}
+                                       ref={menuNameInputRef}/>
                             </div>
                         </div>
-                        <div id={'mapWrapper'} className='col'>
+                    </div>
+                    <div className='row mt-2'>
+                        <div id={'mapWrapper'} className='col mb-2'>
                             {isPlaceSelected &&
                                 < Map
                                     center={{lat: location.latitude, lng: location.longitude}}
@@ -205,39 +173,70 @@ const MenuUpdateForm = () => {
                                 </Map>
                             }
                             {!isPlaceSelected &&
-                                <EmptyBox clickHandler={mapUploadHandler} minHeight={'360px'}/>
+                                <EmptyBox clickHandler={mapUploadHandler}
+                                          minHeight={'360px'}
+                                          caption={'위치정보를 등록해주세요.'}
+                                />
                             }
+                        </div>
+                        <div className='col-md-5'>
+                            <>
+                                {thumbnail &&
+                                    <img id='menuThumbnail'
+                                         src={thumbnail}
+                                         alt='메뉴 썸네일 미리보기'>
+                                    </img>
+                                }
+                                {!thumbnail &&
+                                    <EmptyBox minHeight={'265px'}
+                                              clickHandler={thumbnailUploadHandler}
+                                              caption={"사진을 등록해주세요."}
+                                    />
+                                }
+                                <input onChange={thumbnailChangeHandler} type={'file'} ref={imageUploadRef}
+                                       style={{display: 'none'}}/>
+                            </>
+                            <hr/>
+                            <div className={"mb-2"}>
+                                <div id={'soberCommentTitle'}>냉정한 한줄평</div>
+                                <textarea id={'soberCommentInput'}
+                                          className={'w-100'}
+                                          placeholder={"냉정한 미식가의 평가를 입력해주세요."}
+                                          maxLength={30}
+                                          onChange={soberCommentChangeHandler}
+                                          ref={soberCommentInputRef}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="row p-4 pt-3">
-                <div id={'updateSubmitBtnWrap'} className={'col-md-10'}>
-                    <button className="btn btn-outline-primary w-100"
-                            onClick={submitClickHandler}
-                            ref={submitButtonRef}
-                            disabled={!isUploadPossible}
-                    >
-                        {uploadBtnMessage}
-                    </button>
-                </div>
-                <div id={'updateCancelBtnWrap'} className={'col'}>
-                    <button id={'updateCancelBtn'}
-                            className={'btn btn-outline-danger w-100'}
-                            onClick={updateCancelHandler}> X
-                    </button>
+                <div className="row mt-2">
+                    <div id={'updateSubmitBtnWrap'} className={'col-md-10 mt-2'}>
+                        <button className="btn btn-outline-primary w-100"
+                                onClick={submitClickHandler}
+                                ref={submitButtonRef}
+                                disabled={!isUploadPossible}
+                        >
+                            {uploadBtnMessage}
+                        </button>
+                    </div>
+                    <div id={'updateCancelBtnWrap'} className={'col-md-2 mt-2 mb-3'}>
+                        <button id={'updateCancelBtn'}
+                                className={'btn btn-outline-danger w-100'}
+                                onClick={updateCancelHandler}> 취소
+                        </button>
+                    </div>
                 </div>
             </div>
             {isUpdateModalPopped &&
                 <Modal
-                    height={'470px'}
                     onClose={modalCloseHandler}>
                     <MapUploadTool onLocationChange={locationChangeHandler}
                                    onModalClose={modalCloseHandler}
                     />
                 </Modal>
             }
-        </div>
+        </MenuContainer>
     );
 }
 

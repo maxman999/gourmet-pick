@@ -1,11 +1,9 @@
-.gourmet {
-    min-height: 40px;
-    max-width: 60px;
+.gourmet-box {
+    text-align: center;
 }
 
-.gourmet-img {
-    min-height: 40px;
-    border: 1px solid gray;
+.gourmet-avatar {
+    color: gray;
 }
 
 .vote-light {
@@ -15,9 +13,9 @@
 }
 
 .noName {
-    font-size: 5px;
+    font-size: 10px;
 }
 
-.active{
-    background-color: darkseagreen;
+.gourmet-avatar.active {
+    color: darkseagreen;
 }

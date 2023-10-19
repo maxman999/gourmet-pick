@@ -4,7 +4,6 @@ import * as ReactDOM from 'react-dom';
 interface ModalProps {
     children: React.ReactNode;
     onClose: () => void;
-    height?: string;
 }
 
 interface ModalOverlayProps {
@@ -25,9 +24,7 @@ const Backdrop = (props: BackdropProps) => {
 
 const ModalOverlay = (props: ModalOverlayProps) => {
     return (
-        <div className="modal"
-             style={{'height': props.height}}
-        >
+        <div className="custom-modal">
             <div className="content">{props.children}</div>
         </div>
     )
@@ -39,7 +36,7 @@ const Modal = (props: ModalProps) => {
     return (
         <>
             {ReactDOM.createPortal(<Backdrop onClose={props.onClose}/>, portalElement)}
-            {ReactDOM.createPortal(<ModalOverlay height={props.height}>{props.children}</ModalOverlay>, portalElement)}
+            {ReactDOM.createPortal(<ModalOverlay>{props.children}</ModalOverlay>, portalElement)}
         </>
     )
 }

@@ -5,6 +5,7 @@ import {IRoom} from "../interfaces/IRoom";
 
 type roomState = {
     roomInfo: IRoom;
+    isMenuListEmpty: boolean;
     roomPhase: string;
     votingStatus: string;
     callerFlag: boolean;
@@ -12,6 +13,7 @@ type roomState = {
 
 type roomAction =
     | { type: "DEFAULT_ROOM_SETTING"; roomInfo: IRoom; }
+    | { type: "SET_MENU_EMPTY_FLAG"; isMenuListEmpty: boolean }
     | { type: "SET_ROOM_PHASE"; roomPhase: string; }
     | { type: "SET_CALLER_FLAG"; callerFlag: boolean; }
     | { type: "SET_VOTING_STATUS"; votingStatus: string; }
@@ -28,6 +30,13 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
         };
     }
 
+    if (roomAction.type === "SET_MENU_EMPTY_FLAG") {
+        return {
+            ...state,
+            isMenuListEmpty: roomAction.isMenuListEmpty
+        };
+    }
+
     if (roomAction.type === "SET_ROOM_PHASE") {
         return {
             ...state,
@@ -36,7 +45,6 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
     }
 
     if (roomAction.type === "SET_CALLER_FLAG") {
-        console.log("this")
         return {
             ...state,
             callerFlag: roomAction.callerFlag
@@ -54,6 +62,7 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
 
 const defaultRoomState: roomState = {
     roomInfo: undefined,
+    isMenuListEmpty: true,
     roomPhase: 'default',
     callerFlag: false,
     votingStatus: 'gathering',
@@ -66,6 +75,13 @@ const RoomProvider = (props: props) => {
         dispatchMenuActions({
             type: 'DEFAULT_ROOM_SETTING',
             roomInfo: room,
+        });
+    }
+
+    const menuEmptyFlagSettingHandler = (isMenuListEmpty: boolean) => {
+        dispatchMenuActions({
+            type: 'SET_MENU_EMPTY_FLAG',
+            isMenuListEmpty: isMenuListEmpty,
         });
     }
 
@@ -93,11 +109,13 @@ const RoomProvider = (props: props) => {
 
     const roomContext = {
         roomInfo: roomState.roomInfo,
-        setRoomInfo: roomSettingHandler,
+        isMenuListEmpty: roomState.isMenuListEmpty,
         roomPhase: roomState.roomPhase,
         callerFlag: roomState.callerFlag,
-        setCallerFlag: callerFlagChangeHandler,
         votingStatus: roomState.votingStatus,
+        setRoomInfo: roomSettingHandler,
+        setMenuEmptyFlag: menuEmptyFlagSettingHandler,
+        setCallerFlag: callerFlagChangeHandler,
         changeRoomPhase: roomPhaseChangeHandler,
         changeVotingStatus: votingStatusChangeHandler,
     }

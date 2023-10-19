@@ -2,7 +2,11 @@ import {IMenu} from "../../interfaces/IMenu";
 import './MenuItem.css';
 import axios from "axios";
 import {StaticMap, MapMarker} from "react-kakao-maps-sdk";
-import {useRef} from "react";
+import {useRef, useState} from "react";
+import Timer from "../VotingTable/Timer";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faMapLocationDot} from "@fortawesome/free-solid-svg-icons";
+import Modal from "../UI/Modal";
 
 interface props {
     menu: IMenu;
@@ -10,8 +14,9 @@ interface props {
 }
 
 const MenuItem = (props: props) => {
-    const deleteBtnRef = useRef(null);
+    const [isMapModalOpened, setIsMapModalOpened] = useState(false);
 
+    const deleteBtnRef = useRef(null);
 
     const deleteClickHandler = async () => {
         const targetMenuId = Number(deleteBtnRef.current.dataset.id);
@@ -20,14 +25,30 @@ const MenuItem = (props: props) => {
         props.onDelete(targetMenuId);
     }
 
+    function getLocationHandler() {
+        setIsMapModalOpened(true);
+    }
+
+    function modalCloseHandler() {
+        setIsMapModalOpened(false);
+    }
+
     return (
-        <div className='card mt-2 p-3'>
-            <div className='row'>
-                <div className='col-11 menu-title'>
-                    <div> {props.menu.name} </div>
+        <div className='menuItemWrapper card mt-3 p-3'>
+            <div className='row mb-2'>
+                <div className='col menu-title'>
+                    <div>
+                        {props.menu.name}
+                        <button className={'locationBtn btn btn-outline-success btn-sm'}
+                                onClick={getLocationHandler}
+                        >
+
+                            <FontAwesomeIcon icon={faMapLocationDot}/>
+                        </button>
+                    </div>
                 </div>
                 {props.onDelete &&
-                    <div className='col-1 text-end'>
+                    <div className='col text-end'>
                         <button
                             className='btn btn-sm btn-outline-secondary'
                             data-id={props.menu.id}
@@ -38,34 +59,39 @@ const MenuItem = (props: props) => {
                         </button>
                     </div>
                 }
+                {!props.onDelete &&
+                    <div className={"col"}>
+                        <Timer/>
+                    </div>
+                }
             </div>
-            <div className='row justify-content-center'>
-                <div className='menu-detail card mt-2 p-3'>
-                    <div className='row'>
-                        <div className='col-md-5'>
-                            <img id='menuThumbnail'
-                                 src={`/api/menu/getMenuImageURL?fileName=${props.menu.thumbnail}`}
-                                 alt='메뉴 썸네일'/>
-                            <hr/>
-                            <div>
-                                <div id={'soberCommentTitle'}>냉정한 한줄평</div>
-                                <span id={'soberCommentInput'}
-                                      className={'w-100'}>
-                                        "{props.menu.soberComment}"
-                                    </span>
-                            </div>
-                        </div>
-                        <div id={'mapWrapper'} className='col'>
+            <div className={"row mt-2"}>
+                <div className='col text-center'>
+                    <img id='menuThumbnail'
+                         src={`/api/menu/getMenuImageURL?fileName=${props.menu.thumbnail}`}
+                         alt='메뉴 썸네일'/>
+                    <hr/>
+                    <div>
+                        <div id={'soberCommentTitle'}>냉정한 한줄평</div>
+                        <span id={'soberCommentInput'}
+                              className={'w-100'}>
+                            "{props.menu.soberComment}"
+                        </span>
+                    </div>
+                </div>
+                {isMapModalOpened &&
+                    <Modal onClose={modalCloseHandler}>
+                        <div id={'mapWrapper'} className=''>
                             <StaticMap
                                 center={{lat: props.menu.latitude, lng: props.menu.longitude}}
-                                style={{width: "100%", minHeight: "360px", border: "1px solid gray"}}
+                                style={{width: "100%", height: "560px", border: "1px solid gray"}}
                                 marker={true}
                                 level={3}
                             >
                             </StaticMap>
                         </div>
-                    </div>
-                </div>
+                    </Modal>
+                }
             </div>
         </div>
     );

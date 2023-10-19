@@ -9,13 +9,9 @@ const MenuInput = () => {
     }
 
     return (
-        <div className='card mt-3 p-3'>
-            <form id='menuInputForm' className='p-2'>
-                <div className='row'>
-                    <button type='submit' className='btn btn-outline-primary' onClick={updateClickHandler}>ADD NEW MENU
-                    </button>
-                </div>
-            </form>
+        <div className='row mt-3 p-3'>
+            <button className='btn btn-outline-primary' onClick={updateClickHandler}>ADD NEW MENU
+            </button>
         </div>
     );
 }

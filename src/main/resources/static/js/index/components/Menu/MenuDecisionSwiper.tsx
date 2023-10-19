@@ -41,7 +41,6 @@ const MenuDecisionSwiper = memo((props: props) => {
                     );
                 })}
                 {/* 투표 영역 */}
-                <Timer/>
                 <GourmetTable
                     menuList={props.menuList}
                     gourmet={props.gourmet}

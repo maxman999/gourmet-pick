@@ -14,11 +14,12 @@ const GourmetTable = (props: props) => {
     return (
         <>
             <VotePanel menuList={props.menuList}/>
-            <div className='row mt-1 p-3'>
+            <div className='row mt-1'>
                 {empty_seat.map((cnt, index) => {
                     return <Gourmet key={index} isActive={index < props.gourmet}/>
                 })}
             </div>
+
         </>
     );
 }

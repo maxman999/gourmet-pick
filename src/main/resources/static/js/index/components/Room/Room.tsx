@@ -6,6 +6,7 @@ import websocketContext from "../../store/websocket-context";
 import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
 import MenuUpdateForm from "../Menu/MenuUpdateForm";
+import RoomContainer from "./RoomContainer";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
@@ -20,7 +21,6 @@ const Room = () => {
         roomId: roomCtx.roomInfo.id,
         userId: Number(sessionStorage.getItem('userId')),
     }
-    console.log({sessionInfo});
 
     const modalCloseHandler = () => {
         roomCtx.changeVotingStatus('gathering');
@@ -81,7 +81,7 @@ const Room = () => {
     useEffect(() => {
         if (!sessionInfo.userId) {
             alert("인증 정보를 받아올 수 없습니다. 다시 시도해주세요.")
-            location.reload();
+            document.location.reload();
         }
         websocketAPIs.register(sessionInfo, onMessageHandler, onPrivateMessageHandler);
 
@@ -93,16 +93,20 @@ const Room = () => {
 
     return (
         <>
-            {roomCtx.roomInfo && (roomCtx.roomPhase !== 'updating') &&
-                <div
-                    className={`room-container row card mt-3 p-3 ${roomCtx.roomPhase === 'default' ? 'room-show' : 'room-active'}`}>
-                    <RoomHeader room={roomCtx.roomInfo}/>
-                    <MenuList room={roomCtx.roomInfo} gourmet={gourmet}/>
-                </div>
-            }
-            {roomCtx.roomInfo && (roomCtx.roomPhase === 'updating') &&
-                <MenuUpdateForm/>
-            }
+            <RoomContainer>
+                {roomCtx.roomInfo && (roomCtx.roomPhase !== 'updating') &&
+                    <>
+                        <RoomHeader room={roomCtx.roomInfo} isConsoleActive={true}/>
+                        <MenuList room={roomCtx.roomInfo} gourmet={gourmet}/>
+                    </>
+                }
+                {roomCtx.roomInfo && (roomCtx.roomPhase === 'updating') &&
+                    <>
+                        <RoomHeader room={roomCtx.roomInfo} isConsoleActive={false}/>
+                        <MenuUpdateForm/>
+                    </>
+                }
+            </RoomContainer>
             {isModalPopped &&
                 <Modal onClose={modalCloseHandler}>
                     <div>{todayPick}</div>

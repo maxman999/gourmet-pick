@@ -1,4 +1,6 @@
 import "./Gourmet.css"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faUser} from "@fortawesome/free-solid-svg-icons";
 
 type props = {
     isActive: boolean
@@ -6,11 +8,11 @@ type props = {
 
 const Gourmet = (props: props) => {
     return (
-        <div className='gourmet d-inline m-1'>
-            {props.isActive && <div className='gourmet-img active'></div>}
-            {!props.isActive && <div className='gourmet-img'></div>}
-            <div className='vote-light'></div>
-            <div className='noName text-center'>mr</div>
+        <div className='gourmet-box col'>
+            <div className={`gourmet-avatar ${props.isActive ? 'active' : ''}`}>
+                <FontAwesomeIcon icon={faUser}/>
+            </div>
+            <div className='noName text-center'>off</div>
         </div>
     );
 }

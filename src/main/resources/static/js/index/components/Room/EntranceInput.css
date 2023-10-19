@@ -1,16 +1,23 @@
+#invitationCodeContainer{
+    align-content: center;
+    width: 75%;
+    height: 100%;
+}
+
+#invitationCodeInputWrapper{
+    top: 25%;
+}
+
+
 #entranceBtn {
-    max-width: 65px;
+    width: 100%;
 }
 
 .codeInput-show {
-    transform: translate(0, 0%);
-    transition-property: transform;
-    transition-duration: 500ms;
+
 }
 
 
 .codeInput-hide {
-    transform: translate(0, -90%);
-    transition-property: transform;
-    transition-duration: 500ms;
+    display: none;
 }

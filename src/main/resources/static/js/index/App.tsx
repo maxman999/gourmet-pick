@@ -5,6 +5,7 @@ import './App.css';
 import axios from "axios";
 import EntranceInput from "./components/Room/EntranceInput";
 import roomContext from "./store/room-context";
+import MainFrame from "./components/Frame/MainFrame";
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -26,10 +27,10 @@ const App = () => {
             {isAuthenticated !== null &&
                 <>
                     {isAuthenticated &&
-                        <div className='main-container container-fluid'>
+                        <MainFrame>
                             <EntranceInput/>
                             {roomCtx.roomInfo && <Room/>}
-                        </div>
+                        </MainFrame>
                     }
                     {!isAuthenticated &&
                         <SignIn/>

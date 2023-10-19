@@ -1,9 +1,5 @@
-#search-wrapper{
-    padding-left: 0;
-}
 .search-area {
-    padding-left: 0;
-    max-height: 400px;
+    max-height: 300px;
     overflow: scroll;
 }
 

@@ -1,12 +1,11 @@
 .menu-title {
-    padding-left: 20px;
-    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+    margin-left: 5px;
+    font-size: 22px;
     font-weight: bold;
-    align-self: center;
 }
 
-.menu-detail{
-    width: 93%;
-    min-height: 390px;
-    background-color: whitesmoke;
+.locationBtn{
+    margin-left: 15px;
+    border-radius: 50%;
 }

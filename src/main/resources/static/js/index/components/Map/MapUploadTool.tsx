@@ -92,8 +92,8 @@ const MapUploadTool = (props: props) => {
     }, [map, searchKeyword])
 
     return (
-        <div className={`map_wrap row`}>
-            <div className={'col'}>
+        <div className={`map_wrap`}>
+            <div className={'row p-2'}>
                 <Map // 로드뷰를 표시할 Container
                     center={{
                         lat: 37.566826,
@@ -101,7 +101,8 @@ const MapUploadTool = (props: props) => {
                     }}
                     style={{
                         width: "100%",
-                        height: "430px",
+                        height: "300px",
+                        border: "1px solid gray"
                     }}
                     level={3}
                     onCreate={setMap}
@@ -119,7 +120,7 @@ const MapUploadTool = (props: props) => {
                     ))}
                 </Map>
             </div>
-            <div id={'search-wrapper'} className={'col-md-4'}>
+            <div id={'search-wrapper'} className={'row'}>
                 <div className={'search-area'}>
                     <div className="input-group mb-1">
                         <input type="text" className="form-control" id={'placeSearchInput'}
@@ -146,7 +147,9 @@ const MapUploadTool = (props: props) => {
                         })}
                     </div>
                 </div>
-                <button className={'btn btn-sm btn-outline-success w-100 mt-2'}
+            </div>
+            <div className={"row p-2 mt-1"}>
+                <button className={'btn btn-sm btn-outline-success'}
                         onClick={mapSelectHandler}> 등록하기
                 </button>
             </div>

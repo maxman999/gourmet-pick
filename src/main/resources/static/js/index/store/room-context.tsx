@@ -5,6 +5,9 @@ const RoomContext = React.createContext({
     roomInfo: null,
     setRoomInfo: (room: IRoom) => {
     },
+    isMenuListEmpty: true,
+    setMenuEmptyFlag: (isMenuListEmpty: boolean) => {
+    },
     roomPhase: 'default',
     changeRoomPhase: (roomPhase: string) => {
     },

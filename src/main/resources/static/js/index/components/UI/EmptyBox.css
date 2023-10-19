@@ -1,6 +1,7 @@
 .empty-box {
     border: 1px solid #198754;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     color: #198754;
@@ -8,4 +9,10 @@
 
 .empty-box :hover {
     cursor: pointer;
+}
+
+.box-caption{
+    margin-top: 5px;
+    font-size: 13px;
+
 }

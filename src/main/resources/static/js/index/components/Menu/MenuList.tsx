@@ -6,6 +6,8 @@ import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
 import MenuDecisionSwiper from "./MenuDecisionSwiper";
 import roomContext from "../../store/room-context";
+import MenuContainer from "./MenuContainer";
+import * as _ from "lodash";
 
 interface props {
     room: IRoom;
@@ -37,19 +39,22 @@ const MenuList = (props: props) => {
         setDefaultMenuList().then();
     }, []);
 
+    useEffect(() => {
+        roomCtx.setMenuEmptyFlag(_.isEmpty(menuList))
+    }, [menuList]);
+
     return (
-        <div className='menu-container'>
-            {!(roomCtx.roomPhase === 'default') &&
-                <MenuDecisionSwiper
-                    menuList={menuList}
-                    gourmet={props.gourmet}
-                />}
+        <MenuContainer>
             {roomCtx.roomPhase === 'default' &&
                 <>
                     <MenuDisplaySwiper menuList={menuList} onDelete={deleteHandler}/>
                     <MenuInput/>
-                </>}
-        </div>
+                </>
+            }
+            {!(roomCtx.roomPhase === 'default') &&
+                <MenuDecisionSwiper menuList={menuList} gourmet={props.gourmet}/>
+            }
+        </MenuContainer>
     );
 }
 
