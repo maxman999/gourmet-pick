@@ -72,19 +72,18 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "CANCEL") {
-        const {topic, userId, roomId} = state.sessionInfo
-        stompClient.send(`/app/${topic}/cancel/${userId}/${roomId}`, {});
+        const {topic, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/cancel/${roomId}`, {});
     }
 
     if (action.type === "SEAT") {
         const {topic, userId, roomId} = state.sessionInfo
         stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {});
-        // stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
     }
 
     if (action.type === "BOOTING") {
-        const {topic, userId, roomId} = state.sessionInfo
-        stompClient.send(`/app/${topic}/start/${userId}/${roomId}`, {});
+        const {topic, roomId} = state.sessionInfo
+        stompClient.send(`/app/${topic}/start/${roomId}`, {});
     }
 
     if (action.type === "START") {
@@ -106,8 +105,8 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "FINISH") {
-        const {topic, userId, roomId} = state.sessionInfo;
-        stompClient.send(`/app/${topic}/finish/${userId}/${roomId}`);
+        const {topic, roomId} = state.sessionInfo;
+        stompClient.send(`/app/${topic}/finish/${roomId}`);
         return {
             ...state,
             isVotingPossible: false,

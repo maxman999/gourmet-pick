@@ -5,7 +5,7 @@ import './Room.css';
 import websocketContext from "../../store/websocket-context";
 import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
-import MenuUpdateForm from "../Menu/MenuUpdateForm";
+import MenuInsertForm from "../Menu/MenuInsertForm";
 import RoomContainer from "./RoomContainer";
 
 const Room = () => {
@@ -36,9 +36,11 @@ const Room = () => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
             case "CREATE":
+                websocketAPIs.seat();
                 roomCtx.changeRoomPhase('calling');
                 break;
             case 'SEATING':
+                roomCtx.changeRoomPhase('calling');
                 setGourmet(Number(payloadData.data));
                 break;
             case 'CANCEL':
@@ -49,15 +51,19 @@ const Room = () => {
                 roomCtx.changeRoomPhase('ready');
                 break;
             case 'START':
+                websocketAPIs.start();
                 roomCtx.changeRoomPhase('starting');
                 roomCtx.changeVotingStatus('voting');
-                websocketAPIs.start();
                 break
             case 'FINISH':
                 setTodayPick([`${payloadData.data}`][0]);
                 setGourmet(0);
                 modalPopHandler(true);
                 break;
+            case 'EXILE':
+                alert("방이 삭제되었습니다. 메인 화면으로 돌아갑니다.")
+                document.location.reload();
+                break
             case 'DISCONNECT':
                 setGourmet(Number(payloadData.data));
                 break
@@ -103,7 +109,7 @@ const Room = () => {
                 {roomCtx.roomInfo && (roomCtx.roomPhase === 'updating') &&
                     <>
                         <RoomHeader room={roomCtx.roomInfo} isConsoleActive={false}/>
-                        <MenuUpdateForm/>
+                        <MenuInsertForm/>
                     </>
                 }
             </RoomContainer>

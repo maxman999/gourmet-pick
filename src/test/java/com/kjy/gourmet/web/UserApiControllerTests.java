@@ -42,7 +42,6 @@ public class UserApiControllerTests {
                         MockMvcRequestBuilders.post("/api/user/signUp")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(newbieJson)
-
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());

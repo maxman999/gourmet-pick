@@ -20,25 +20,24 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MenuApiControllerTests {
 
-    @Autowired private WebApplicationContext ctx;
-    @Autowired private RoomService roomService;
-    @Autowired private MenuService menuService;
+    @Autowired
+    private WebApplicationContext ctx;
+    @Autowired
+    private RoomService roomService;
+    @Autowired
+    private MenuService menuService;
 
     private MockMvc mockMvc;
     Gson gson = new Gson();
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
-        Room room = Room.builder()
-                .name("점심책임방")
-                .invitationCode("123ZXCa")
-                .build();
-        roomService.makeRoom(room);
+        roomService.makeRoom("점심책임방");
     }
 
     @AfterEach
-    public void cleanUp(){
+    public void cleanUp() {
         long roomId = roomService.getRoomByCode("123ZXCa").getId();
         roomService.deleteRoomById(roomId);
     }
@@ -60,15 +59,13 @@ public class MenuApiControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         // get menuList
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/menu/"+roomId))
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/menu/" + roomId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         // delete menu
         menuId = menuService.getMenuList(roomId).get(0).getId();
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/menu/"+menuId));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/menu/" + menuId));
     }
-
-
 
 
 }

@@ -24,15 +24,10 @@ public class MenuServiceTests {
 
     @BeforeEach
     public void setUp() {
-        Room room = Room.builder()
-                .name("점심책임방")
-                .invitationCode("123ZXCa")
-                .build();
-        roomService.makeRoom(room);
-        long roomId = roomService.getRoomByCode("123ZXCa").getId();
+        Room room = roomService.makeRoom("점심책임방");
         for (int i = 0; i < 2; i++) {
             Menu menu = Menu.builder()
-                    .roomId(roomId)
+                    .roomId(room.getId())
                     .name("명가 돌솥 설렁탕" + i)
                     .build();
             menuService.addMenu(menu);

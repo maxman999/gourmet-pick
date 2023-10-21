@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -116,12 +115,25 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public boolean removeMenuImage(String fileName) {
-        String srcFileName = null;
-        srcFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
-        File file = new File(uploadPath + File.separator + srcFileName);
-        return file.delete();
+    public List<String> getAllThumbnailsById(long roomId) {
+        return menuMapper.getAllThumbnailsById(roomId);
     }
 
+    @Override
+    public boolean removeMenuImage(String fileName) {
+        try {
+            String srcFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
+            File file = new File(uploadPath + File.separator + srcFileName);
+            return file.delete();
+        } catch (RuntimeException e) {
+            log.error("썸네일 삭제 실패 ======> 파일명 {}", fileName);
+            return false;
+        }
+    }
+
+    @Override
+    public void removeAllMenuImages(List<String> menuImageList) {
+        menuImageList.forEach(this::removeMenuImage);
+    }
 
 }

@@ -22,12 +22,13 @@ public class RoomServiceTests {
 
     @Autowired
     UserService userService;
-    @Autowired RoomService roomService;
+    @Autowired
+    RoomService roomService;
 
     List<String> invitationCodes = new ArrayList<>();
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         User newbie = User.builder()
                 .email("test1@naver.com")
                 .nickname("고든램지")
@@ -35,44 +36,51 @@ public class RoomServiceTests {
                 .build();
         userService.signUp(newbie);
 
-        for(int i = 0; i < 2; i++){
-            Room room = Room.builder()
-                    .name("점심책임방"+i)
-                    .invitationCode("123ZXCa"+i)
-                    .build();
+        for (int i = 0; i < 2; i++) {
+            Room room = roomService.makeRoom("점심책임방" + i);
             invitationCodes.add(room.getInvitationCode());
-            roomService.makeRoom(room);
         }
     }
 
     @AfterEach
-    public void cleanUp(){
+    public void cleanUp() {
         long memId = userService.getUserByEmail("test1@naver.com").getId();
-        for(int i = 0; i < 2; i++){
-            long roomId = roomService.getRoomByCode("123ZXCa"+i).getId();
-            roomService.exitRoom(memId,roomId);
+        invitationCodes.forEach(code -> {
+            long roomId = roomService.getRoomByCode(code).getId();
+            roomService.exitRoom(memId, roomId);
             roomService.deleteRoomById(roomId);
-        }
+        });
         userService.signOut(memId);
     }
+
     @Test
-    public void getRoomTest(){
-        for(int i = 0; i < 2; i++){
+    public void getRoomTest() {
+        for (int i = 0; i < 2; i++) {
             String roomName = roomService.getRoomByCode(invitationCodes.get(i)).getName();
-            assertThat(roomName).isEqualTo("점심책임방"+i);
+            assertThat(roomName).isEqualTo("점심책임방" + i);
         }
     }
+
     @Test
-    public void enterRoomTest(){
+    public void enterRoomTest() {
         long userId = userService.getUserByEmail("test1@naver.com").getId();
-        for(int i = 0; i < 2; i++){
-            long roomId = roomService.getRoomByCode("123ZXCa"+i).getId();
+        for (int i = 0; i < 2; i++) {
+            long roomId = roomService.getRoomByCode("123ZXCa" + i).getId();
             roomService.enterRoom(userId, roomId);
         }
         List<Room> myRoomList = roomService.getMyRoomList(userId);
-        for(int i = 0; i < 2; i++){
+        for (int i = 0; i < 2; i++) {
             String roomName = myRoomList.get(i).getName();
-            assertThat(roomName).isEqualTo("점심책임방"+i);
+            assertThat(roomName).isEqualTo("점심책임방" + i);
         }
+    }
+
+    @Test
+    public void modifyRoomNameTest() {
+        String targetCode = invitationCodes.get(0);
+        long roomId = roomService.getRoomByCode(targetCode).getId();
+        roomService.modifyRoomName(roomId, "계란빵방");
+        String modifiedRoomName = roomService.getRoomByCode(targetCode).getName();
+        assertThat(modifiedRoomName).isEqualTo("계란빵방");
     }
 }

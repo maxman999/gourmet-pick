@@ -1,0 +1,27 @@
+.roomTitleUpdateBtn {
+    text-decoration: none;
+    margin-left: 5px;
+    color: cornflowerblue;
+    border: none;
+    background: transparent;
+}
+
+.roomTitleUpdateBtn :hover {
+    text-decoration: none;
+    transform: scale(1.07);
+    color: blue;
+}
+
+.roomDeleteBtn {
+    text-decoration: none;
+    margin-left: 5px;
+    color: palevioletred;
+    border: none;
+    background: transparent;
+}
+
+.roomDeleteBtn :hover {
+    text-decoration: none;
+    transform: scale(1.07);
+    color: red;
+}

@@ -19,13 +19,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 public class RoomTests {
 
-    @Autowired private UserMapper userMapper;
-    @Autowired private RoomMapper roomMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private RoomMapper roomMapper;
 
     List<String> invitationCodes = new ArrayList<>();
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         User newbie = User.builder()
                 .email("test1@naver.com")
                 .nickname("고든램지")
@@ -33,10 +35,10 @@ public class RoomTests {
                 .build();
         userMapper.insertUser(newbie);
 
-        for(int i = 0; i < 2; i++){
+        for (int i = 0; i < 2; i++) {
             Room room = Room.builder()
-                    .name("점심책임방"+i)
-                    .invitationCode("123ZXCa"+i)
+                    .name("점심책임방" + i)
+                    .invitationCode("123ZXCa" + i)
                     .build();
             roomMapper.insertRoom(room);
             this.invitationCodes.add(room.getInvitationCode());
@@ -44,7 +46,7 @@ public class RoomTests {
     }
 
     @AfterEach
-    public void cleanUp(){
+    public void cleanUp() {
         roomMapper.deleteAllRoomFavorites();
         roomMapper.deleteAllRoom();
         long id = userMapper.selectUserByEmail("test1@naver.com").getId();
@@ -52,21 +54,29 @@ public class RoomTests {
     }
 
     @Test
-    public void selectRoomByCodeTest(){
+    public void selectRoomByCodeTest() {
         Room room = roomMapper.selectRoomByCode("123ZXCa0");
         assertThat(room.getName()).isEqualTo("점심책임방0");
     }
 
     @Test
-    public void insertFavoriteRoomTest(){
+    public void insertFavoriteRoomTest() {
         User user = userMapper.selectUserByEmail("test1@naver.com");
         this.invitationCodes.forEach(code -> {
             Room room = roomMapper.selectRoomByCode(code);
-            roomMapper.insertFavoriteRoom(user.getId(),room.getId());
+            roomMapper.insertFavoriteRoom(user.getId(), room.getId());
         });
         List<Room> favoriteRoomList = roomMapper.selectFavoriteRoomList(user.getId());
-        for(int i = 0; i < 2; i++){
-            assertThat(favoriteRoomList.get(i).getName()).isEqualTo("점심책임방"+i);
+        for (int i = 0; i < 2; i++) {
+            assertThat(favoriteRoomList.get(i).getName()).isEqualTo("점심책임방" + i);
         }
+    }
+
+    @Test
+    public void modifyRoomNameTest() {
+        Room room = roomMapper.selectRoomByCode("123ZXCa0");
+        roomMapper.modifyRoomName(room.getId(), "계란빵방");
+        String modifiedName = roomMapper.selectRoomByCode("123ZXCa0").getName();
+        assertThat(modifiedName).isEqualTo("계란빵방");
     }
 }

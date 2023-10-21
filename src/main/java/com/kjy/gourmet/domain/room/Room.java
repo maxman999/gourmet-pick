@@ -1,16 +1,16 @@
 package com.kjy.gourmet.domain.room;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
+@Data
 public class Room {
     private long id;
     private String name;
     private String invitationCode;
+
+    private boolean hasVotingSession;
+    private int currentVotingUserCnt;
 }

@@ -6,6 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class SessionMapper {
-    private String userId;
-    private String roomId;
+    private long userId;
+    private long roomId;
 }

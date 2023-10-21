@@ -21,6 +21,12 @@
         order by id desc /* 성능 봐서 역순 인덱스 */
     </select>
 
+    <select id="getAllThumbnailsById" parameterType="long" resultType="java.lang.String">
+        select thumbnail
+        from menu
+        where room_id = #{roomId}
+    </select>
+
     <delete id="deleteMenu" parameterType="long">
         delete
         from menu

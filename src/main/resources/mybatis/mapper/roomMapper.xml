@@ -3,9 +3,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.kjy.gourmet.mapper.RoomMapper">
-    <insert id="insertRoom" parameterType="com.kjy.gourmet.domain.room.Room">
+    <insert id="insertRoom" parameterType="com.kjy.gourmet.domain.room.Room" useGeneratedKeys="true" keyProperty="id">
         insert into room(name, invitation_code)
-        values (#{name}, #{invitationCode});
+        values (#{name}, #{invitationCode})
     </insert>
 
     <select id="selectRoomById" parameterType="String" resultType="com.kjy.gourmet.domain.room.Room">
@@ -44,6 +44,13 @@
         where user_id = #{userId}
           and room_id = #{roomId};
     </delete>
+
+    <update id="modifyRoomName">
+        update room
+        set name = #{roomName}
+        where id = #{roomId}
+    </update>
+
 
     <delete id="deleteAllRoom">
         delete

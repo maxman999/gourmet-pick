@@ -20,5 +20,10 @@ public interface MenuService {
 
     ResponseEntity<byte[]> getMenuImageURL(String fileName);
 
+    List<String> getAllThumbnailsById(long roomId);
+
+    void removeAllMenuImages(List<String> menuImageList);
+
     boolean removeMenuImage(String fileName);
+
 }

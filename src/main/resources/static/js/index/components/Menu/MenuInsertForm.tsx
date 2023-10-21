@@ -1,5 +1,5 @@
 import {useRef, useEffect, useContext, useState} from "react";
-import './MenuUpdateForm.css';
+import './MenuInsertForm.css';
 import {Map, MapMarker} from "react-kakao-maps-sdk";
 import roomContext from "../../store/room-context";
 import Modal from "../UI/Modal";
@@ -11,10 +11,9 @@ import {IMenu} from "../../interfaces/IMenu";
 import axios from "axios";
 import MenuContainer from "./MenuContainer";
 
-const MenuUpdateForm = () => {
-
+const MenuInsertForm = () => {
     const roomCtx = useContext(roomContext);
-
+    const [isMenuUpdate, setIsMenuUpdate] = useState(false);
     const [menuName, setMenuName] = useState('');
     const [isMenuNameValid, setIsMenuNameValid] = useState(false);
     const [location, setLocation] = useState({placeName: '', longitude: 0, latitude: 0});
@@ -41,7 +40,7 @@ const MenuUpdateForm = () => {
             setIsMenuNameValid(false);
             setMenuName('');
         }
-    }, 500);
+    }, 200);
 
     const soberCommentChangeHandler = _.debounce(() => {
         const inputVal = soberCommentInputRef.current.value.trim();
@@ -52,7 +51,7 @@ const MenuUpdateForm = () => {
             setIsSoberCommentValid(false);
             setSoberComment('');
         }
-    }, 500);
+    }, 200);
 
     const mapUploadHandler = () => {
         setIsUpdateModalPopped(true);
@@ -87,6 +86,7 @@ const MenuUpdateForm = () => {
         if (!isSoberCommentValid) {
             btnMsg = "냉정한 한줄평을 작성해주세요.";
             isUploadPossible = false;
+            soberCommentInputRef.current.focus();
         }
 
         if (!isPlaceSelected) {
@@ -101,6 +101,7 @@ const MenuUpdateForm = () => {
         if (!isMenuNameValid) {
             btnMsg = "메뉴이름을 입력해주세요.";
             isUploadPossible = false;
+            menuNameInputRef.current.focus();
         }
 
         setUploadBtnMessage(btnMsg);
@@ -166,6 +167,7 @@ const MenuUpdateForm = () => {
                                 < Map
                                     center={{lat: location.latitude, lng: location.longitude}}
                                     style={{width: "100%", minHeight: "360px", border: "1px solid gray"}}
+                                    onClick={mapUploadHandler}
                                 >
                                     <MapMarker position={{lat: location.latitude, lng: location.longitude}}>
                                         {location.placeName}
@@ -184,7 +186,8 @@ const MenuUpdateForm = () => {
                                 {thumbnail &&
                                     <img id='menuThumbnail'
                                          src={thumbnail}
-                                         alt='메뉴 썸네일 미리보기'>
+                                         alt='메뉴 썸네일 미리보기'
+                                         onClick={thumbnailUploadHandler}>
                                     </img>
                                 }
                                 {!thumbnail &&
@@ -240,4 +243,4 @@ const MenuUpdateForm = () => {
     );
 }
 
-export default MenuUpdateForm;
+export default MenuInsertForm;

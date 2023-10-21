@@ -6,20 +6,29 @@ import axios from "axios";
 import EntranceInput from "./components/Room/EntranceInput";
 import roomContext from "./store/room-context";
 import MainFrame from "./components/Frame/MainFrame";
+import MyRoomList from "./components/Room/MyRoomList";
+import {IRoom} from "./interfaces/IRoom";
 
 const App = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
     const roomCtx = useContext(roomContext);
+    const [isAuthenticated, setIsAuthenticated] = useState(null);
+    const [myRoomList, setMyRoomList] = useState<IRoom[]>([]);
 
-    const getSessionHandler = async () => {
+
+    const authenticateHandler = async () => {
         const {data: userId} = await axios.get("/getAuthenticatedUserId");
         const isAuthenticated = userId > 0;
-        if (isAuthenticated) sessionStorage.setItem('userId', userId);
+        if (isAuthenticated) {
+            sessionStorage.setItem('userId', userId);
+            const {data: myRoomList}: { data: IRoom[] } = await axios.get(`/api/room/getMyRoomList?userId=${userId}`);
+            setMyRoomList(myRoomList);
+        }
+
         setIsAuthenticated(isAuthenticated);
     }
 
     useEffect(() => {
-        getSessionHandler();
+        authenticateHandler();
     }, []);
 
     return (
@@ -28,8 +37,15 @@ const App = () => {
                 <>
                     {isAuthenticated &&
                         <MainFrame>
-                            <EntranceInput/>
-                            {roomCtx.roomInfo && <Room/>}
+                            {!roomCtx.roomInfo &&
+                                <div id={'roomEntranceContainer'} className={`container`}>
+                                    <EntranceInput/>
+                                    <MyRoomList myRoomList={myRoomList}/>
+                                </div>
+                            }
+                            {roomCtx.roomInfo &&
+                                <Room/>
+                            }
                         </MainFrame>
                     }
                     {!isAuthenticated &&

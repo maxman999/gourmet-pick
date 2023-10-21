@@ -17,5 +17,7 @@ public interface MenuMapper {
 
     int deleteMenu(long menuId);
 
+    List<String> getAllThumbnailsById(long roomId);
+
     int deleteAllMenu();
 }

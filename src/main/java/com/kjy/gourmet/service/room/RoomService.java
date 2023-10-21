@@ -5,11 +5,19 @@ import com.kjy.gourmet.domain.room.Room;
 import java.util.List;
 
 public interface RoomService {
-    int makeRoom(Room room);
+    Room makeRoom(String roomName);
+
     int deleteRoomById(long roomId);
+
     Room getRoomById(long roomId);
+
     Room getRoomByCode(String invitationCode);
+
     int enterRoom(long userId, long roomId);
+
     int exitRoom(long userId, long roomId);
+
     List<Room> getMyRoomList(long userId);
+
+    int modifyRoomName(long roomId, String roomName);
 }

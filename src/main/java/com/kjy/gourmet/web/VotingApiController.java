@@ -29,66 +29,65 @@ public class VotingApiController {
         return votingService.isSessionDuplicated(userEmail);
     }
 
-    @MessageMapping("/voting/register/{userName}/{roomId}")
-    public void register(@DestinationVariable String roomId,
-                         @DestinationVariable String userName,
+    @MessageMapping("/voting/register/{userId}/{roomId}")
+    public void register(@DestinationVariable long roomId,
+                         @DestinationVariable long userId,
                          SimpMessageHeaderAccessor headerAccessor) {
-//        String sessionId = headerAccessor.getSessionId();
-        String sessionId = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
-        votingService.userRegisterHandler(roomId, sessionId, userName);
-        log.info("{}방에 {}님 입장", roomId, userName);
+        String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
+        votingService.userRegisterHandler(userEmail, roomId, userId);
+        log.info("{}번 방에 {}님 입장", roomId, userId);
     }
 
-    @MessageMapping("/voting/create/{userName}/{roomId}")
-    public void create(@DestinationVariable String roomId) {
-        votingService.creatVotingSession(roomId);
-        log.info("{}방에 투표세션이 생성되었습니다.", roomId);
+    @MessageMapping("/voting/create/{userId}/{roomId}")
+    public void create(@DestinationVariable long roomId,
+                       @DestinationVariable long userId,
+                       SimpMessageHeaderAccessor headerAccessor) {
+        String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
+        votingService.creatVotingSession(userEmail, roomId, userId);
+        log.info("{}번 방에 투표세션이 생성되었습니다.", roomId);
     }
 
-    @MessageMapping("/voting/sync/{userName}/{roomId}")
-    public void sync(@DestinationVariable String roomId,
-                     @DestinationVariable String userName) {
-        votingService.syncHandler(roomId, userName);
+    @MessageMapping("/voting/sync/{userId}/{roomId}")
+    public void sync(@DestinationVariable long roomId,
+                     @DestinationVariable long userId,
+                     SimpMessageHeaderAccessor headerAccessor) {
+        String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
+        votingService.syncHandler(userEmail, roomId, userId);
     }
 
-    @MessageMapping("/voting/cancel/{userName}/{roomId}")
-    public void cancel(@DestinationVariable String roomId) {
+    @MessageMapping("/voting/cancel/{roomId}")
+    public void cancel(@DestinationVariable long roomId) {
         votingService.cancelHandler(roomId);
     }
 
-    @MessageMapping("/voting/seating/{userName}/{roomId}")
+    @MessageMapping("/voting/seating/{userId}/{roomId}")
     public void seating(SimpMessageHeaderAccessor headerAccessor,
-                        @DestinationVariable String roomId,
-                        @DestinationVariable String userName) {
-//        String sessionId = headerAccessor.getSessionId();
-        String sessionId = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
-        votingService.userSeatingHandler(roomId, sessionId, userName);
+                        @DestinationVariable long roomId,
+                        @DestinationVariable long userId) {
+        String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
+        votingService.userSeatingHandler(userEmail, roomId, userId);
     }
 
-    @MessageMapping("/voting/start/{userName}/{roomId}")
-    public void start(@DestinationVariable String roomId,
-                      @DestinationVariable String userName) {
-        votingService.startVoting(roomId, userName);
+    @MessageMapping("/voting/start/{roomId}")
+    public void start(@DestinationVariable long roomId) {
+        votingService.startVoting(roomId);
     }
 
-    @MessageMapping("/voting/decide/{userName}/{roomId}")
-    public void decide(@DestinationVariable String roomId, Ballot ballot) {
-        votingService.decidePreference(roomId, ballot);
+    @MessageMapping("/voting/decide/{userId}/{roomId}")
+    public void decide(@DestinationVariable long roomId, Ballot ballot) {
+        votingService.soberDecision(roomId, ballot);
     }
 
-    @MessageMapping("/voting/finish/{userName}/{roomId}")
-    public void finish(@DestinationVariable String roomId,
-                       @DestinationVariable String userName,
+    @MessageMapping("/voting/finish/{roomId}")
+    public void finish(@DestinationVariable long roomId,
                        SimpMessageHeaderAccessor headerAccessor) {
-//        String sessionId = headerAccessor.getSessionId();
-        String sessionId = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
-        votingService.finishVoting(roomId, sessionId, userName);
+        String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
+        votingService.finishVoting(userEmail, roomId);
     }
 
     @EventListener
     public void handleDisconnectEvent(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-//        String sessionId = headerAccessor.getSessionId();
         String sessionId = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
         votingService.disconnectSession(sessionId);
     }

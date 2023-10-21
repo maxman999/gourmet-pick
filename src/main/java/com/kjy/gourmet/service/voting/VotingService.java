@@ -1,26 +1,37 @@
 package com.kjy.gourmet.service.voting;
 
 import com.kjy.gourmet.domain.dto.Ballot;
+import com.kjy.gourmet.domain.dto.VotingSession;
+import com.kjy.gourmet.domain.dto.VotingStatus;
+import com.kjy.gourmet.domain.room.Room;
+
+import java.util.List;
 
 public interface VotingService {
 
-    void userRegisterHandler(String roomId, String sessionId, String userId);
+    void userRegisterHandler(String sessionId, long roomId, long userId);
 
     boolean isSessionDuplicated(String sessionId);
 
-    void creatVotingSession(String roomId);
+    void creatVotingSession(String sessionId, long roomId, long userId);
 
-    void syncHandler(String roomId, String userId);
+    void syncHandler(String sessionId, long roomId, long userId);
 
-    void cancelHandler(String roomId);
+    void cancelHandler(long roomId);
 
-    void userSeatingHandler(String roomId, String sessionId, String userId);
+    void userSeatingHandler(String sessionId, long roomId, long userId);
 
-    void startVoting(String roomId, String userName);
+    void startVoting(long roomId);
 
-    void decidePreference(String roomId, Ballot ballot);
+    void soberDecision(long roomId, Ballot ballot);
 
-    void finishVoting(String roomId, String sessionId, String userName);
+    void finishVoting(String sessionId, long roomId);
+
+    List<Room> setCurrentVotingSessionStatus(List<Room> myRoomList);
+
+    void exileAllUsers(long roomId);
 
     void disconnectSession(String sessionId);
+
+    VotingSession getVotingSessionByRoomId(long roomId);
 }

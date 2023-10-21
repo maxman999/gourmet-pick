@@ -1,23 +1,8 @@
-#invitationCodeContainer{
-    align-content: center;
-    width: 75%;
-    height: 100%;
-}
-
 #invitationCodeInputWrapper{
-    top: 25%;
+    /*top: 25%;*/
 }
 
 
 #entranceBtn {
     width: 100%;
-}
-
-.codeInput-show {
-
-}
-
-
-.codeInput-hide {
-    display: none;
 }

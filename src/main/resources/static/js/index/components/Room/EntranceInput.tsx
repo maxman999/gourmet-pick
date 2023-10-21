@@ -32,27 +32,11 @@ const EntranceInput = () => {
     };
 
     const clickHandler = async () => {
-        const userId = Number(sessionStorage.getItem("userId"));
-
-        const isSessionDuplicated = await inspectSessionDuplication();
-        if (isSessionDuplicated) {
-            alert("이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.");
-            return;
-        }
-
-        const room: IRoom = await getRoom(invitationCodeRef.current.value || "noCode");
-        if (!_.isEmpty(room)) {
-            const isEntranceSuccess = await enterRoom(userId, room.id);
-            isEntranceSuccess ? roomCtx.setRoomInfo(room) : alert("방 입장 실패");
-        } else {
-            alert("해당 방이 존재하지 않습니다.");
-        }
+        roomCtx.enterRoom(invitationCodeRef.current.value);
     };
 
     return (
-        <div id={'invitationCodeContainer'}
-             className={`container ${roomCtx.roomInfo ? 'codeInput-hide' : 'codeInput-show'}`}
-        >
+        <div className={'row'}>
             <div id={"invitationCodeInputWrapper"} className="card p-3">
                 <label htmlFor="invitationCodeInput" className="form-label"># INVITATION CODE</label>
                 <div className='row'>

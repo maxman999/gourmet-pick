@@ -8,5 +8,6 @@ public enum VotingStatus {
     READY,
     START,
     FINISH,
+    EXILE,
     DISCONNECT,
 }

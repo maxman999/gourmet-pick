@@ -32,12 +32,7 @@ public class IndexController {
     @GetMapping("/getAuthenticatedUserId")
     public long getAuthenticatedUserId(Authentication authentication) {
         if (authentication == null) return 0;
-
         String username = AuthUtil.extractEmailFromAuth(authentication);
-        if (username.equals("guest")) {
-            return (long) (Math.random() * 900000) + 100000;
-        }
-
         return userService.getUserByEmail(username).getId();
     }
 

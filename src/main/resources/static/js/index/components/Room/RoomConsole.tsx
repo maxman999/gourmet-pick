@@ -11,12 +11,8 @@ const RoomConsole = () => {
 
     const gourmetCallHandler = () => {
         roomCtx.changeRoomPhase('calling');
+        roomCtx.setCallerFlag(true);
         websocketAPIs.create();
-    }
-
-    const gourmetSeatingHandler = () => {
-        roomCtx.changeRoomPhase('seating');
-        websocketAPIs.seat();
     }
 
     const gourmetVotingHandler = () => {
@@ -28,10 +24,14 @@ const RoomConsole = () => {
         websocketAPIs.cancel();
     }
 
+    const isVoteStartingPossible = (roomCtx.callerFlag && (roomCtx.roomPhase !== 'starting'))
+        || roomCtx.roomPhase === 'ready';
 
-    function exitHandler() {
+
+    const exitHandler = () => {
         document.location.reload();
     }
+
 
     return (
         <>
@@ -46,17 +46,9 @@ const RoomConsole = () => {
                 </div>
                 <div className={"col"}>
                     <button
-                        className='phaseBtn btn btn-sm btn-outline-success phase-seat-btn'
-                        data-next-phase='seating'
-                        disabled={roomCtx.roomPhase !== 'calling'}
-                        onClick={gourmetSeatingHandler}> 착 석
-                    </button>
-                </div>
-                <div className={"col"}>
-                    <button
                         className='phaseBtn btn btn-sm btn-outline-success phase-start-btn'
                         data-next-phase='starting'
-                        disabled={roomCtx.roomPhase !== 'ready'}
+                        disabled={!isVoteStartingPossible}
                         onClick={gourmetVotingHandler}> 투 표 시 작
                     </button>
                 </div>
@@ -78,9 +70,16 @@ const RoomConsole = () => {
                     </button>
                 </div>
             </div>
-            <Tooltip anchorSelect=".phaseBtn" place="top">
-                Hello world!
-            </Tooltip>
+            {roomCtx.roomPhase === 'default' && !roomCtx.isMenuListEmpty &&
+                <Tooltip anchorSelect=".phase-call-btn" place="top" style={{zIndex: '9998'}}>
+                    버튼을 누르면 투표를 진행할 수 있습니다.
+                </Tooltip>
+            }
+            {roomCtx.roomPhase === 'calling' &&
+                <Tooltip anchorSelect=".phase-start-btn" place="top" style={{zIndex: '9998'}}>
+                    과반이상 입장했거나, 방장의 요청에 의해 투표를 시작할 수 있습니다.
+                </Tooltip>
+            }
         </>
     )
 }

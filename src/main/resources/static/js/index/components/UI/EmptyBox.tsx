@@ -3,14 +3,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 
 type props = {
+    clickHandler: () => void
     minHeight?: string
     width?: string
-    clickHandler: () => void
     caption?: string
+    color?: string
 }
 
 const EmptyBox = (props: props) => {
-
     return (
         <>
             <div className={'empty-box'}
@@ -18,6 +18,8 @@ const EmptyBox = (props: props) => {
                  style={{
                      minHeight: props.minHeight,
                      width: props.width,
+                     color: props.color,
+                     borderColor: props.color,
                  }}>
                 <div className={"text-center"}>
                     <FontAwesomeIcon icon={faPlus} size={'2x'}/>

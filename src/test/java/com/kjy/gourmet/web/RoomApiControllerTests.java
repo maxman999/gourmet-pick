@@ -21,15 +21,18 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RoomApiControllerTests {
 
-    @Autowired private WebApplicationContext ctx;
-    @Autowired private UserService userService;
-    @Autowired private RoomService roomService;
+    @Autowired
+    private WebApplicationContext ctx;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private RoomService roomService;
 
     private MockMvc mockMvc;
     Gson gson = new Gson();
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 
         User newbie = User.builder()
@@ -41,7 +44,7 @@ public class RoomApiControllerTests {
     }
 
     @AfterEach
-    public void cleanUp(){
+    public void cleanUp() {
         long userId = userService.getUserByEmail("roomApiTest@naver.com").getId();
         userService.signOut(userId);
     }
@@ -57,14 +60,14 @@ public class RoomApiControllerTests {
                 .build();
         String roomJson = gson.toJson(room);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/room/make")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(roomJson))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(roomJson))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         roomId = roomService.getRoomByCode("qwkekd@1").getId();
         // lookup room
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/room/"+"qwkekd@1")
+                        MockMvcRequestBuilders.get("/api/room/" + "qwkekd@1")
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -74,9 +77,15 @@ public class RoomApiControllerTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
+        // modify roomName
+        String modificationUrl = "/api/room/modify/" + roomId + "/" + "수정된 방이름";
+        mockMvc.perform(MockMvcRequestBuilders.post(modificationUrl)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print());
         //lookup user's roomList
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/room/getList?userId="+userId)
+                        MockMvcRequestBuilders.get("/api/room/getMyRoomList" + userId)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
@@ -87,7 +96,7 @@ public class RoomApiControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
         //remove room
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/room/remove/"+roomId)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/room/remove/" + roomId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
