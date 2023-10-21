@@ -8,9 +8,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface MenuService {
-    int addMenu(Menu menu);
+    int insertMenu(Menu menu);
 
     Menu getMenuById(long menuId);
+
+    int updateMenu(Menu menu);
 
     int deleteMenu(long menuId);
 
@@ -24,6 +26,5 @@ public interface MenuService {
 
     void removeAllMenuImages(List<String> menuImageList);
 
-    boolean removeMenuImage(String fileName);
-
+    boolean removeMenuImageFile(String fileName);
 }

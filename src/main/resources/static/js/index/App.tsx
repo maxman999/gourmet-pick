@@ -7,7 +7,7 @@ import EntranceInput from "./components/Room/EntranceInput";
 import roomContext from "./store/room-context";
 import MainFrame from "./components/Frame/MainFrame";
 import MyRoomList from "./components/Room/MyRoomList";
-import {IRoom} from "./interfaces/IRoom";
+import {IRoom} from "./types/IRoom";
 
 const App = () => {
     const roomCtx = useContext(roomContext);

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,14 +20,24 @@ public class MenuApiController {
 
     private final MenuService menuService;
 
-    @PostMapping("/add")
-    public int addMenu(@RequestBody Menu menu) {
-        return menuService.addMenu(menu);
+    @PostMapping("/insert")
+    public int insertMenu(@RequestBody Menu menu) {
+        return menuService.insertMenu(menu);
     }
 
-    @GetMapping("/{roomId}")
+    @PostMapping("/update")
+    public int updateMenu(@RequestBody Menu menu) {
+        return menuService.updateMenu(menu);
+    }
+
+    @GetMapping("/all/{roomId}")
     public List<Menu> getMenuList(@PathVariable("roomId") long roomId) {
         return menuService.getMenuList(roomId);
+    }
+
+    @GetMapping("/{menuId}")
+    public Menu getMenu(@PathVariable("menuId") long menuId) {
+        return menuService.getMenuById(menuId);
     }
 
     @DeleteMapping("/{menuId}")
@@ -34,15 +45,20 @@ public class MenuApiController {
         return menuService.deleteMenu(menuId);
     }
 
-    @PostMapping("/uploadMenuImage")
+    @PostMapping("/uploadMenuImageFile")
     public ResponseEntity<List<MenuThumbnail>> uploadFile(MultipartFile[] uploadFiles) {
         return menuService.uploadMenuImage(uploadFiles);
+    }
+
+    @PostMapping("/deleteMenuImageFile")
+    public boolean deleteFile(@RequestBody Map<String, String> paramMap) {
+        if (!paramMap.containsKey("imageFileName")) return false;
+        return menuService.removeMenuImageFile(paramMap.get("imageFileName"));
     }
 
     @GetMapping("/getMenuImageURL")
     public ResponseEntity<byte[]> getFile(String fileName) {
         return menuService.getMenuImageURL(fileName);
     }
-
 
 }

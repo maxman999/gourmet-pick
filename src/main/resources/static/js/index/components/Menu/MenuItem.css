@@ -5,7 +5,15 @@
     font-weight: bold;
 }
 
-.locationBtn{
+.locationBtn {
     margin-left: 15px;
     border-radius: 50%;
+}
+
+.menuUpdateBtn {
+    margin-right: 15px;
+}
+
+.menuDeleteBtn {
+    margin-right: 5px;
 }

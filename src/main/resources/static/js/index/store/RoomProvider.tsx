@@ -1,24 +1,46 @@
 import * as React from "react";
 import {useReducer} from "react";
 import RoomContext from "./room-context";
-import {IRoom} from "../interfaces/IRoom";
+import {IRoom} from "../types/IRoom";
 import axios from "axios";
 import * as _ from "lodash";
+import RoomPhase from "../types/RoomPhase";
+import VotingStatus from "../types/VotingStatus";
 
 type roomState = {
     roomInfo: IRoom;
     isMenuListEmpty: boolean;
     roomPhase: string;
+    updateTargetMenuId: number
     votingStatus: string;
     callerFlag: boolean;
 }
 
 type roomAction =
-    | { type: "DEFAULT_ROOM_SETTING"; roomInfo: IRoom; }
-    | { type: "SET_MENU_EMPTY_FLAG"; isMenuListEmpty: boolean }
-    | { type: "SET_ROOM_PHASE"; roomPhase: string; }
-    | { type: "SET_CALLER_FLAG"; callerFlag: boolean; }
-    | { type: "SET_VOTING_STATUS"; votingStatus: string; }
+    | {
+    type: "DEFAULT_ROOM_SETTING";
+    roomInfo: IRoom;
+}
+    | {
+    type: "SET_MENU_EMPTY_FLAG";
+    isMenuListEmpty: boolean
+}
+    | {
+    type: "SET_ROOM_PHASE";
+    roomPhase: string;
+}
+    | {
+    type: "SET_UPDATE_TARGET_MENU";
+    menuId: number;
+}
+    | {
+    type: "SET_CALLER_FLAG";
+    callerFlag: boolean;
+}
+    | {
+    type: "SET_VOTING_STATUS";
+    votingStatus: string;
+}
 
 type props = {
     children: React.ReactNode;
@@ -33,9 +55,6 @@ const getRoom = async (code: string = "") => {
     const fetchRes = await axios.get(`/api/room/${code}`);
     if (fetchRes.status === 200) {
         return fetchRes.data
-    } else {
-        alert("no code");
-        return;
     }
 };
 
@@ -96,6 +115,13 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
         };
     }
 
+    if (roomAction.type === "SET_UPDATE_TARGET_MENU") {
+        return {
+            ...state,
+            updateTargetMenuId: roomAction.menuId,
+        };
+    }
+
     if (roomAction.type === "SET_VOTING_STATUS") {
         return {
             ...state,
@@ -106,11 +132,12 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
 }
 
 const defaultRoomState: roomState = {
-    roomInfo: undefined,
+    roomInfo: null,
     isMenuListEmpty: true,
-    roomPhase: 'default',
+    roomPhase: RoomPhase.DEFAULT,
+    updateTargetMenuId: null,
     callerFlag: false,
-    votingStatus: 'gathering',
+    votingStatus: VotingStatus.GATHERING,
 }
 
 const RoomProvider = (props: props) => {
@@ -139,6 +166,13 @@ const RoomProvider = (props: props) => {
         });
     }
 
+    const setUpdateTargetMenuHandler = (menuId: number) => {
+        dispatchMenuActions({
+            type: 'SET_UPDATE_TARGET_MENU',
+            menuId: menuId,
+        });
+    }
+
     const roomPhaseChangeHandler = (roomPhase: string) => {
         dispatchMenuActions({
             type: 'SET_ROOM_PHASE',
@@ -163,16 +197,18 @@ const RoomProvider = (props: props) => {
 
     const roomContext = {
         roomInfo: roomState.roomInfo,
-        isMenuListEmpty: roomState.isMenuListEmpty,
-        roomPhase: roomState.roomPhase,
-        callerFlag: roomState.callerFlag,
-        votingStatus: roomState.votingStatus,
         setRoomInfo: roomSettingHandler,
-        enterRoom: enterRoomHandler,
+        isMenuListEmpty: roomState.isMenuListEmpty,
         setMenuEmptyFlag: menuEmptyFlagSettingHandler,
-        setCallerFlag: callerFlagChangeHandler,
+        roomPhase: roomState.roomPhase,
         changeRoomPhase: roomPhaseChangeHandler,
+        callerFlag: roomState.callerFlag,
+        setCallerFlag: callerFlagChangeHandler,
+        votingStatus: roomState.votingStatus,
         changeVotingStatus: votingStatusChangeHandler,
+        updateTargetMenuId: roomState.updateTargetMenuId,
+        setUpdateTargetMenu: setUpdateTargetMenuHandler,
+        enterRoom: enterRoomHandler,
     }
 
     return (

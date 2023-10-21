@@ -1,7 +1,7 @@
 import './GourmetTable.css';
 import Gourmet from "./Gourmet";
 import VotePanel from "./VotePanel";
-import {IMenu} from "../../interfaces/IMenu";
+import {IMenu} from "../../types/IMenu";
 
 interface props {
     menuList: IMenu[];

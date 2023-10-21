@@ -1,11 +1,12 @@
 import {useContext} from "react";
 import roomContext from "../../store/room-context";
+import RoomPhase from "../../types/RoomPhase";
 
 const MenuInput = () => {
     const roomCtx = useContext(roomContext)
 
     const updateClickHandler = () => {
-        roomCtx.changeRoomPhase('updating');
+        roomCtx.changeRoomPhase(RoomPhase.UPDATING);
     }
 
     return (

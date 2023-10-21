@@ -1,6 +1,6 @@
 import "./MyRoomList.css"
 import MyRoom from "./MyRoom";
-import {IRoom} from "../../interfaces/IRoom";
+import {IRoom} from "../../types/IRoom";
 import EmptyBox from "../UI/EmptyBox";
 import MyRoomContainer from "./MyRoomContainer";
 import axios from "axios";

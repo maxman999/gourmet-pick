@@ -2,23 +2,24 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, Scrollbar, EffectCube} from "swiper";
 import "swiper/css";
 import "swiper/css/effect-cube";
-import {IMenu} from "../../interfaces/IMenu";
+import {IMenu} from "../../types/IMenu";
 import MenuItem from "./MenuItem";
 import './MenuDisplaySwiper.css';
 import EmptyBox from "../UI/EmptyBox";
 import {useContext} from "react";
 import roomContext from "../../store/room-context";
+import RoomPhase from "../../types/RoomPhase";
 
 interface props {
     menuList: IMenu[];
-    onDelete?: (menuId: number) => void;
+    onMenuDelete?: (menuId: number) => void;
 }
 
 const MenuDisplaySwiper = (props: props) => {
     const roomCtx = useContext(roomContext);
 
     const menuAddingHandler = () => {
-        roomCtx.changeRoomPhase('updating');
+        roomCtx.changeRoomPhase(RoomPhase.UPDATING);
     }
 
     return (
@@ -53,7 +54,7 @@ const MenuDisplaySwiper = (props: props) => {
                         return (
                             <SwiperSlide key={menuItem.id}>
                                 <MenuItem menu={menuItem}
-                                          onDelete={props.onDelete}/>
+                                          onMenuDelete={props.onMenuDelete}/>
                             </SwiperSlide>
                         );
                     })}

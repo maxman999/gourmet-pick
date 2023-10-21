@@ -1,5 +1,5 @@
 import {useRef, useEffect, useContext, useState} from "react";
-import './MenuInsertForm.css';
+import './MenuUpdateForm.css';
 import {Map, MapMarker} from "react-kakao-maps-sdk";
 import roomContext from "../../store/room-context";
 import Modal from "../UI/Modal";
@@ -7,17 +7,19 @@ import MapUploadTool from "../Map/MapUploadTool";
 import EmptyBox from "../UI/EmptyBox";
 import * as _ from 'lodash';
 import CommonUtils from "../../utils/websocket/CommonUtils";
-import {IMenu} from "../../interfaces/IMenu";
+import {IMenu} from "../../types/IMenu";
 import axios from "axios";
 import MenuContainer from "./MenuContainer";
 
-const MenuInsertForm = () => {
+const MenuUpdateForm = () => {
     const roomCtx = useContext(roomContext);
-    const [isMenuUpdate, setIsMenuUpdate] = useState(false);
+
     const [menuName, setMenuName] = useState('');
     const [isMenuNameValid, setIsMenuNameValid] = useState(false);
     const [location, setLocation] = useState({placeName: '', longitude: 0, latitude: 0});
     const [thumbnail, setThumbnail] = useState<any>();
+    const [prevThumbnailFileName, setPrevThumbnailFileName] = useState('');
+    const [isThumbnailChanged, setIsThumbnailChanged] = useState(false);
     const [soberComment, setSoberComment] = useState('');
     const [isSoberCommentValid, setIsSoberCommentValid] = useState(false);
     const [isUpdateModalPopped, setIsUpdateModalPopped] = useState(false);
@@ -28,7 +30,9 @@ const MenuInsertForm = () => {
     const soberCommentInputRef = useRef(null);
     const submitButtonRef = useRef(null);
     const imageUploadRef = useRef(null);
+    const thumbnailImgRef = useRef(null);
 
+    const isMenuModify = roomCtx.updateTargetMenuId > 0;
     const isPlaceSelected = location.longitude + location.latitude > 0;
 
     const menuNameChangeHandler = _.debounce(() => {
@@ -40,7 +44,7 @@ const MenuInsertForm = () => {
             setIsMenuNameValid(false);
             setMenuName('');
         }
-    }, 200);
+    }, 300);
 
     const soberCommentChangeHandler = _.debounce(() => {
         const inputVal = soberCommentInputRef.current.value.trim();
@@ -51,7 +55,7 @@ const MenuInsertForm = () => {
             setIsSoberCommentValid(false);
             setSoberComment('');
         }
-    }, 200);
+    }, 300);
 
     const mapUploadHandler = () => {
         setIsUpdateModalPopped(true);
@@ -67,6 +71,7 @@ const MenuInsertForm = () => {
         reader.onload = (e) => {
             const imageData = e.target.result;
             setThumbnail(imageData);
+            setIsThumbnailChanged(true);
         }
         reader.readAsDataURL(file);
     }
@@ -76,17 +81,16 @@ const MenuInsertForm = () => {
             placeName: placeName,
             longitude: longitude,
             latitude: latitude
-        })
+        });
     }
 
     const observeFormValidity = () => {
-        let btnMsg = "등록하기";
+        let btnMsg = isMenuModify ? "수 정 하 기" : "등 록 하 기";
         let isUploadPossible = true;
 
         if (!isSoberCommentValid) {
             btnMsg = "냉정한 한줄평을 작성해주세요.";
             isUploadPossible = false;
-            soberCommentInputRef.current.focus();
         }
 
         if (!isPlaceSelected) {
@@ -108,8 +112,25 @@ const MenuInsertForm = () => {
         setIsUploadPossible(isUploadPossible);
     }
 
+    // 사진 스토리지에 저장
+    const uploadThumbnail = async () => {
+        const formData = new FormData();
+        formData.append('uploadFiles', imageUploadRef.current.files[0]);
+        const {data: result} = await axios.post('/api/menu/uploadMenuImageFile', formData);
+        if (result) {
+            return result[0].thumbnailURL;
+        }
+    }
+
+    const deleteThumbnailFileOnModify = (imageFileName: string) => {
+        axios.post('/api/menu/deleteMenuImageFile', {imageFileName: imageFileName});
+    }
+
     const submitClickHandler = async () => {
+        const URL = `/api/menu/${isMenuModify ? 'update' : 'insert'}`;
+
         const newMenu: IMenu = {
+            id: roomCtx.updateTargetMenuId,
             name: menuName,
             latitude: location?.latitude,
             longitude: location?.longitude,
@@ -117,15 +138,14 @@ const MenuInsertForm = () => {
             thumbnail: thumbnail,
             roomId: roomCtx.roomInfo?.id,
         }
-        // 사진 스토리지에 저장
-        const formData = new FormData();
-        formData.append('uploadFiles', imageUploadRef.current.files[0]);
-        const {data: result} = await axios.post('/api/menu/uploadMenuImage', formData);
-        if (result) {
-            console.log({result})
-            newMenu.thumbnail = result[0].thumbnailURL;
+
+        if (isThumbnailChanged) {
+            if (isMenuModify) deleteThumbnailFileOnModify(prevThumbnailFileName);
+            newMenu.thumbnail = await uploadThumbnail();
         }
-        const {data: res} = await axios.post("/api/menu/add", newMenu);
+
+        const {data: res} = await axios.post(URL, newMenu);
+
         roomCtx.changeRoomPhase('default');
     }
 
@@ -137,8 +157,35 @@ const MenuInsertForm = () => {
         setIsUpdateModalPopped(false);
     }
 
+    const setTargetMenuInfo = async (menuId: number) => {
+        const {data: menu}: {
+            data: IMenu
+        } = await axios.get(`api/menu/${menuId}`);
+        setMenuName(menu.name);
+        setIsMenuNameValid(true);
+        menuNameInputRef.current.value = menu.name;
+
+        setSoberComment(menu.soberComment);
+        setIsSoberCommentValid(true);
+        soberCommentInputRef.current.value = menu.soberComment;
+
+        setPrevThumbnailFileName(menu.thumbnail);
+        setThumbnail(menu.thumbnail);
+
+        setLocation({
+            placeName: '',
+            longitude: menu.longitude,
+            latitude: menu.latitude
+        });
+    }
+
     useEffect(() => {
+        if (isMenuModify) setTargetMenuInfo(roomCtx.updateTargetMenuId);
         menuNameInputRef.current.focus();
+
+        return () => {
+            roomCtx.setUpdateTargetMenu(0)
+        };
     }, []);
 
     useEffect(() => {
@@ -185,7 +232,8 @@ const MenuInsertForm = () => {
                             <>
                                 {thumbnail &&
                                     <img id='menuThumbnail'
-                                         src={thumbnail}
+                                         ref={thumbnailImgRef}
+                                         src={!isThumbnailChanged ? `/api/menu/getMenuImageURL?fileName=${thumbnail}` : thumbnail}
                                          alt='메뉴 썸네일 미리보기'
                                          onClick={thumbnailUploadHandler}>
                                     </img>
@@ -243,4 +291,4 @@ const MenuInsertForm = () => {
     );
 }
 
-export default MenuInsertForm;
+export default MenuUpdateForm;

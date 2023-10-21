@@ -8,6 +8,16 @@
         values (#{roomId}, #{name}, #{thumbnail}, #{soberComment}, #{longitude}, #{latitude});
     </insert>
 
+    <update id="updateMenu" parameterType="com.kjy.gourmet.domain.menu.Menu">
+        update menu
+        set name          = #{name},
+            thumbnail     = #{thumbnail},
+            sober_comment = #{soberComment},
+            longitude     = #{longitude},
+            latitude      = #{latitude}
+        where id = #{id}
+    </update>
+
     <select id="selectMenu" parameterType="long" resultType="com.kjy.gourmet.domain.menu.Menu">
         select *
         from menu
@@ -18,7 +28,7 @@
         select *
         from menu
         where room_id = #{roomId}
-        order by id desc /* 성능 봐서 역순 인덱스 */
+        order by update_date desc /* 성능 봐서 역순 인덱스 */
     </select>
 
     <select id="getAllThumbnailsById" parameterType="long" resultType="java.lang.String">

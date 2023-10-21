@@ -1,4 +1,4 @@
-import {IRoom} from "../../interfaces/IRoom";
+import {IRoom} from "../../types/IRoom";
 import axios from "axios";
 import './EntranceInput.css';
 import {useContext, useRef} from "react";

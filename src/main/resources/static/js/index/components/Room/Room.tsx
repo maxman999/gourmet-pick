@@ -5,8 +5,10 @@ import './Room.css';
 import websocketContext from "../../store/websocket-context";
 import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
-import MenuInsertForm from "../Menu/MenuInsertForm";
+import MenuUpdateForm from "../Menu/MenuUpdateForm";
 import RoomContainer from "./RoomContainer";
+import RoomPhase from "../../types/RoomPhase";
+import VotingStatus from "../../types/VotingStatus";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
@@ -23,8 +25,8 @@ const Room = () => {
     }
 
     const modalCloseHandler = () => {
-        roomCtx.changeVotingStatus('gathering');
-        roomCtx.changeRoomPhase('default');
+        roomCtx.changeVotingStatus(VotingStatus.GATHERING);
+        roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
         setIsModalPopped(false);
     }
 
@@ -37,23 +39,23 @@ const Room = () => {
         switch (payloadData.status) {
             case "CREATE":
                 websocketAPIs.seat();
-                roomCtx.changeRoomPhase('calling');
+                roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 break;
             case 'SEATING':
-                roomCtx.changeRoomPhase('calling');
+                roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 setGourmet(Number(payloadData.data));
                 break;
             case 'CANCEL':
-                roomCtx.changeRoomPhase('default');
+                roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
                 setGourmet(0);
                 break;
             case 'READY':
-                roomCtx.changeRoomPhase('ready');
+                roomCtx.changeRoomPhase(RoomPhase.READY);
                 break;
             case 'START':
                 websocketAPIs.start();
-                roomCtx.changeRoomPhase('starting');
-                roomCtx.changeVotingStatus('voting');
+                roomCtx.changeRoomPhase(RoomPhase.STARTING);
+                roomCtx.changeVotingStatus(VotingStatus.VOTING);
                 break
             case 'FINISH':
                 setTodayPick([`${payloadData.data}`][0]);
@@ -76,7 +78,7 @@ const Room = () => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
             case 'SYNC':
-                roomCtx.changeRoomPhase('calling');
+                roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 setGourmet(Number(payloadData.data));
                 break
             default :
@@ -100,16 +102,16 @@ const Room = () => {
     return (
         <>
             <RoomContainer>
-                {roomCtx.roomInfo && (roomCtx.roomPhase !== 'updating') &&
+                {roomCtx.roomInfo && (roomCtx.roomPhase !== RoomPhase.UPDATING) &&
                     <>
                         <RoomHeader room={roomCtx.roomInfo} isConsoleActive={true}/>
                         <MenuList room={roomCtx.roomInfo} gourmet={gourmet}/>
                     </>
                 }
-                {roomCtx.roomInfo && (roomCtx.roomPhase === 'updating') &&
+                {roomCtx.roomInfo && (roomCtx.roomPhase === RoomPhase.UPDATING) &&
                     <>
                         <RoomHeader room={roomCtx.roomInfo} isConsoleActive={false}/>
-                        <MenuInsertForm/>
+                        <MenuUpdateForm/>
                     </>
                 }
             </RoomContainer>

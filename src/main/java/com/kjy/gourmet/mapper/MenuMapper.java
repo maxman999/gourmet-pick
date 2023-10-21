@@ -11,6 +11,8 @@ import java.util.List;
 public interface MenuMapper {
     int insertMenu(Menu menu);
 
+    int updateMenu(Menu menu);
+
     Menu selectMenu(long menuId);
 
     List<Menu> selectMenuList(long roomId);

@@ -30,7 +30,7 @@ public class MenuServiceTests {
                     .roomId(room.getId())
                     .name("명가 돌솥 설렁탕" + i)
                     .build();
-            menuService.addMenu(menu);
+            menuService.insertMenu(menu);
         }
     }
 

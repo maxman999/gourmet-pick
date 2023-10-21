@@ -1,5 +1,6 @@
 import * as React from "react";
-import {IRoom} from "../interfaces/IRoom";
+import {IRoom} from "../types/IRoom";
+import VotingStatus from "../types/VotingStatus";
 
 const RoomContext = React.createContext({
     roomInfo: {
@@ -21,7 +22,7 @@ const RoomContext = React.createContext({
     setMenuEmptyFlag: (isMenuListEmpty: boolean) => {
     },
 
-    roomPhase: 'default',
+    roomPhase: undefined,
 
     changeRoomPhase: (roomPhase: string) => {
     },
@@ -31,7 +32,12 @@ const RoomContext = React.createContext({
     setCallerFlag: (callerFlag: boolean) => {
     },
 
-    votingStatus: 'gathering',
+    updateTargetMenuId: 0,
+
+    setUpdateTargetMenu: (menuId: number) => {
+    },
+
+    votingStatus: undefined,
 
     changeVotingStatus: (votingStatus: string) => {
     },

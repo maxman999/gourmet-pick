@@ -45,13 +45,18 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public int addMenu(Menu menu) {
+    public int insertMenu(Menu menu) {
         return menuMapper.insertMenu(menu);
     }
 
     @Override
+    public int updateMenu(Menu menu) {
+        return menuMapper.updateMenu(menu);
+    }
+
+    @Override
     public int deleteMenu(long menuId) {
-        removeMenuImage(getMenuById(menuId).getThumbnail());
+        removeMenuImageFile(getMenuById(menuId).getThumbnail());
         return menuMapper.deleteMenu(menuId);
     }
 
@@ -120,12 +125,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public boolean removeMenuImage(String fileName) {
+    public boolean removeMenuImageFile(String fileName) {
         try {
             String srcFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
             File file = new File(uploadPath + File.separator + srcFileName);
             return file.delete();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("썸네일 삭제 실패 ======> 파일명 {}", fileName);
             return false;
         }
@@ -133,7 +138,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public void removeAllMenuImages(List<String> menuImageList) {
-        menuImageList.forEach(this::removeMenuImage);
+        menuImageList.forEach(this::removeMenuImageFile);
     }
 
 }

@@ -1,36 +1,45 @@
-import {IMenu} from "../../interfaces/IMenu";
+import {IMenu} from "../../types/IMenu";
 import './MenuItem.css';
 import axios from "axios";
 import {StaticMap, MapMarker} from "react-kakao-maps-sdk";
-import {useRef, useState} from "react";
+import {useContext, useRef, useState} from "react";
 import Timer from "../VotingTable/Timer";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMapLocationDot} from "@fortawesome/free-solid-svg-icons";
+import {faMapLocationDot, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Modal from "../UI/Modal";
+import roomContext from "../../store/room-context";
+import RoomPhase from "../../types/RoomPhase";
 
 interface props {
     menu: IMenu;
-    onDelete?: (menuId: number) => void;
+    onMenuDelete?: (menuId: number) => void;
 }
 
 const MenuItem = (props: props) => {
+    const roomCtx = useContext(roomContext);
     const [isMapModalOpened, setIsMapModalOpened] = useState(false);
 
-    const deleteBtnRef = useRef(null);
+    const menuDeleteBtnRef = useRef(null);
+    const menuUpdateBtnRef = useRef(null);
 
-    const deleteClickHandler = async () => {
-        const targetMenuId = Number(deleteBtnRef.current.dataset.id);
-        // const targetMenuThumbnail = deleteBtnRef.current.dataset.thumbnail;
-        await axios.delete(`/api/menu/${targetMenuId}`);
-        props.onDelete(targetMenuId);
+    const menuDeleteClickHandler = async () => {
+        const targetMenuId = Number(menuDeleteBtnRef.current.dataset.id);
+        props.onMenuDelete(targetMenuId);
     }
 
-    function getLocationHandler() {
+    const getLocationHandler = () => {
         setIsMapModalOpened(true);
     }
 
-    function modalCloseHandler() {
+    const modalCloseHandler = () => {
         setIsMapModalOpened(false);
+    }
+
+    const menuUpdateClickHandler = () => {
+        const targetMenuId = Number(menuUpdateBtnRef.current.dataset.id);
+        console.log({targetMenuId});
+        roomCtx.setUpdateTargetMenu(targetMenuId);
+        roomCtx.changeRoomPhase(RoomPhase.UPDATING);
     }
 
     return (
@@ -47,19 +56,29 @@ const MenuItem = (props: props) => {
                         </button>
                     </div>
                 </div>
-                {props.onDelete &&
-                    <div className='col text-end'>
-                        <button
-                            className='btn btn-sm btn-outline-secondary'
-                            data-id={props.menu.id}
-                            data-thumbnail={props.menu.thumbnail}
-                            ref={deleteBtnRef}
-                            onClick={deleteClickHandler}
-                        >X
-                        </button>
-                    </div>
+                {props.onMenuDelete &&
+                    <>
+                        <div className='col text-end'>
+                            <button
+                                className='btn btn-sm btn-outline-secondary menuUpdateBtn'
+                                data-id={props.menu.id}
+                                data-thumbnail={props.menu.thumbnail}
+                                ref={menuDeleteBtnRef}
+                                onClick={menuUpdateClickHandler}
+                            ><FontAwesomeIcon icon={faPen}/>
+                            </button>
+                            <button
+                                className='btn btn-sm btn-outline-secondary menuDeleteBtn'
+                                data-id={props.menu.id}
+                                data-thumbnail={props.menu.thumbnail}
+                                ref={menuUpdateBtnRef}
+                                onClick={menuDeleteClickHandler}
+                            ><FontAwesomeIcon icon={faTrash}/>
+                            </button>
+                        </div>
+                    </>
                 }
-                {!props.onDelete &&
+                {!props.onMenuDelete &&
                     <div className={"col"}>
                         <Timer/>
                     </div>

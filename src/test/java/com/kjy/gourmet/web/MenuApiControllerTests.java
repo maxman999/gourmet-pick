@@ -53,7 +53,7 @@ public class MenuApiControllerTests {
                 .build();
         String menuJson = gson.toJson(menu);
         // add menu
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/menu/add")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/menu/insert")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(menuJson))
                 .andExpect(MockMvcResultMatchers.status().isOk())

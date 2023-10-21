@@ -4,6 +4,7 @@ import {useSwiper} from "swiper/react";
 import {useContext} from "react";
 import websocketContext from "../../store/websocket-context";
 import roomContext from "../../store/room-context";
+import VotingStatus from "../../types/VotingStatus";
 
 const Timer = () => {
     const swiper = useSwiper();
@@ -16,9 +17,9 @@ const Timer = () => {
             shouldRepeat = false;
             // 방 상태 초기화
             websocketAPIs.finishVoting();
-            roomCtx.changeVotingStatus('finishing');
+            roomCtx.changeVotingStatus(VotingStatus.FINISHING);
         } else {
-            roomCtx.changeVotingStatus('voting');
+            roomCtx.changeVotingStatus(VotingStatus.VOTING);
         }
         swiper.slideNext();
         return {shouldRepeat: shouldRepeat, delay: 0.5}

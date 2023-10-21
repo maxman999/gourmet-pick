@@ -1,5 +1,5 @@
 import "./MyRoom.css";
-import {IRoom} from "../../interfaces/IRoom";
+import {IRoom} from "../../types/IRoom";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import MyRoomContainer from "./MyRoomContainer";

@@ -1,4 +1,4 @@
-import {IRoom} from "../../interfaces/IRoom";
+import {IRoom} from "../../types/IRoom";
 import './RoomHeader.css';
 import {useContext, useRef, useState} from "react";
 import RoomConsole from "./RoomConsole";
