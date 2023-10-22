@@ -10,7 +10,7 @@ import java.util.HashSet;
 @NoArgsConstructor
 public class VotingSession {
     private final HashSet<String> users = new HashSet<>();
-    private final HashMap<String, Integer> aggregation = new HashMap<>();
+    private final HashMap<Long, Integer> aggregation = new HashMap<>();
     private final HashSet<String> finishCalls = new HashSet<>();
 }
 

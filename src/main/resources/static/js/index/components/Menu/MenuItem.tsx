@@ -1,7 +1,6 @@
 import {IMenu} from "../../types/IMenu";
 import './MenuItem.css';
-import axios from "axios";
-import {StaticMap, MapMarker} from "react-kakao-maps-sdk";
+import {StaticMap} from "react-kakao-maps-sdk";
 import {useContext, useRef, useState} from "react";
 import Timer from "../VotingTable/Timer";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -56,7 +55,7 @@ const MenuItem = (props: props) => {
                         </button>
                     </div>
                 </div>
-                {props.onMenuDelete &&
+                {roomCtx.roomPhase === RoomPhase.DEFAULT && props.onMenuDelete &&
                     <>
                         <div className='col text-end'>
                             <button
@@ -78,7 +77,7 @@ const MenuItem = (props: props) => {
                         </div>
                     </>
                 }
-                {!props.onMenuDelete &&
+                {roomCtx.roomPhase === RoomPhase.STARTING &&
                     <div className={"col"}>
                         <Timer/>
                     </div>

@@ -1,8 +1,10 @@
 package com.kjy.gourmet.domain;
 
+import com.kjy.gourmet.domain.menu.Menu;
 import com.kjy.gourmet.domain.user.Role;
 import com.kjy.gourmet.domain.user.User;
 import com.kjy.gourmet.domain.room.Room;
+import com.kjy.gourmet.mapper.MenuMapper;
 import com.kjy.gourmet.mapper.UserMapper;
 import com.kjy.gourmet.mapper.RoomMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +25,8 @@ public class RoomTests {
     private UserMapper userMapper;
     @Autowired
     private RoomMapper roomMapper;
+    @Autowired
+    private MenuMapper menuMapper;
 
     List<String> invitationCodes = new ArrayList<>();
 
@@ -78,5 +82,26 @@ public class RoomTests {
         roomMapper.modifyRoomName(room.getId(), "계란빵방");
         String modifiedName = roomMapper.selectRoomByCode("123ZXCa0").getName();
         assertThat(modifiedName).isEqualTo("계란빵방");
+    }
+
+    @Test
+    public void insertTodayPickTest() {
+        Room room = roomMapper.selectRoomByCode("123ZXCa0");
+        Menu menu = Menu.builder()
+                .roomId(room.getId())
+                .name("명가 돌솥 설렁탕")
+                .thumbnail("test")
+                .soberComment("냉맛평")
+                .latitude(123.12345)
+                .longitude(123.1234)
+                .build();
+        menuMapper.insertMenu(menu);
+        menuMapper.insertTodayPick(room.getId(), menu.getId());
+        Room roomAfterInsertTodayPick = roomMapper.selectRoomByCode("123ZXCa0");
+        assertThat(roomAfterInsertTodayPick.getTodayPick().getId()).isEqualTo(menu.getId());
+
+        menuMapper.deleteTodayPick(room.getId());
+        Room roomAfterTodayPickDelete = roomMapper.selectRoomByCode("123ZXCa0");
+        assertThat(roomAfterTodayPickDelete.getTodayPick().getId()).isNotEqualTo(menu.getId());
     }
 }

@@ -2,7 +2,7 @@ import "./MenuDecisionSwiper.css"
 import {IMenu} from "../../types/IMenu";
 import MenuItem from "./MenuItem";
 import {Scrollbar, EffectCube} from "swiper";
-import {Swiper, SwiperSlide} from "swiper/react";
+import {Swiper, SwiperSlide, useSwiper} from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-cube";
 import GourmetTable from "../VotingTable/GourmetTable";
@@ -14,6 +14,8 @@ interface props {
 }
 
 const MenuDecisionSwiper = memo((props: props) => {
+    const swiper = useSwiper();
+
     return (
         <>
             <Swiper

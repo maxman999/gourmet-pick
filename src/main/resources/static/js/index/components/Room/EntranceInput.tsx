@@ -10,27 +10,6 @@ const EntranceInput = () => {
     const roomCtx = useContext(roomContext);
     const invitationCodeRef = useRef(null);
 
-    const getRoom = async (code: string = "") => {
-        const fetchRes = await axios.get(`/api/room/${code}`);
-        if (fetchRes.status === 200) {
-            return fetchRes.data
-        } else {
-            alert("no code");
-            return;
-        }
-    };
-
-    const inspectSessionDuplication = async () => {
-        // 세션 검사
-        const {data: isSessionDuplicated} = await axios.get("/voting/isSessionDuplicated");
-        return isSessionDuplicated;
-    }
-
-    const enterRoom = async (userId: number, roomId: number) => {
-        const fetchResult = await axios.post(`api/room/enter/${userId}/${roomId}`);
-        return Number(fetchResult.data) >= 0;
-    };
-
     const clickHandler = async () => {
         roomCtx.enterRoom(invitationCodeRef.current.value);
     };

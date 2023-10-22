@@ -27,7 +27,7 @@ const WebsocketContext = React.createContext({
     },
     start: () => {
     },
-    vote: (menuName: string, preference: number) => {
+    decide: (menuId: number, menuName: string, preference: number) => {
     },
     finishVoting: () => {
     },

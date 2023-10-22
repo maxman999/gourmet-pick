@@ -14,10 +14,12 @@
         where id = #{id};
     </select>
 
-    <select id="selectRoomByCode" parameterType="String" resultType="com.kjy.gourmet.domain.room.Room">
-        select *
-        from room
-        where invitation_code = #{invitationCode};
+    <select id="selectRoomByCode" parameterType="String" resultMap="roomResultMap">
+        SELECT r.*, m.id menu_id, m.name menu_name, m.thumbnail, m.sober_comment, m.longitude, m.latitude
+        FROM room r
+                 LEFT JOIN today_pick tp ON (r.id = tp.room_id and DATE(tp.create_date) = CURDATE())
+                 LEFT JOIN menu m ON tp.menu_id = m.id
+        WHERE r.invitation_code = #{invitationCode}; /* 성능 봐서 인덱싱 */
     </select>
 
     <delete id="deleteRoomById">
@@ -61,4 +63,20 @@
         delete
         from room_favorites;
     </delete>
+
+    <resultMap id="roomResultMap" type="com.kjy.gourmet.domain.room.Room">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="invitationCode" column="invitation_code"/>
+        <association property="todayPick" javaType="com.kjy.gourmet.domain.menu.Menu">
+            <id property="id" column="menu_id"/>
+            <result property="roomId" column="id"/>
+            <result property="name" column="menu_name"/>
+            <result property="thumbnail" column="thumbnail"/>
+            <result property="soberComment" column="sober_comment"/>
+            <result property="longitude" column="longitude"/>
+            <result property="latitude" column="latitude"/>
+        </association>
+    </resultMap>
 </mapper>
+

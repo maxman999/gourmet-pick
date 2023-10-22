@@ -10,6 +10,10 @@ import java.util.List;
 public interface MenuService {
     int insertMenu(Menu menu);
 
+    int insertTodayPick(long roomId, long menuId);
+
+    int deleteTodayPick(long roomId);
+
     Menu getMenuById(long menuId);
 
     int updateMenu(Menu menu);

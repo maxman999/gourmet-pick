@@ -4,14 +4,20 @@ import {useContext, useRef, useState} from "react";
 import RoomConsole from "./RoomConsole";
 import Modal from "../UI/Modal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faEye, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import roomContext from "../../store/room-context";
 import axios from "axios";
-import CommonUtils from "../../utils/websocket/CommonUtils";
+import CommonUtils from "../../utils/CommonUtils";
+import RoomPhase from "../../types/RoomPhase";
+import {Tooltip} from "react-tooltip";
+import * as _ from "lodash";
+import todayPick from "../Menu/TodayPick";
 
 interface props {
     room: IRoom;
     isConsoleActive: boolean;
+    todayPickPopupFlag?: boolean;
+    todayPickPopupFlagHandler?: (popupFlag: boolean) => void
 }
 
 const RoomHeader = (props: props) => {
@@ -65,7 +71,7 @@ const RoomHeader = (props: props) => {
                     <div data-room-id={props.room?.id}>
                         <span className='room-title'> # {currentRoomName} </span>
                         <span className='room-code'>({props.room?.invitationCode})</span>
-                        {roomCtx.roomPhase === 'default' &&
+                        {roomCtx.roomPhase === RoomPhase.DEFAULT &&
                             <>
                                 <button className={'roomTitleUpdateBtn'} onClick={nameUpdatePopUpHandler}>
                                     <FontAwesomeIcon icon={faPen}/>
@@ -79,7 +85,8 @@ const RoomHeader = (props: props) => {
                 </div>
                 {props.isConsoleActive &&
                     <div className={"col mt-2 text-end"}>
-                        <RoomConsole/>
+                        <RoomConsole todayPickPopupFlag={props.todayPickPopupFlag}
+                                     todayPickPopupFlagHandler={props.todayPickPopupFlagHandler}/>
                     </div>
                 }
             </div>

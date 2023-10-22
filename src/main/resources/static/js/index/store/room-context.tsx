@@ -1,6 +1,6 @@
 import * as React from "react";
 import {IRoom} from "../types/IRoom";
-import VotingStatus from "../types/VotingStatus";
+import {IMenu} from "../types/IMenu";
 
 const RoomContext = React.createContext({
     roomInfo: {
@@ -9,6 +9,7 @@ const RoomContext = React.createContext({
         name: '',
         hasVotingSession: false,
         currentVotingUserCnt: 0,
+        todayPick: undefined,
     },
 
     setRoomInfo: (room: IRoom) => {
@@ -40,6 +41,14 @@ const RoomContext = React.createContext({
     votingStatus: undefined,
 
     changeVotingStatus: (votingStatus: string) => {
+    },
+
+    setTodayPick: (menu: IMenu) => {
+
+    },
+
+    deleteTodayPick: (roomId: number) => {
+
     },
 });
 

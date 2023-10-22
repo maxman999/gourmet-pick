@@ -6,10 +6,11 @@ import Modal from "../UI/Modal";
 import MapUploadTool from "../Map/MapUploadTool";
 import EmptyBox from "../UI/EmptyBox";
 import * as _ from 'lodash';
-import CommonUtils from "../../utils/websocket/CommonUtils";
+import CommonUtils from "../../utils/CommonUtils";
 import {IMenu} from "../../types/IMenu";
 import axios from "axios";
 import MenuContainer from "./MenuContainer";
+import RoomPhase from "../../types/RoomPhase";
 
 const MenuUpdateForm = () => {
     const roomCtx = useContext(roomContext);
@@ -146,11 +147,11 @@ const MenuUpdateForm = () => {
 
         const {data: res} = await axios.post(URL, newMenu);
 
-        roomCtx.changeRoomPhase('default');
+        roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
     }
 
     const updateCancelHandler = () => {
-        roomCtx.changeRoomPhase('default');
+        roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
     }
 
     const modalCloseHandler = () => {

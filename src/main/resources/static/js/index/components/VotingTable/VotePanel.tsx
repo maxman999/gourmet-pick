@@ -19,8 +19,9 @@ const VotePanel = (props: props) => {
     const swiper = useSwiper();
 
     const votingHandler = (gourmetPick: number) => {
+        const menuId = props.menuList[swiper.realIndex].id;
         const menuName = props.menuList[swiper.realIndex].name;
-        websocketAPIs.vote(menuName, gourmetPick);
+        websocketAPIs.decide(menuId, menuName, gourmetPick);
     }
 
     return (

@@ -8,6 +8,7 @@ import MenuDecisionSwiper from "./MenuDecisionSwiper";
 import roomContext from "../../store/room-context";
 import MenuContainer from "./MenuContainer";
 import * as _ from "lodash";
+import RoomPhase from "../../types/RoomPhase";
 
 type props = {
     room: IRoom,
@@ -49,7 +50,7 @@ const MenuList = (props: props) => {
 
     return (
         <MenuContainer>
-            {roomCtx.roomPhase === 'default' &&
+            {roomCtx.roomPhase === RoomPhase.DEFAULT &&
                 <>
                     <MenuDisplaySwiper
                         menuList={menuList}
@@ -58,7 +59,7 @@ const MenuList = (props: props) => {
                     <MenuInput/>
                 </>
             }
-            {!(roomCtx.roomPhase === 'default') &&
+            {!(roomCtx.roomPhase === RoomPhase.DEFAULT) &&
                 <MenuDecisionSwiper menuList={menuList} gourmet={props.gourmet}/>
             }
         </MenuContainer>

@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public class Ballot {
-    private String senderName;
+    private long menuId;
     private String menuName;
+    private String senderName;
     private int preference;
 }

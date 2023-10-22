@@ -1,7 +1,9 @@
 package com.kjy.gourmet.service.voting;
 
 import com.kjy.gourmet.domain.dto.*;
+import com.kjy.gourmet.domain.menu.Menu;
 import com.kjy.gourmet.domain.room.Room;
+import com.kjy.gourmet.service.menu.MenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,7 +20,9 @@ public class VotingServiceImpl implements VotingService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final Map<String, SessionMapper> sessionMapper = new ConcurrentHashMap<>();
     private final Map<Long, VotingSession> votingSessions = new ConcurrentHashMap<>();
-    private final int ROOM_CAPACITY = 3;
+    private final int ROOM_CAPACITY = 2;
+
+    private final MenuService menuService;
 
 
     @Override
@@ -85,33 +89,37 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void soberDecision(long roomId, Ballot ballot) {
-        HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
-        String targetMenu = ballot.getMenuName();
-        if (votingStatus.containsKey(targetMenu)) {
-            int totalPreference = votingStatus.get(targetMenu) + ballot.getPreference();
-            votingStatus.put(targetMenu, totalPreference);
+        HashMap<Long, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
+        long targetMenuId = ballot.getMenuId();
+        if (votingStatus.containsKey(targetMenuId)) {
+            int totalPreference = votingStatus.get(targetMenuId) + ballot.getPreference();
+            votingStatus.put(targetMenuId, totalPreference);
         } else {
-            votingStatus.put(targetMenu, ballot.getPreference());
+            votingStatus.put(targetMenuId, ballot.getPreference());
         }
     }
 
     @Override
     public void finishVoting(String sessionId, long roomId) {
         HashSet<String> finishCalls = votingSessions.get(roomId).getFinishCalls();
-        int userCnt = votingSessions.get(roomId).getUsers().size();
+        int currentSessionUserCnt = votingSessions.get(roomId).getUsers().size();
         finishCalls.add(sessionId);
-        if (finishCalls.size() >= userCnt) {
+        // 투표 끝난 유저의 세션정보 제거
+        sessionMapper.remove(sessionId);
+        votingSessions.get(roomId).getUsers().remove(sessionId);
+
+        if (finishCalls.size() >= currentSessionUserCnt) {
             // 투표 집계
-            HashMap<String, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
-            String maxKey = Collections.max(votingStatus.entrySet(), Map.Entry.comparingByValue()).getKey();
+            HashMap<Long, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
+            long todayPickMenuId = Collections.max(votingStatus.entrySet(), Map.Entry.comparingByValue()).getKey();
+            menuService.insertTodayPick(roomId, todayPickMenuId);
+            Menu todayPick = menuService.getMenuById(todayPickMenuId);
             // 집계 결과 송출
-            Message endMessage = new Message("server", "people", "투표완료", VotingStatus.FINISH, maxKey);
+            Message endMessage = new Message("server", "people", "투표완료", VotingStatus.FINISH, todayPick);
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
             // session cleanup
             votingSessions.remove(roomId);
         }
-        sessionMapper.remove(sessionId);
-        votingSessions.get(roomId).getUsers().remove(sessionId);
     }
 
     @Override

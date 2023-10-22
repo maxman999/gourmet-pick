@@ -35,7 +35,7 @@ type websocketAction =
     | { type: "SEAT" }
     | { type: "BOOTING" }
     | { type: "START" }
-    | { type: "VOTE"; menuName: string; preference: number }
+    | { type: "VOTE"; menuId: number; menuName: string; preference: number; }
     | { type: "FINISH" }
     | { type: "DISCONNECT" };
 
@@ -95,13 +95,14 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
 
     if (action.type === "VOTE") {
         const {topic, userId, roomId} = state.sessionInfo
-        const chatMessage = {
+        const ballot = {
+            menuId: action.menuId,
+            menuName: action.menuName,
             senderName: userId,
             status: 'VOTE',
-            menuName: action.menuName,
             preference: action.preference,
         }
-        stompClient.send(`/app/${topic}/decide/${userId}/${roomId}`, {}, JSON.stringify(chatMessage));
+        stompClient.send(`/app/${topic}/decide/${userId}/${roomId}`, {}, JSON.stringify(ballot));
     }
 
     if (action.type === "FINISH") {
@@ -175,9 +176,10 @@ const WebsocketProvider = (props: props) => {
         });
     }
 
-    const votingHandler = (menuName: string, preference: number) => {
+    const votingHandler = (menuId: number, menuName: string, preference: number) => {
         dispatchWebsocketActions({
             type: 'VOTE',
+            menuId: menuId,
             menuName: menuName,
             preference: preference,
         });
@@ -203,7 +205,7 @@ const WebsocketProvider = (props: props) => {
         seat: seatHandler,
         boot: bootHandler,
         start: startHandler,
-        vote: votingHandler,
+        decide: votingHandler,
         finishVoting: finishVotingHandler,
         disconnect: disconnectHandler,
     }

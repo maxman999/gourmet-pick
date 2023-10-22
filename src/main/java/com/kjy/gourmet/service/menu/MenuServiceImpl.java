@@ -50,6 +50,16 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public int insertTodayPick(long roomId, long menuId) {
+        return menuMapper.insertTodayPick(roomId, menuId);
+    }
+
+    @Override
+    public int deleteTodayPick(long roomId) {
+        return menuMapper.deleteTodayPick(roomId);
+    }
+
+    @Override
     public int updateMenu(Menu menu) {
         return menuMapper.updateMenu(menu);
     }

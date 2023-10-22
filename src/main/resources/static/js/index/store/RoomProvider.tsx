@@ -6,85 +6,30 @@ import axios from "axios";
 import * as _ from "lodash";
 import RoomPhase from "../types/RoomPhase";
 import VotingStatus from "../types/VotingStatus";
+import {IMenu} from "../types/IMenu";
 
 type roomState = {
     roomInfo: IRoom;
     isMenuListEmpty: boolean;
     roomPhase: string;
     updateTargetMenuId: number
-    votingStatus: string;
     callerFlag: boolean;
+    votingStatus: string;
 }
 
 type roomAction =
-    | {
-    type: "DEFAULT_ROOM_SETTING";
-    roomInfo: IRoom;
-}
-    | {
-    type: "SET_MENU_EMPTY_FLAG";
-    isMenuListEmpty: boolean
-}
-    | {
-    type: "SET_ROOM_PHASE";
-    roomPhase: string;
-}
-    | {
-    type: "SET_UPDATE_TARGET_MENU";
-    menuId: number;
-}
-    | {
-    type: "SET_CALLER_FLAG";
-    callerFlag: boolean;
-}
-    | {
-    type: "SET_VOTING_STATUS";
-    votingStatus: string;
-}
+    | { type: "DEFAULT_ROOM_SETTING"; roomInfo: IRoom; }
+    | { type: "SET_MENU_EMPTY_FLAG"; isMenuListEmpty: boolean }
+    | { type: "SET_ROOM_PHASE"; roomPhase: string; }
+    | { type: "SET_UPDATE_TARGET_MENU"; menuId: number; }
+    | { type: "SET_CALLER_FLAG"; callerFlag: boolean; }
+    | { type: "SET_VOTING_STATUS"; votingStatus: string; }
+    | { type: "SET_TODAY_PICK"; menu: IMenu; }
+    | { type: "DELETE_TODAY_PICK"; roomId: number; }
 
 type props = {
     children: React.ReactNode;
 }
-
-const inspectSessionDuplication = async () => {
-    const {data: isSessionDuplicated} = await axios.get("/voting/isSessionDuplicated");
-    return isSessionDuplicated;
-}
-
-const getRoom = async (code: string = "") => {
-    const fetchRes = await axios.get(`/api/room/${code}`);
-    if (fetchRes.status === 200) {
-        return fetchRes.data
-    }
-};
-
-const enterRoom = async (userId: number, roomId: number) => {
-    const fetchResult = await axios.post(`api/room/enter/${userId}/${roomId}`);
-    return Number(fetchResult.data) >= 0;
-};
-
-const getRoomWithInspection = async (roomCode: string, userId: number) => {
-    const isSessionDuplicated = await inspectSessionDuplication();
-    if (isSessionDuplicated) {
-        alert("이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.");
-        return;
-    }
-
-    const room: IRoom = await getRoom(roomCode);
-    if (_.isEmpty(room)) {
-        alert("해당 방이 존재하지 않습니다.");
-        return;
-    }
-
-    const isEntranceSuccess = await enterRoom(userId, room.id);
-    if (isEntranceSuccess) {
-        return room;
-    } else {
-        alert("방 입장 실패");
-        return;
-    }
-}
-
 
 const roomReducer = (state: roomState, roomAction: roomAction) => {
     if (roomAction.type === "DEFAULT_ROOM_SETTING") {
@@ -128,6 +73,23 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
             votingStatus: roomAction.votingStatus
         };
     }
+
+    if (roomAction.type === "DELETE_TODAY_PICK") {
+        delete state.roomInfo.todayPick
+        return {
+            ...state,
+        };
+    }
+
+    if (roomAction.type === "SET_TODAY_PICK") {
+        return {
+            ...state,
+            roomInfo: {
+                ...state.roomInfo,
+                todayPick: roomAction.menu,
+            }
+        };
+    }
     return state;
 }
 
@@ -138,6 +100,49 @@ const defaultRoomState: roomState = {
     updateTargetMenuId: null,
     callerFlag: false,
     votingStatus: VotingStatus.GATHERING,
+}
+
+const inspectSessionDuplication = async () => {
+    const {data: isSessionDuplicated} = await axios.get("/voting/isSessionDuplicated");
+    return isSessionDuplicated;
+}
+
+const getRoom = async (code: string = "") => {
+    const {data: room}: { data: IRoom } = await axios.get(`/api/room/${code}`);
+    if (!room) {
+        alert("해당 방이 존재하지 않습니다.");
+        return;
+    }
+    if (room.todayPick.id === 0) delete room.todayPick;
+    return room;
+};
+
+const enterRoom = async (userId: number, roomId: number) => {
+    const fetchResult = await axios.post(`api/room/enter/${userId}/${roomId}`);
+    return Number(fetchResult.data) >= 0;
+};
+
+const getRoomWithInspection = async (roomCode: string, userId: number) => {
+    const isSessionDuplicated = await inspectSessionDuplication();
+    if (isSessionDuplicated) {
+        alert("이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.");
+        return;
+    }
+
+    const room: IRoom = await getRoom(roomCode);
+
+    const isEntranceSuccess = await enterRoom(userId, room.id);
+    if (isEntranceSuccess) {
+        return room;
+    } else {
+        alert("방 입장 실패");
+        return;
+    }
+}
+
+const deleteTodayPick = async (roomId: number) => {
+    const {data: result} = await axios.delete(`/api/menu/todayPick/${roomId}`);
+    return result;
 }
 
 const RoomProvider = (props: props) => {
@@ -194,6 +199,24 @@ const RoomProvider = (props: props) => {
         });
     }
 
+    const setTodayPickHandler = async (menu: IMenu) => {
+        dispatchMenuActions({
+            type: 'SET_TODAY_PICK',
+            menu: menu,
+        });
+    }
+
+    const deleteTodayPickHandler = async (roomId: number) => {
+        const result = await deleteTodayPick(roomId);
+        if (result === 0) {
+            alert("오늘의 메뉴를 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.");
+            return;
+        }
+        dispatchMenuActions({
+            type: 'DELETE_TODAY_PICK',
+            roomId: roomId,
+        });
+    }
 
     const roomContext = {
         roomInfo: roomState.roomInfo,
@@ -209,6 +232,8 @@ const RoomProvider = (props: props) => {
         updateTargetMenuId: roomState.updateTargetMenuId,
         setUpdateTargetMenu: setUpdateTargetMenuHandler,
         enterRoom: enterRoomHandler,
+        setTodayPick: setTodayPickHandler,
+        deleteTodayPick: deleteTodayPickHandler,
     }
 
     return (

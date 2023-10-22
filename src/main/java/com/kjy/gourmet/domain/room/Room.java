@@ -1,5 +1,6 @@
 package com.kjy.gourmet.domain.room;
 
+import com.kjy.gourmet.domain.menu.Menu;
 import lombok.*;
 
 @Builder
@@ -13,4 +14,5 @@ public class Room {
 
     private boolean hasVotingSession;
     private int currentVotingUserCnt;
+    private Menu todayPick;
 }

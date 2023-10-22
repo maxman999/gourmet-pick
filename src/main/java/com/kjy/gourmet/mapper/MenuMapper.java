@@ -11,6 +11,10 @@ import java.util.List;
 public interface MenuMapper {
     int insertMenu(Menu menu);
 
+    int insertTodayPick(long roomId, long menuId);
+
+    int deleteTodayPick(long roomId);
+
     int updateMenu(Menu menu);
 
     Menu selectMenu(long menuId);

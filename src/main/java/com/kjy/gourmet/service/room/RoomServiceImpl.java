@@ -76,5 +76,4 @@ public class RoomServiceImpl implements RoomService {
     public List<Room> getMyRoomList(long userId) {
         return roomMapper.selectFavoriteRoomList(userId);
     }
-
 }

@@ -1,5 +1,4 @@
 class CommonUtils {
-
     static filterHtmlTags = (htmlString: string) => {
         return htmlString
             .replace(/&/g, "&amp;")

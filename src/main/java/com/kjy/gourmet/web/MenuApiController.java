@@ -61,4 +61,9 @@ public class MenuApiController {
         return menuService.getMenuImageURL(fileName);
     }
 
+    @DeleteMapping("/todayPick/{roomId}")
+    public int deleteTodayPick(@PathVariable("roomId") long roomId) {
+        return menuService.deleteTodayPick(roomId);
+    }
+
 }

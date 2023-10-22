@@ -20,4 +20,5 @@ public interface RoomService {
     List<Room> getMyRoomList(long userId);
 
     int modifyRoomName(long roomId, String roomName);
+
 }

@@ -1,0 +1,74 @@
+.ribbon {
+    position: absolute;
+    right: -5px;
+    top: -7px;
+    z-index: 1;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+    text-align: right;
+}
+
+.ribbon span {
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFF;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 24px;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    width: 140px;
+    display: block;
+    background: #ff6f61;
+    box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+    position: absolute;
+    top: 29px;
+    right: -31px;
+}
+
+.ribbon span::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: -1;
+    border-left: 5px solid #8F0808;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid #8F0808;
+}
+
+.ribbon span::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: -1;
+    border-left: 5px solid transparent;
+    border-right: 5px solid #8F0808;
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid #8F0808;
+}
+
+.todayPickResetBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    transform: none;
+    padding: 7px;
+}
+
+.votingEndTooltip:hover {
+    cursor: pointer;
+}
+
+.votingEndTooltip-title {
+    margin-right: 10px;
+}
+
+.votingEndTooltip-btn {
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 4px;
+}

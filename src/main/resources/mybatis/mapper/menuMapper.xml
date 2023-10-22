@@ -3,10 +3,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.kjy.gourmet.mapper.MenuMapper">
-    <insert id="insertMenu" parameterType="com.kjy.gourmet.domain.menu.Menu">
+    <insert id="insertMenu" parameterType="com.kjy.gourmet.domain.menu.Menu" useGeneratedKeys="true" keyProperty="id">
         insert into menu(room_id, name, thumbnail, sober_comment, longitude, latitude)
         values (#{roomId}, #{name}, #{thumbnail}, #{soberComment}, #{longitude}, #{latitude});
     </insert>
+
+    <insert id="insertTodayPick" parameterType="long">
+        insert ignore into today_pick(room_id, menu_id)
+        values (#{roomId}, #{menuId});
+    </insert>
+
+    <delete id="deleteTodayPick" parameterType="long">
+        delete
+        from today_pick
+        where room_id = #{roomId}
+    </delete>
 
     <update id="updateMenu" parameterType="com.kjy.gourmet.domain.menu.Menu">
         update menu
@@ -28,7 +39,7 @@
         select *
         from menu
         where room_id = #{roomId}
-        order by update_date desc /* 성능 봐서 역순 인덱스 */
+        order by update_date desc /* 성능 봐서 인덱싱 */
     </select>
 
     <select id="getAllThumbnailsById" parameterType="long" resultType="java.lang.String">
