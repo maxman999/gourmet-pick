@@ -12,12 +12,13 @@ import VotingStatus from "../../types/VotingStatus";
 import {IMenu} from "../../types/IMenu";
 import TodayPick from "../Menu/TodayPick";
 import * as _ from "lodash";
+import {IUser} from "../../types/IUser";
+import roomPhase from "../../types/RoomPhase";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
     const websocketAPIs = useContext(websocketContext);
 
-    const [gourmet, setGourmet] = useState(0);
     const [isTodayPickElected, setIsTodayPickElected] = useState(false)
     const [todayPickPopupFlag, setTodayPickPopupFlag] = useState(!_.isEmpty(roomCtx.roomInfo.todayPick));
 
@@ -45,11 +46,11 @@ const Room = () => {
                 break;
             case 'SEATING':
                 roomCtx.changeRoomPhase(RoomPhase.CALLING);
-                setGourmet(Number(payloadData.data));
+                roomCtx.setVotingGourmets(payloadData.data);
                 break;
             case 'CANCEL':
                 roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
-                setGourmet(0);
+                roomCtx.setVotingGourmets([]);
                 break;
             case 'READY':
                 roomCtx.changeRoomPhase(RoomPhase.READY);
@@ -63,7 +64,7 @@ const Room = () => {
                 const votingResult = payloadData.data as IMenu;
                 roomCtx.setTodayPick(votingResult);
                 roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
-                setGourmet(0);
+                roomCtx.setVotingGourmets([]);
                 voteFinishingModalPopHandler(true);
                 break;
             case 'EXILE':
@@ -72,12 +73,17 @@ const Room = () => {
                 break
             case 'DISCONNECT':
                 // 임시로직
-                const currentUserCnt = Number(payloadData.data);
+                const users = payloadData.data;
+                const currentUserCnt = users.length;
                 if (currentUserCnt < 2) {
-                    roomCtx.changeRoomPhase(RoomPhase.CALLING);
+                    if (roomCtx.roomPhase === RoomPhase.STARTING) roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 }
-                setGourmet(currentUserCnt);
+                roomCtx.setVotingGourmets(users);
                 break
+            case 'FAIL':
+                alert("결과를 집계할 수 없습니다. 메인 화면으로 돌아갑니다.");
+                document.location.reload();
+                break;
             default :
                 break;
         }
@@ -88,7 +94,7 @@ const Room = () => {
         switch (payloadData.status) {
             case 'SYNC':
                 roomCtx.changeRoomPhase(RoomPhase.CALLING);
-                setGourmet(Number(payloadData.data));
+                roomCtx.setVotingGourmets(payloadData.data);
                 break
             default :
                 break;
@@ -99,10 +105,10 @@ const Room = () => {
         const sessionInfo = {
             topic: 'voting',
             roomId: roomCtx.roomInfo.id,
-            userId: Number(sessionStorage.getItem('userId')),
+            user: JSON.parse(sessionStorage.getItem('user')),
         }
 
-        if (!sessionInfo.userId) {
+        if (!sessionInfo.user) {
             alert("인증 정보를 받아올 수 없습니다. 다시 시도해주세요.")
             document.location.reload();
         }
@@ -124,7 +130,7 @@ const Room = () => {
                                     todayPickPopupFlag={todayPickPopupFlag}
                                     todayPickPopupFlagHandler={todayPickPopupFlagHandler}
                         />
-                        <MenuList room={roomCtx.roomInfo} gourmet={gourmet}/>
+                        <MenuList room={roomCtx.roomInfo}/>
                     </>
                 }
                 {roomCtx.roomInfo && (roomCtx.roomPhase === RoomPhase.UPDATING) &&

@@ -7,6 +7,7 @@ import {useContext, useState} from "react";
 import axios from "axios";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
+import {IUser} from "../../types/IUser";
 
 const NavigationDropDown = () => {
     const roomCtx = useContext(roomContext);
@@ -25,13 +26,18 @@ const NavigationDropDown = () => {
     }
 
     const nicknameUpdateHandler = async (nickname: string) => {
+        const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
         const {data: result} = await axios.post('/api/user/updateNickname', {
-            id: sessionStorage.getItem('userId'),
+            id: user.id,
             nickname: nickname,
         });
         if (result === 0) {
             alert("닉네임 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            return
         }
+        user.nickname = nickname
+        sessionStorage.setItem("user", JSON.stringify(user));
+
         setIsNicknameUpdateModalPop(false);
     }
 

@@ -3,9 +3,9 @@ package com.kjy.gourmet.web;
 import com.kjy.gourmet.config.auth.LoginUser;
 import com.kjy.gourmet.config.auth.dto.SessionUser;
 import com.kjy.gourmet.domain.dto.Ballot;
-import com.kjy.gourmet.service.user.UserService;
 import com.kjy.gourmet.service.voting.VotingService;
 import com.kjy.gourmet.utils.AuthUtil;
+import com.kjy.gourmet.web.dto.WebSocketUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -29,13 +29,11 @@ public class VotingApiController {
         return votingService.isSessionDuplicated(user.getEmail());
     }
 
-    @MessageMapping("/voting/register/{userId}/{roomId}")
-    public void register(@DestinationVariable long roomId,
-                         @DestinationVariable long userId,
-                         SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("/voting/register")
+    public void register(WebSocketUser webSocketUser, SimpMessageHeaderAccessor headerAccessor) {
         String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
-        votingService.userRegisterHandler(userEmail, roomId, userId);
-        log.info("{}번 방에 {}님 입장", roomId, userId);
+        votingService.userRegisterHandler(userEmail, webSocketUser);
+        log.info("{}번 방에 {}님 입장", webSocketUser.getRoomId(), webSocketUser.getNickname());
     }
 
     @MessageMapping("/voting/create/{userId}/{roomId}")
@@ -45,14 +43,6 @@ public class VotingApiController {
         String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
         votingService.creatVotingSession(userEmail, roomId, userId);
         log.info("{}번 방에 투표세션이 생성되었습니다.", roomId);
-    }
-
-    @MessageMapping("/voting/sync/{userId}/{roomId}")
-    public void sync(@DestinationVariable long roomId,
-                     @DestinationVariable long userId,
-                     SimpMessageHeaderAccessor headerAccessor) {
-        String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
-        votingService.syncHandler(userEmail, roomId, userId);
     }
 
     @MessageMapping("/voting/cancel/{roomId}")

@@ -1,12 +1,12 @@
 import {CountdownCircleTimer} from 'react-countdown-circle-timer'
 import "./Timer.css"
 import {useSwiper} from "swiper/react";
-import {useContext} from "react";
+import {memo, useContext, useRef} from "react";
 import websocketContext from "../../store/websocket-context";
 import roomContext from "../../store/room-context";
 import VotingStatus from "../../types/VotingStatus";
 
-const Timer = () => {
+const Timer = memo(() => {
     const swiper = useSwiper();
     const websocketAPIs = useContext(websocketContext);
     const roomCtx = useContext(roomContext)
@@ -40,6 +40,6 @@ const Timer = () => {
             </CountdownCircleTimer>
         </div>
     );
-}
+});
 
 export default Timer;

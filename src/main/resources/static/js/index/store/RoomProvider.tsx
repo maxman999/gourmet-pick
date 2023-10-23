@@ -7,6 +7,7 @@ import * as _ from "lodash";
 import RoomPhase from "../types/RoomPhase";
 import VotingStatus from "../types/VotingStatus";
 import {IMenu} from "../types/IMenu";
+import {IUser} from "../types/IUser";
 
 type roomState = {
     roomInfo: IRoom;
@@ -15,6 +16,7 @@ type roomState = {
     updateTargetMenuId: number
     callerFlag: boolean;
     votingStatus: string;
+    votingGourmets: string[];
 }
 
 type roomAction =
@@ -24,6 +26,7 @@ type roomAction =
     | { type: "SET_UPDATE_TARGET_MENU"; menuId: number; }
     | { type: "SET_CALLER_FLAG"; callerFlag: boolean; }
     | { type: "SET_VOTING_STATUS"; votingStatus: string; }
+    | { type: "SET_VOTING_GOURMETS"; votingGourmets: string[]; }
     | { type: "SET_TODAY_PICK"; menu: IMenu; }
     | { type: "DELETE_TODAY_PICK"; roomId: number; }
 
@@ -74,6 +77,13 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
         };
     }
 
+    if (roomAction.type === "SET_VOTING_GOURMETS") {
+        return {
+            ...state,
+            votingGourmets: roomAction.votingGourmets
+        };
+    }
+
     if (roomAction.type === "DELETE_TODAY_PICK") {
         delete state.roomInfo.todayPick
         return {
@@ -100,6 +110,7 @@ const defaultRoomState: roomState = {
     updateTargetMenuId: null,
     callerFlag: false,
     votingStatus: VotingStatus.GATHERING,
+    votingGourmets: [],
 }
 
 const inspectSessionDuplication = async () => {
@@ -156,8 +167,12 @@ const RoomProvider = (props: props) => {
     }
 
     const enterRoomHandler = async (roomCode: string) => {
-        const userId = Number(sessionStorage.getItem("userId"));
-        const room = await getRoomWithInspection(roomCode, userId);
+        const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
+        if (!user) {
+            alert("인증 정보를 받아올 수 없습니다. 다시 시도해주세요.")
+            document.location.reload();
+        }
+        const room = await getRoomWithInspection(roomCode, user.id);
         dispatchMenuActions({
             type: 'DEFAULT_ROOM_SETTING',
             roomInfo: room,
@@ -199,6 +214,13 @@ const RoomProvider = (props: props) => {
         });
     }
 
+    const setVotingGourmetsHandler = (votingGourmets: string[]) => {
+        dispatchMenuActions({
+            type: 'SET_VOTING_GOURMETS',
+            votingGourmets: votingGourmets,
+        })
+    }
+
     const setTodayPickHandler = async (menu: IMenu) => {
         dispatchMenuActions({
             type: 'SET_TODAY_PICK',
@@ -229,6 +251,8 @@ const RoomProvider = (props: props) => {
         setCallerFlag: callerFlagChangeHandler,
         votingStatus: roomState.votingStatus,
         changeVotingStatus: votingStatusChangeHandler,
+        votingGourmets: roomState.votingGourmets,
+        setVotingGourmets: setVotingGourmetsHandler,
         updateTargetMenuId: roomState.updateTargetMenuId,
         setUpdateTargetMenu: setUpdateTargetMenuHandler,
         enterRoom: enterRoomHandler,

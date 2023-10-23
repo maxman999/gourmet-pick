@@ -17,7 +17,7 @@ const MyRoomList = (props: props) => {
     const [roomName, setRoomName] = useState(null);
 
     const createRoomHandler = async () => {
-        const randomNumber = Math.floor(Math.random() * 99) + 1;
+        const randomNumber = Math.floor(Math.random() * 100) + 1;
         const {data: invitationCode} = await axios.post("/api/room/make", {name: `냉정한 미식방 ${randomNumber}`});
         if (invitationCode) {
             roomCtx.enterRoom(invitationCode);

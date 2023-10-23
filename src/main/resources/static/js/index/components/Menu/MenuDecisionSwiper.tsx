@@ -6,18 +6,14 @@ import {Swiper, SwiperSlide, useSwiper} from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-cube";
 import GourmetTable from "../VotingTable/GourmetTable";
-import {memo} from "react";
-import RoomPhase from "../../types/RoomPhase";
 import Timer from "../VotingTable/Timer";
+import {memo} from "react";
 
 interface props {
     menuList: IMenu[];
-    gourmet: number;
 }
 
 const MenuDecisionSwiper = memo((props: props) => {
-    const swiper = useSwiper();
-
     return (
         <>
             <Swiper
@@ -45,13 +41,10 @@ const MenuDecisionSwiper = memo((props: props) => {
                 })}
                 {/* 투표 영역 */}
                 <Timer/>
-                <GourmetTable
-                    menuList={props.menuList}
-                    gourmet={props.gourmet}
-                />
+                <GourmetTable menuList={props.menuList}/>
             </Swiper>
         </>
     );
-})
+});
 
 export default MenuDecisionSwiper;

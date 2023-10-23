@@ -46,7 +46,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
     private User getUserFromOAuthAttributes(OAuthAttributes attributes) {
         return User.builder()
                 .email(attributes.getEmail())
-                .nickname(attributes.getName())
+                .nickname("냉정한 미식가")
                 .role(Role.USER)
                 .build();
     }

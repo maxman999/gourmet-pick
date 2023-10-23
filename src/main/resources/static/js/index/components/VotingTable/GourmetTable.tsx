@@ -2,21 +2,28 @@ import './GourmetTable.css';
 import Gourmet from "./Gourmet";
 import VotePanel from "./VotePanel";
 import {IMenu} from "../../types/IMenu";
+import {useContext} from "react";
+import roomContext from "../../store/room-context";
 
-interface props {
+type props = {
     menuList: IMenu[];
-    gourmet: number;
 }
 
 const GourmetTable = (props: props) => {
+    const roomCtx = useContext(roomContext);
     const empty_seat = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
     return (
         <>
             <VotePanel menuList={props.menuList}/>
-            <div className='row'>
+            <div className='row p-2'>
                 {empty_seat.map((cnt, index) => {
-                    return <Gourmet key={index} isActive={index < props.gourmet}/>
+                    return (
+                        <Gourmet key={index}
+                                 isActive={index < roomCtx.votingGourmets.length}
+                                 nickname={roomCtx.votingGourmets[index]}
+                        />
+                    )
                 })}
             </div>
 

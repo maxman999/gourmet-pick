@@ -6,7 +6,7 @@ import {IMenu} from "../../types/IMenu";
 import MenuItem from "./MenuItem";
 import './MenuDisplaySwiper.css';
 import EmptyBox from "../UI/EmptyBox";
-import {useContext} from "react";
+import {memo, useContext} from "react";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
 
@@ -15,7 +15,7 @@ interface props {
     onMenuDelete?: (menuId: number) => void;
 }
 
-const MenuDisplaySwiper = (props: props) => {
+const MenuDisplaySwiper = memo((props: props) => {
     const roomCtx = useContext(roomContext);
 
     const menuAddingHandler = () => {
@@ -62,6 +62,6 @@ const MenuDisplaySwiper = (props: props) => {
             }
         </>
     );
-}
+})
 
 export default MenuDisplaySwiper;

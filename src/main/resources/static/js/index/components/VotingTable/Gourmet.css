@@ -12,7 +12,9 @@
     border: 1px solid gray;
 }
 
-.noName {
+.nickName {
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
     font-size: 10px;
 }
 

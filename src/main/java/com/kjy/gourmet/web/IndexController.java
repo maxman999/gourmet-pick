@@ -6,6 +6,7 @@ import com.kjy.gourmet.domain.user.Role;
 import com.kjy.gourmet.domain.user.User;
 import com.kjy.gourmet.service.user.UserService;
 import com.kjy.gourmet.utils.AuthUtil;
+import com.kjy.gourmet.web.dto.WebSocketUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -34,9 +35,9 @@ public class IndexController {
 
     @ResponseBody
     @GetMapping("/getAuthenticatedUserId")
-    public long getAuthenticatedUserId(@LoginUser SessionUser user) {
-        if (user == null) return 0;
-        return userService.getUserByEmail(user.getEmail()).getId();
+    public WebSocketUser getAuthenticatedUserId(@LoginUser SessionUser user) {
+        if (user == null) return null;
+        return new WebSocketUser(userService.getUserByEmail(user.getEmail()));
     }
 
     @PostMapping("/guest")

@@ -43,6 +43,12 @@ const RoomContext = React.createContext({
     changeVotingStatus: (votingStatus: string) => {
     },
 
+    votingGourmets: [],
+
+    setVotingGourmets: (gourmets: string[]) => {
+
+    },
+
     setTodayPick: (menu: IMenu) => {
 
     },

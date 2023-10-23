@@ -8,6 +8,7 @@ import roomContext from "./store/room-context";
 import MainFrame from "./components/Frame/MainFrame";
 import MyRoomList from "./components/Room/MyRoomList";
 import {IRoom} from "./types/IRoom";
+import {IUser} from "./types/IUser";
 
 const App = () => {
     const roomCtx = useContext(roomContext);
@@ -15,14 +16,13 @@ const App = () => {
     const [myRoomList, setMyRoomList] = useState<IRoom[]>([]);
 
     const authenticateHandler = async () => {
-        const {data: userId} = await axios.get("/getAuthenticatedUserId");
-        const isAuthenticated = userId > 0;
-        if (isAuthenticated) {
-            sessionStorage.setItem('userId', userId);
-            const {data: myRoomList}: { data: IRoom[] } = await axios.get(`/api/room/getMyRoomList?userId=${userId}`);
+        const {data: user}: { data: IUser } = await axios.get("/getAuthenticatedUserId");
+        const isAuthenticated = !!user;
+        if (user) {
+            const {data: myRoomList}: { data: IRoom[] } = await axios.get(`/api/room/getMyRoomList?userId=${user.id}`);
             setMyRoomList(myRoomList);
+            sessionStorage.setItem('user', JSON.stringify(user));
         }
-
         setIsAuthenticated(isAuthenticated);
     }
 

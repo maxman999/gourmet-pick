@@ -1,6 +1,7 @@
 import {useReducer} from "react";
 import {Client, over} from "stompjs";
 import WebsocketContext from "./websocket-context";
+import {IUser} from "../types/IUser";
 
 const SockJS = require('sockjs-client');
 
@@ -19,8 +20,8 @@ type websocketState = {
 
 type sessionInfo = {
     topic: string,
-    userId: number,
     roomId: number,
+    user: IUser,
 }
 
 type websocketAction =
@@ -49,16 +50,18 @@ const onError = (err: any) => {
 
 const websocketReducer = (state: websocketState, action: websocketAction): websocketState => {
     if (action.type === "REGISTER") {
-        const {topic, userId, roomId} = action.sessionInfo
+        const {topic, roomId, user} = action.sessionInfo
         let Sock = new SockJS(WEBSOCKET_SERVER_URL);
         stompClient = over(Sock);
         stompClient.connect({}, () => {
-            const subscription = stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
-            stompClient.subscribe(`/user/${userId}/private`, action.onPrivateMessageHandler);
+                stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
+                stompClient.subscribe(`/user/${user.id}/private`, action.onPrivateMessageHandler);
 
-            stompClient.send(`/app/${topic}/register/${userId}/${roomId}`, {});
-            stompClient.send(`/app/${topic}/sync/${userId}/${roomId}`, {});
-        }, onError);
+                const payload = {...user, ...{roomId: roomId}}
+                stompClient.send(`/app/${topic}/register`, {}, JSON.stringify(payload));
+            },
+            onError
+        );
 
         return {
             ...state,
@@ -67,8 +70,8 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "CREATE") {
-        const {topic, userId, roomId} = state.sessionInfo
-        stompClient.send(`/app/${topic}/create/${userId}/${roomId}`, {});
+        const {topic, roomId, user} = state.sessionInfo
+        stompClient.send(`/app/${topic}/create/${user.id}/${roomId}`, {});
     }
 
     if (action.type === "CANCEL") {
@@ -77,8 +80,8 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "SEAT") {
-        const {topic, userId, roomId} = state.sessionInfo
-        stompClient.send(`/app/${topic}/seating/${userId}/${roomId}`, {});
+        const {topic, roomId, user} = state.sessionInfo
+        stompClient.send(`/app/${topic}/seating/${user.id}/${roomId}`, {});
     }
 
     if (action.type === "BOOTING") {
@@ -94,15 +97,15 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "VOTE") {
-        const {topic, userId, roomId} = state.sessionInfo
+        const {topic, roomId, user} = state.sessionInfo
         const ballot = {
             menuId: action.menuId,
             menuName: action.menuName,
-            senderName: userId,
+            senderName: user.id,
             status: 'VOTE',
             preference: action.preference,
         }
-        stompClient.send(`/app/${topic}/decide/${userId}/${roomId}`, {}, JSON.stringify(ballot));
+        stompClient.send(`/app/${topic}/decide/${user.id}/${roomId}`, {}, JSON.stringify(ballot));
     }
 
     if (action.type === "FINISH") {
@@ -126,7 +129,7 @@ const defaultWebsocketState: websocketState = {
     sessionInfo: {
         topic: '',
         roomId: null,
-        userId: null,
+        user: null,
     },
     isVotingPossible: false,
 }

@@ -16,12 +16,8 @@ const SignIn = () => {
         document.location = "/oauth2/authorization/kakao";
     }
 
-    const guestLoginHandler = async () => {
-        document.location = "/guest";
-    }
-
     useEffect(() => {
-        const randomNumber = Math.floor(Math.random() * 100) + 1;
+        const randomNumber = Math.floor(Math.random() * 10) + 1;
         const accountStr = `GUEST#${randomNumber}`;
         guestLoginIdInputRef.current.value = guestLoginInputPwRef.current.value = accountStr;
     }, []);

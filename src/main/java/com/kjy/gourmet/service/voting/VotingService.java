@@ -2,14 +2,14 @@ package com.kjy.gourmet.service.voting;
 
 import com.kjy.gourmet.domain.dto.Ballot;
 import com.kjy.gourmet.domain.dto.VotingSession;
-import com.kjy.gourmet.domain.dto.VotingStatus;
 import com.kjy.gourmet.domain.room.Room;
+import com.kjy.gourmet.web.dto.WebSocketUser;
 
 import java.util.List;
 
 public interface VotingService {
 
-    void userRegisterHandler(String sessionId, long roomId, long userId);
+    void userRegisterHandler(String sessionId, WebSocketUser webSocketUser);
 
     boolean isSessionDuplicated(String sessionId);
 

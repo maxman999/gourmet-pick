@@ -12,7 +12,6 @@ import RoomPhase from "../../types/RoomPhase";
 
 type props = {
     room: IRoom,
-    gourmet: number,
 }
 
 const MenuList = (props: props) => {
@@ -60,7 +59,7 @@ const MenuList = (props: props) => {
                 </>
             }
             {!(roomCtx.roomPhase === RoomPhase.DEFAULT) &&
-                <MenuDecisionSwiper menuList={menuList} gourmet={props.gourmet}/>
+                <MenuDecisionSwiper menuList={menuList}/>
             }
         </MenuContainer>
     );

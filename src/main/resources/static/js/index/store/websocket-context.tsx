@@ -1,9 +1,10 @@
 import * as React from "react";
+import {IUser} from "../types/IUser";
 
 type sessionInfo = {
     topic: string,
-    userId: number,
     roomId: number,
+    user: IUser,
 }
 
 const WebsocketContext = React.createContext({

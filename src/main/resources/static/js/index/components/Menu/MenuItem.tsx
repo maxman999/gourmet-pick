@@ -2,7 +2,6 @@ import {IMenu} from "../../types/IMenu";
 import './MenuItem.css';
 import {StaticMap} from "react-kakao-maps-sdk";
 import {useContext, useRef, useState} from "react";
-import Timer from "../VotingTable/Timer";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faMapLocationDot, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Modal from "../UI/Modal";

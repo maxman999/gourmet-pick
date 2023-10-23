@@ -18,10 +18,10 @@ const VotePanel = (props: props) => {
     const websocketAPIs = useContext(websocketContext);
     const swiper = useSwiper();
 
-    const votingHandler = (gourmetPick: number) => {
+    const votingHandler = (weight: number) => {
         const menuId = props.menuList[swiper.realIndex].id;
         const menuName = props.menuList[swiper.realIndex].name;
-        websocketAPIs.decide(menuId, menuName, gourmetPick);
+        websocketAPIs.decide(menuId, menuName, weight);
     }
 
     return (
