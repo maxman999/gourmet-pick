@@ -50,7 +50,7 @@ public class RoomServiceTests {
             roomService.exitRoom(memId, roomId);
             roomService.deleteRoomById(roomId);
         });
-        userService.signOut(memId);
+        userService.signOutById(memId);
     }
 
     @Test

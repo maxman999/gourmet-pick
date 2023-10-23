@@ -34,7 +34,6 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         User user = getUserFromOAuthAttributes(attributes);
         userService.signUpOrUpdateUser(user);
         // 세션 정보 저장
-        httpSession.setMaxInactiveInterval(600);
         httpSession.setAttribute("user", new SessionUser(user));
 
         return new DefaultOAuth2User(

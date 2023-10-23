@@ -46,7 +46,7 @@ public class RoomApiControllerTests {
     @AfterEach
     public void cleanUp() {
         long userId = userService.getUserByEmail("roomApiTest@naver.com").getId();
-        userService.signOut(userId);
+        userService.signOutById(userId);
     }
 
     @Test

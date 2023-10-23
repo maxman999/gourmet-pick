@@ -1,6 +1,7 @@
 package com.kjy.gourmet.config.auth;
 
 import com.kjy.gourmet.domain.user.Role;
+import com.kjy.gourmet.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -49,12 +53,15 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails guest = User.builder()
-                .username("guest")
-                .password(passwordEncoder().encode("guest"))
-                .roles(Role.GUEST.name())
-                .build();
-        return new InMemoryUserDetailsManager(guest);
+        List<UserDetails> guests = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            UserDetails guest = User.builder().username("GUEST#" + i)
+                    .password(passwordEncoder().encode("GUEST#" + i))
+                    .roles(Role.GUEST.name())
+                    .build();
+            guests.add(guest);
+        }
+        return new InMemoryUserDetailsManager(guests);
     }
 
 

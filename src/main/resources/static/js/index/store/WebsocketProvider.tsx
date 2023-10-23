@@ -53,7 +53,7 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
         let Sock = new SockJS(WEBSOCKET_SERVER_URL);
         stompClient = over(Sock);
         stompClient.connect({}, () => {
-            stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
+            const subscription = stompClient.subscribe(`/${topic}/${roomId}`, action.onMessageHandler);
             stompClient.subscribe(`/user/${userId}/private`, action.onPrivateMessageHandler);
 
             stompClient.send(`/app/${topic}/register/${userId}/${roomId}`, {});

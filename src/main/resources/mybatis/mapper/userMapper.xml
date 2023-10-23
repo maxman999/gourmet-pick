@@ -9,7 +9,8 @@
         values (#{email}, #{nickname}, #{role});
     </insert>
 
-    <insert id="insertOrUpdateUser" parameterType="com.kjy.gourmet.domain.user.User">
+    <insert id="insertOrUpdateUser" parameterType="com.kjy.gourmet.domain.user.User" useGeneratedKeys="true"
+            keyProperty="id">
         insert into user(email, nickname, role)
         values (#{email}, #{nickname}, #{role})
         on duplicate key update email    = VALUES(email),
@@ -29,9 +30,22 @@
         where email = #{email};
     </select>
 
+    <update id="updateNickname">
+        update user
+        set nickname = #{nickname}
+        where id = #{userId}
+    </update>
+
     <delete id="deleteUserById" parameterType="long">
         delete
         from user
         where id = #{userId}
     </delete>
+
+    <delete id="deleteUserByEmail" parameterType="String">
+        delete
+        from user
+        where email = #{email}
+    </delete>
+
 </mapper>

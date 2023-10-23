@@ -17,13 +17,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public int updateNickname(long userId, String nickname) {
+        return userMapper.updateNickname(userId, nickname);
+    }
+
+    @Override
     public int signUp(User user) {
         return userMapper.insertUser(user);
     }
 
     @Override
-    public int signOut(long userId) {
+    public int signOutById(long userId) {
         return userMapper.deleteUserById(userId);
+    }
+
+    @Override
+    public int signOutByEmail(String email) {
+        return userMapper.deleteUserByEmail(email);
     }
 
     @Override

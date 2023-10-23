@@ -1,6 +1,9 @@
 package com.kjy.gourmet.web;
 
+import com.kjy.gourmet.config.auth.LoginUser;
+import com.kjy.gourmet.config.auth.dto.SessionUser;
 import com.kjy.gourmet.domain.dto.Ballot;
+import com.kjy.gourmet.service.user.UserService;
 import com.kjy.gourmet.service.voting.VotingService;
 import com.kjy.gourmet.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +13,9 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,9 +25,8 @@ public class VotingApiController {
     private final VotingService votingService;
 
     @GetMapping("/voting/isSessionDuplicated")
-    public boolean isSessionDuplicated(Authentication authentication) {
-        String userEmail = AuthUtil.extractEmailFromAuth(authentication);
-        return votingService.isSessionDuplicated(userEmail);
+    public boolean isSessionDuplicated(@LoginUser SessionUser user) {
+        return votingService.isSessionDuplicated(user.getEmail());
     }
 
     @MessageMapping("/voting/register/{userId}/{roomId}")

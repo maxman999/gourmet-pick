@@ -7,6 +7,8 @@ import "swiper/css";
 import "swiper/css/effect-cube";
 import GourmetTable from "../VotingTable/GourmetTable";
 import {memo} from "react";
+import RoomPhase from "../../types/RoomPhase";
+import Timer from "../VotingTable/Timer";
 
 interface props {
     menuList: IMenu[];
@@ -42,6 +44,7 @@ const MenuDecisionSwiper = memo((props: props) => {
                     );
                 })}
                 {/* 투표 영역 */}
+                <Timer/>
                 <GourmetTable
                     menuList={props.menuList}
                     gourmet={props.gourmet}

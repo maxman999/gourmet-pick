@@ -1,17 +1,14 @@
-.signIn-container {
-    height: 100vh;
-}
-
 .signIn-wrap {
-    height: 100%;
-    justify-content: center;
+    height: 100vh;
     align-content: center;
+    justify-content: center;
     text-align: center;
 }
 
 .signIn-form {
-    width: 40%;
     align-items: center;
+    max-width: 390px;
+    margin-bottom: 100px;
 }
 
 .signIn-form hr {
@@ -19,7 +16,8 @@
 }
 
 .signIn-header {
-    font-size: 55px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
 }
 
 .signIn-hint {
@@ -27,29 +25,40 @@
     color: gray;
 }
 
-.catchphrase {
-    justify-content: center;
+.login-title-wrap{
     margin-bottom: 40px;
+}
+
+.login-title {
     font-family: 'Arial', sans-serif;
     font-size: 3rem;
     font-weight: bold;
     color: #333333;
-    letter-spacing: 3px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+.login-title-sub{
+    font-size: 1.1rem;
+    color: gray;
+}
+
+.social-btn-wrap {
+    border-top: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
+    padding: 20px 0 20px 0;
+    margin: 20px 0 20px 0;
+}
+
 .social-btn {
-    padding: 12px;
+    padding: 13px;
     margin-bottom: 5px;
     background-color: transparent;
     border: 1px solid black;
-    width: 45%;
+    width: 80%;
 }
 
 .social-btn svg {
-    margin-top: 5px;
-    margin-left: 10px;
-    float: left;
+    margin-right: 10px;
 }
 
 .social-btn-text {

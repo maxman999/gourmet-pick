@@ -31,7 +31,7 @@ public class UserServiceTests {
     @AfterEach
     public void cleanUp() {
         long memId = userService.getUserByEmail("test1@naver.com").getId();
-        int procRes = userService.signOut(memId);
+        int procRes = userService.signOutById(memId);
         assertThat(procRes).isEqualTo(1);
     }
 

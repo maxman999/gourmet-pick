@@ -2,8 +2,11 @@ import './SignIn.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGoogle} from "@fortawesome/free-brands-svg-icons";
 import {faChildReaching, faK} from "@fortawesome/free-solid-svg-icons";
+import {useEffect, useRef} from "react";
 
 const SignIn = () => {
+    const guestLoginIdInputRef = useRef(null);
+    const guestLoginInputPwRef = useRef(null);
 
     const googleLoginHandler = async () => {
         document.location = "/oauth2/authorization/google";
@@ -17,50 +20,56 @@ const SignIn = () => {
         document.location = "/guest";
     }
 
+    useEffect(() => {
+        const randomNumber = Math.floor(Math.random() * 100) + 1;
+        const accountStr = `GUEST#${randomNumber}`;
+        guestLoginIdInputRef.current.value = guestLoginInputPwRef.current.value = accountStr;
+    }, []);
+
     return (
-        <div className="signIn-container">
-            <div className={"signIn-wrap row"}>
-                <div className="catchphrase">
-                    "우리가 먹는 것이 곧 우리 자신이 된다"
+        <div className={"signIn-wrap row"}>
+            <div className="login-title-wrap">
+                <div className={'login-title'}>
+                    GOURMET PICK
                 </div>
-                <div className={"signIn-form card shadow p-3"}>
-                    <h1 className="text-center signIn-header">Sign In</h1>
-                    <div className="signIn-hint">미식가들의 냉정한 맛평가 서비스를 이용하시려면 계정을 등록해주세요.</div>
-                    <hr/>
-                    <div className="row social-btn-wrap">
-                        <div>
-                            <button className={"social-btn google-btn"}
-                                    onClick={googleLoginHandler}>
-                                <FontAwesomeIcon icon={faGoogle}/>
-                                <span className={"social-btn-text"}>
+                <div className={'login-title-sub'}>
+                    냉정한 미식가들의 소중한 한끼를 위한 선택
+                </div>
+            </div>
+            <div className={"signIn-form card shadow p-3"}>
+                <div className="row social-btn-wrap">
+                    <div>
+                        <button className={"social-btn google-btn"}
+                                onClick={googleLoginHandler}>
+                            <FontAwesomeIcon icon={faGoogle}/>
+                            <span className={"social-btn-text"}>
                                     Sign in with <b>Google</b>
                                 </span>
-                            </button>
-                        </div>
-                        <div>
-                            <button className="social-btn kakao-btn"
-                                    onClick={kakaoLoginHandler}>
-                                <FontAwesomeIcon icon={faK}/>
-                                <span className={"social-btn-text"}>
+                        </button>
+                    </div>
+                    <div>
+                        <button className="social-btn kakao-btn"
+                                onClick={kakaoLoginHandler}>
+                            <FontAwesomeIcon icon={faK}/>
+                            <span className={"social-btn-text"}>
                                     Sign in with <b>Kakao</b>
                                 </span>
-                            </button>
-                        </div>
-                        <div>
-                            <form className="form-group" action="/login" method="post">
-                                <input type="hidden" name="username" value="guest"/>
-                                <input type="hidden" name="password" value="guest"/>
-                                <button className="social-btn guest-btn">
-                                    <FontAwesomeIcon icon={faChildReaching}/>
-                                    <span className={"social-btn-text"}>
+                        </button>
+                    </div>
+                    <div>
+                        <form className="form-group" action="/login" method="post">
+                            <input type="hidden" name="username" ref={guestLoginIdInputRef}/>
+                            <input type="hidden" name="password" ref={guestLoginInputPwRef}/>
+                            <button className="social-btn guest-btn" type={"submit"}>
+                                <FontAwesomeIcon icon={faChildReaching}/>
+                                <span className={"social-btn-text"}>
                                     Use as a <b>GUEST</b>
                                     </span>
-                                </button>
-                            </form>
-                        </div>
+                            </button>
+                        </form>
                     </div>
-                    <hr/>
                 </div>
+                <div className="signIn-hint">서비스를 이용하시려면 계정을 등록해주세요.</div>
             </div>
         </div>
     );

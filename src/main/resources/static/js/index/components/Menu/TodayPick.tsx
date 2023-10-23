@@ -30,7 +30,7 @@ const TodayPick = (props: props) => {
                     <FontAwesomeIcon icon={faRotateLeft}/>
                 </div>
                 <Tooltip anchorSelect={'.todayPickResetBtn'} style={{background: '#dc3545'}}>
-                    <small>오늘 투표 결과를 삭제합니다.</small> <br/>
+                    <small>오늘의 투표 결과를 삭제합니다.</small> <br/>
                     <small>다시 투표가 가능해집니다.</small>
                 </Tooltip>
             </div>

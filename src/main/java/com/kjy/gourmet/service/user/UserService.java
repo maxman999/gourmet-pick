@@ -7,7 +7,11 @@ public interface UserService {
 
     int signUpOrUpdateUser(User user);
 
-    int signOut(long userId);
+    int updateNickname(long userId, String nickname);
+
+    int signOutById(long userId);
+
+    int signOutByEmail(String email);
 
     User getUserById(long userId);
 

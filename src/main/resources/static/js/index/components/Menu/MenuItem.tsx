@@ -36,7 +36,6 @@ const MenuItem = (props: props) => {
 
     const menuUpdateClickHandler = () => {
         const targetMenuId = Number(menuUpdateBtnRef.current.dataset.id);
-        console.log({targetMenuId});
         roomCtx.setUpdateTargetMenu(targetMenuId);
         roomCtx.changeRoomPhase(RoomPhase.UPDATING);
     }
@@ -76,11 +75,6 @@ const MenuItem = (props: props) => {
                             </button>
                         </div>
                     </>
-                }
-                {roomCtx.roomPhase === RoomPhase.STARTING &&
-                    <div className={"col"}>
-                        <Timer/>
-                    </div>
                 }
             </div>
             <div className={"row mt-2"}>

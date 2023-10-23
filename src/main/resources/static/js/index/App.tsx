@@ -14,7 +14,6 @@ const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [myRoomList, setMyRoomList] = useState<IRoom[]>([]);
 
-
     const authenticateHandler = async () => {
         const {data: userId} = await axios.get("/getAuthenticatedUserId");
         const isAuthenticated = userId > 0;
