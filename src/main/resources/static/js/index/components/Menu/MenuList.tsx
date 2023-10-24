@@ -1,6 +1,5 @@
 import {useContext, useEffect, useState} from "react";
 import MenuInput from "./MenuInput";
-import {IRoom} from "../../types/IRoom";
 import {IMenu} from "../../types/IMenu";
 import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
@@ -10,15 +9,12 @@ import MenuContainer from "./MenuContainer";
 import * as _ from "lodash";
 import RoomPhase from "../../types/RoomPhase";
 
-type props = {
-    room: IRoom,
-}
-
-const MenuList = (props: props) => {
+const MenuList = () => {
     const roomCtx = useContext(roomContext)
     const [menuList, setMenuList] = useState<IMenu[]>();
+
     const getMenuFromServer = async () => {
-        const currentRoomId = props.room.id;
+        const currentRoomId = roomCtx.roomInfo.id
         const fetchRes = await axios.get(`/api/menu/all/${currentRoomId}`);
         return fetchRes.data;
     }

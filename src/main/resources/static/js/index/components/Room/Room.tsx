@@ -12,8 +12,6 @@ import VotingStatus from "../../types/VotingStatus";
 import {IMenu} from "../../types/IMenu";
 import TodayPick from "../Menu/TodayPick";
 import * as _ from "lodash";
-import {IUser} from "../../types/IUser";
-import roomPhase from "../../types/RoomPhase";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
@@ -125,17 +123,16 @@ const Room = () => {
             <RoomContainer>
                 {roomCtx.roomInfo && (roomCtx.roomPhase !== RoomPhase.UPDATING) &&
                     <>
-                        <RoomHeader room={roomCtx.roomInfo}
-                                    isConsoleActive={true}
+                        <RoomHeader isConsoleActive={true}
                                     todayPickPopupFlag={todayPickPopupFlag}
                                     todayPickPopupFlagHandler={todayPickPopupFlagHandler}
                         />
-                        <MenuList room={roomCtx.roomInfo}/>
+                        <MenuList/>
                     </>
                 }
                 {roomCtx.roomInfo && (roomCtx.roomPhase === RoomPhase.UPDATING) &&
                     <>
-                        <RoomHeader room={roomCtx.roomInfo} isConsoleActive={false}/>
+                        <RoomHeader isConsoleActive={false}/>
                         <MenuUpdateForm/>
                     </>
                 }

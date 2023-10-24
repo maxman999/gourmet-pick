@@ -1,21 +1,16 @@
-import {IRoom} from "../../types/IRoom";
 import './RoomHeader.css';
 import {useContext, useRef, useState} from "react";
 import RoomConsole from "./RoomConsole";
 import Modal from "../UI/Modal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEye, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import roomContext from "../../store/room-context";
 import axios from "axios";
 import CommonUtils from "../../utils/CommonUtils";
 import RoomPhase from "../../types/RoomPhase";
-import {Tooltip} from "react-tooltip";
-import * as _ from "lodash";
-import todayPick from "../Menu/TodayPick";
 import SimpleUpdateForm from "../UI/SimpleUpdateForm";
 
 interface props {
-    room: IRoom;
     isConsoleActive: boolean;
     todayPickPopupFlag?: boolean;
     todayPickPopupFlagHandler?: (popupFlag: boolean) => void
@@ -26,7 +21,6 @@ const RoomHeader = (props: props) => {
 
     const [isTitleUpdateModalPopped, setIsTitleUpdateModalPopped] = useState(false);
     const [currentRoomName, setCurrentRoomName] = useState(roomCtx.roomInfo.name);
-    const roomNameInputRef = useRef(null);
 
     const nameUpdatePopUpHandler = async () => {
         setIsTitleUpdateModalPopped(true);
@@ -68,9 +62,9 @@ const RoomHeader = (props: props) => {
         <>
             <div className='row'>
                 <div className='col-md-5 mt-2'>
-                    <div data-room-id={props.room?.id}>
+                    <div data-room-id={roomCtx.roomInfo.id}>
                         <span className='room-title'> # {currentRoomName} </span>
-                        <span className='room-code'>({props.room?.invitationCode})</span>
+                        <span className='room-code'>({roomCtx.roomInfo?.invitationCode})</span>
                         {roomCtx.roomPhase === RoomPhase.DEFAULT &&
                             <>
                                 <button className={'roomTitleUpdateBtn'} onClick={nameUpdatePopUpHandler}>
@@ -93,7 +87,7 @@ const RoomHeader = (props: props) => {
             {isTitleUpdateModalPopped &&
                 <Modal onClose={modalCloseHandler} height={"140px"}>
                     <SimpleUpdateForm title={'변경할 방 이름을 입력해주세요.'}
-                                      placeholder={props.room.name}
+                                      placeholder={roomCtx.roomInfo.name}
                                       updateHandler={nameUpdateHandler}/>
                 </Modal>
             }
