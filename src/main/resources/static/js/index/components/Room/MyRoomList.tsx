@@ -7,6 +7,7 @@ import axios from "axios";
 import {useContext, useState} from "react";
 import roomContext from "../../store/room-context";
 import Modal from "../UI/Modal";
+import {IUser} from "../../types/IUser";
 
 type props = {
     myRoomList: IRoom[]
@@ -14,11 +15,14 @@ type props = {
 
 const MyRoomList = (props: props) => {
     const roomCtx = useContext(roomContext);
-    const [roomName, setRoomName] = useState(null);
+    const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
 
     const createRoomHandler = async () => {
         const randomNumber = Math.floor(Math.random() * 100) + 1;
-        const {data: invitationCode} = await axios.post("/api/room/make", {name: `냉정한 미식방 ${randomNumber}`});
+        const {data: invitationCode} = await axios.post("/api/room/make", {
+            name: `냉정한 미식방 ${randomNumber}`,
+            managerId: user.id
+        });
         if (invitationCode) {
             roomCtx.enterRoom(invitationCode);
         }
@@ -28,7 +32,7 @@ const MyRoomList = (props: props) => {
         <>
             <div className={'row mt-3'}>
                 {props.myRoomList.map(myRoom => {
-                    return <MyRoom key={myRoom.id} myRoom={myRoom}/>
+                    return <MyRoom key={myRoom.id} myRoom={myRoom} userId={user.id}/>
                 })}
                 <MyRoomContainer>
                     <EmptyBox clickHandler={createRoomHandler} minHeight={"100%"} caption={"투표방 새로 만들기"}/>

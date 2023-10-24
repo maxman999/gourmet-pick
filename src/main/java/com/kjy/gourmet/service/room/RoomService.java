@@ -5,7 +5,7 @@ import com.kjy.gourmet.domain.room.Room;
 import java.util.List;
 
 public interface RoomService {
-    Room makeRoom(String roomName);
+    Room makeRoom(String roomName, long managerId);
 
     int deleteRoomById(long roomId);
 

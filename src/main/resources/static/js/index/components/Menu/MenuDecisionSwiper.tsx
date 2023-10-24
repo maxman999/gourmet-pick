@@ -13,7 +13,7 @@ interface props {
     menuList: IMenu[];
 }
 
-const MenuDecisionSwiper = memo((props: props) => {
+const MenuDecisionSwiper = (props: props) => {
     return (
         <>
             <Swiper
@@ -29,7 +29,7 @@ const MenuDecisionSwiper = memo((props: props) => {
                 loop={false}
                 allowTouchMove={false}
                 modules={[Scrollbar, EffectCube]}
-                className="menuDecisionSwiper"
+                className="menuDecisionSwiper slide-in"
             >
                 {/* 메뉴 슬라이드 */}
                 {props.menuList?.map((menuItem: IMenu) => {
@@ -45,6 +45,7 @@ const MenuDecisionSwiper = memo((props: props) => {
             </Swiper>
         </>
     );
-});
+}
 
-export default MenuDecisionSwiper;
+
+export default memo(MenuDecisionSwiper);

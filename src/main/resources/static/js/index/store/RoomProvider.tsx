@@ -3,7 +3,6 @@ import {useReducer} from "react";
 import RoomContext from "./room-context";
 import {IRoom} from "../types/IRoom";
 import axios from "axios";
-import * as _ from "lodash";
 import RoomPhase from "../types/RoomPhase";
 import VotingStatus from "../types/VotingStatus";
 import {IMenu} from "../types/IMenu";
@@ -139,7 +138,6 @@ const getRoomWithInspection = async (roomCode: string, userId: number) => {
         alert("이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.");
         return;
     }
-
     const room: IRoom = await getRoom(roomCode);
 
     const isEntranceSuccess = await enterRoom(userId, room.id);

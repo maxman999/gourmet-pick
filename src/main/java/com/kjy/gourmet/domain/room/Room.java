@@ -11,8 +11,9 @@ public class Room {
     private long id;
     private String name;
     private String invitationCode;
+    private long managerId;
+    private Menu todayPick;
 
     private boolean hasVotingSession;
     private int currentVotingUserCnt;
-    private Menu todayPick;
 }

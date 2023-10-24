@@ -6,7 +6,7 @@
 
 .room-code {
     margin-left: 2px;
-    font-size: 14px;
+    font-size: 12px;
     color: gray;
 }
 
@@ -20,4 +20,38 @@
     color: darkgray;
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.roomManagementBtn {
+    text-decoration: none;
+    margin-left: 5px;
+    border: none;
+    background: transparent;
+}
+
+.roomTitleUpdateBtn {
+    color: cornflowerblue;
+}
+
+.roomTitleUpdateBtn :hover {
+    transform: scale(1.07);
+    color: blue;
+}
+
+.roomDeleteBtn {
+    color: palevioletred;
+}
+
+.roomDeleteBtn :hover {
+    transform: scale(1.07);
+    color: red;
+}
+
+.linkClipBtn {
+    color: darkseagreen;
+}
+
+.linkClipBtn :hover {
+    transform: scale(1.07);
+    color: green;
 }

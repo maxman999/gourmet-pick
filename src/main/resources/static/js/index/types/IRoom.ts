@@ -7,4 +7,5 @@ export interface IRoom {
     hasVotingSession: boolean;
     currentVotingUserCnt: number;
     todayPick: IMenu;
+    managerId: number;
 }

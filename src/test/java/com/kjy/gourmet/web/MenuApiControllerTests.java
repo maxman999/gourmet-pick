@@ -33,7 +33,7 @@ public class MenuApiControllerTests {
     @BeforeEach
     public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
-        roomService.makeRoom("점심책임방");
+        roomService.makeRoom("점심책임방", 0);
     }
 
     @AfterEach

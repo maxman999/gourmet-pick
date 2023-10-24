@@ -24,7 +24,7 @@ public class MenuServiceTests {
 
     @BeforeEach
     public void setUp() {
-        Room room = roomService.makeRoom("점심책임방");
+        Room room = roomService.makeRoom("점심책임방", 0);
         for (int i = 0; i < 2; i++) {
             Menu menu = Menu.builder()
                     .roomId(room.getId())

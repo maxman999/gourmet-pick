@@ -88,7 +88,7 @@ public class MenuServiceImpl implements MenuService {
             String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "." + fileExtension;
             try {
                 File thumbnailFile = new File(saveName); // 원본을 썸네일 파일로 저장
-                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 400, 400);
+                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 300, 300);
                 resultDTOList.add(new MenuThumbnail(uuid, folderPath, fileExtension));
             } catch (IOException e) {
                 throw new RuntimeException(e);

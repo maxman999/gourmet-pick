@@ -1,14 +1,15 @@
 import './RoomHeader.css';
-import {useContext, useRef, useState} from "react";
+import {useContext, useState} from "react";
 import RoomConsole from "./RoomConsole";
 import Modal from "../UI/Modal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faLink, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import roomContext from "../../store/room-context";
 import axios from "axios";
 import CommonUtils from "../../utils/CommonUtils";
 import RoomPhase from "../../types/RoomPhase";
 import SimpleUpdateForm from "../UI/SimpleUpdateForm";
+import {IUser} from "../../types/IUser";
 
 interface props {
     isConsoleActive: boolean;
@@ -21,6 +22,9 @@ const RoomHeader = (props: props) => {
 
     const [isTitleUpdateModalPopped, setIsTitleUpdateModalPopped] = useState(false);
     const [currentRoomName, setCurrentRoomName] = useState(roomCtx.roomInfo.name);
+
+    const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
+    const isManager = roomCtx.roomInfo.managerId === user.id;
 
     const nameUpdatePopUpHandler = async () => {
         setIsTitleUpdateModalPopped(true);
@@ -58,6 +62,10 @@ const RoomHeader = (props: props) => {
         document.location.reload();
     }
 
+    const linkClipHandler = () => {
+
+    }
+
     return (
         <>
             <div className='row'>
@@ -67,11 +75,21 @@ const RoomHeader = (props: props) => {
                         <span className='room-code'>({roomCtx.roomInfo?.invitationCode})</span>
                         {roomCtx.roomPhase === RoomPhase.DEFAULT &&
                             <>
-                                <button className={'roomTitleUpdateBtn'} onClick={nameUpdatePopUpHandler}>
-                                    <FontAwesomeIcon icon={faPen}/>
-                                </button>
-                                <button className={'roomDeleteBtn'} onClick={roomDeleteHandler}>
-                                    <FontAwesomeIcon icon={faTrash}/>
+                                {isManager &&
+                                    <>
+                                        <button className={'roomManagementBtn roomTitleUpdateBtn'}
+                                                onClick={nameUpdatePopUpHandler}>
+                                            <FontAwesomeIcon icon={faPen}/>
+                                        </button>
+                                        <button className={'roomManagementBtn roomDeleteBtn'}
+                                                onClick={roomDeleteHandler}>
+                                            <FontAwesomeIcon icon={faTrash}/>
+                                        </button>
+                                    </>
+                                }
+                                <button className={'roomManagementBtn linkClipBtn'}
+                                        onClick={linkClipHandler}>
+                                    <FontAwesomeIcon icon={faLink}/>
                                 </button>
                             </>
                         }

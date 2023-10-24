@@ -1,0 +1,12 @@
+.roomLikeBtn {
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    color: orange;
+    float: right;
+}
+
+.roomLikeBtn :hover {
+    border-color:  #ff6f61;
+    transform: scale(1.20);
+}

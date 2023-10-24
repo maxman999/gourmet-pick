@@ -4,8 +4,8 @@
 
 <mapper namespace="com.kjy.gourmet.mapper.RoomMapper">
     <insert id="insertRoom" parameterType="com.kjy.gourmet.domain.room.Room" useGeneratedKeys="true" keyProperty="id">
-        insert into room(name, invitation_code)
-        values (#{name}, #{invitationCode})
+        insert into room(name, invitation_code, manager_id)
+        values (#{name}, #{invitationCode}, #{managerId})
     </insert>
 
     <select id="selectRoomById" parameterType="String" resultType="com.kjy.gourmet.domain.room.Room">
@@ -34,7 +34,7 @@
     </insert>
 
     <select id="selectFavoriteRoomList" parameterType="long" resultType="com.kjy.gourmet.domain.room.Room">
-        select user_id, room_id as id, name, invitation_code
+        select user_id, room_id as id, name, invitation_code, manager_id
         from room_favorites
                  join room on room_favorites.room_id = room.id
         where user_id = #{userId};
@@ -68,6 +68,7 @@
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="invitationCode" column="invitation_code"/>
+        <result property="managerId" column="manager_id"/>
         <association property="todayPick" javaType="com.kjy.gourmet.domain.menu.Menu">
             <id property="id" column="menu_id"/>
             <result property="roomId" column="id"/>

@@ -18,7 +18,7 @@ public class RoomApiController {
 
     @PostMapping("/make")
     public String makeRoom(@RequestBody Room room) {
-        return roomService.makeRoom(room.getName()).getInvitationCode();
+        return roomService.makeRoom(room.getName(), room.getManagerId()).getInvitationCode();
     }
 
     @GetMapping("/{invitationCode}")
@@ -37,7 +37,7 @@ public class RoomApiController {
         return roomService.enterRoom(userId, roomId);
     }
 
-    @PostMapping("/exit/{userId}/{roomId}")
+    @DeleteMapping("/exit/{userId}/{roomId}")
     public int exitRoom(@PathVariable("userId") long userId,
                         @PathVariable("roomId") long roomId) {
         return roomService.exitRoom(userId, roomId);

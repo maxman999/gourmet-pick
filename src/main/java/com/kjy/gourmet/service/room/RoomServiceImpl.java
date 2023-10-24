@@ -21,11 +21,12 @@ public class RoomServiceImpl implements RoomService {
     private final MenuService menuService;
 
     @Override
-    public Room makeRoom(String roomName) {
+    public Room makeRoom(String roomName, long managerId) {
         String newInvitationCode = AuthUtil.generateInviteCode(10);
         Room newRoom = Room.builder()
                 .invitationCode(newInvitationCode)
                 .name(roomName)
+                .managerId(managerId)
                 .build();
         roomMapper.insertRoom(newRoom);
         return newRoom;

@@ -7,6 +7,7 @@ const RoomContext = React.createContext({
         id: 0,
         invitationCode: '',
         name: '',
+        managerId: 0,
         hasVotingSession: false,
         currentVotingUserCnt: 0,
         todayPick: undefined,

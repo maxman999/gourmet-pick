@@ -37,7 +37,7 @@ public class RoomServiceTests {
         userService.signUp(newbie);
 
         for (int i = 0; i < 2; i++) {
-            Room room = roomService.makeRoom("점심책임방" + i);
+            Room room = roomService.makeRoom("점심책임방" + i, 0);
             invitationCodes.add(room.getInvitationCode());
         }
     }
