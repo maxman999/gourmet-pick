@@ -45,7 +45,7 @@ let stompClient: Client = null;
 
 const onError = (err: any) => {
     alert("서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.");
-    document.location.reload();
+    document.location.href = "/";
 }
 
 const websocketReducer = (state: websocketState, action: websocketAction): websocketState => {

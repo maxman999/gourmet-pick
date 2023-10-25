@@ -3,6 +3,8 @@ export interface IMenu {
     name: string;
     thumbnail?: string;
     soberComment?: string;
+    placeName?: string;
+    roadAddressName?: string;
     longitude?: number;
     latitude?: number;
     roomId: number;

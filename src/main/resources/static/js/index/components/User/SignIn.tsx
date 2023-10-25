@@ -16,10 +16,24 @@ const SignIn = () => {
         document.location = "/oauth2/authorization/kakao";
     }
 
-    useEffect(() => {
+    const generateGuest = () => {
+        // 일단 공유하는 아이디는 10개로 제한
         const randomNumber = Math.floor(Math.random() * 10) + 1;
         const accountStr = `GUEST#${randomNumber}`;
         guestLoginIdInputRef.current.value = guestLoginInputPwRef.current.value = accountStr;
+    }
+
+    const rememberInvitationCode = () => {
+        const params = new URLSearchParams(window.location.search);
+        const invitationCode = params.get('code');
+        if (invitationCode) {
+            sessionStorage.setItem('invitationCode', invitationCode);
+        }
+    }
+
+    useEffect(() => {
+        generateGuest();
+        rememberInvitationCode();
     }, []);
 
     return (

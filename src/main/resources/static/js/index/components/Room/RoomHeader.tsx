@@ -11,6 +11,8 @@ import RoomPhase from "../../types/RoomPhase";
 import SimpleUpdateForm from "../UI/SimpleUpdateForm";
 import {IUser} from "../../types/IUser";
 import Swal from "sweetalert2";
+import * as _ from "lodash";
+import {text} from "@fortawesome/fontawesome-svg-core";
 
 interface props {
     isConsoleActive: boolean;
@@ -36,13 +38,22 @@ const RoomHeader = (props: props) => {
     }
 
     const nameUpdateHandler = async (newRoomName: string) => {
+        newRoomName = CommonUtils.filterHtmlTags(newRoomName.trim());
         if (newRoomName.length === 0) {
             await CommonUtils.toaster('변경할 이름을 입력해주세요.', 'top', 'warning');
             return;
         }
-        newRoomName = CommonUtils.filterHtmlTags(newRoomName)
+
+        if (newRoomName.length > 10) {
+            await CommonUtils.toaster('허용되지 않은 문자가 포함됐습니다.', 'top', 'warning');
+            return;
+        }
+
         const roomId = roomCtx.roomInfo.id;
-        const {data: result} = await axios.post(`/api/room/modifyRoomName/${roomId}/${newRoomName}`);
+        const {data: result} = await axios.post('/api/room/modifyRoomName', {
+            id: roomId,
+            name: newRoomName,
+        });
         if (result === 0) {
             alert("변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
             document.location.reload();
@@ -69,16 +80,16 @@ const RoomHeader = (props: props) => {
         }
     }
 
-    const linkClipHandler = () => {
-
-    }
+    const linkClipHandler = _.debounce(() => {
+        CommonUtils.copyInvitationCode(roomCtx.roomInfo.invitationCode);
+    }, 200);
 
     return (
         <>
             <div className='row'>
-                <div className='col-md-5 mt-2'>
+                <div className='col-md-7 mt-2'>
                     <div data-room-id={roomCtx.roomInfo.id}>
-                        <span className='room-title'> # {currentRoomName} </span>
+                        <span className='room-title'> # {CommonUtils.bringBackHtmlTags(currentRoomName)} </span>
                         <span className='room-code'>({roomCtx.roomInfo?.invitationCode})</span>
                         {roomCtx.roomPhase === RoomPhase.DEFAULT &&
                             <>
@@ -94,12 +105,12 @@ const RoomHeader = (props: props) => {
                                         </button>
                                     </>
                                 }
-                                <button className={'roomManagementBtn linkClipBtn'}
-                                        onClick={linkClipHandler}>
-                                    <FontAwesomeIcon icon={faLink}/>
-                                </button>
                             </>
                         }
+                        <button className={'roomManagementBtn linkClipBtn'}
+                                onClick={linkClipHandler}>
+                            <FontAwesomeIcon icon={faLink}/>
+                        </button>
                     </div>
                 </div>
                 {props.isConsoleActive &&

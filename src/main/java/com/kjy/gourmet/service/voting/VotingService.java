@@ -2,9 +2,9 @@ package com.kjy.gourmet.service.voting;
 
 import com.kjy.gourmet.config.auth.dto.SessionUser;
 import com.kjy.gourmet.domain.menu.Menu;
+import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.service.voting.dto.Ballot;
 import com.kjy.gourmet.service.voting.dto.VotingSession;
-import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.web.dto.WebSocketUser;
 
 import java.util.List;
@@ -16,6 +16,8 @@ public interface VotingService {
     boolean isSessionDuplicated(String sessionId);
 
     boolean isVotingOngoing(long roomId);
+
+    boolean isRoomCapacityExceeded(long roomId);
 
     void creatVotingSession(String sessionId, long roomId, long userId);
 

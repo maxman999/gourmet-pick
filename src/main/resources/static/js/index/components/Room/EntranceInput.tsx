@@ -1,9 +1,10 @@
 import './EntranceInput.css';
-import {useContext, useRef} from "react";
+import {useContext, useEffect, useRef} from "react";
 import roomContext from "../../store/room-context";
 import Swal from "sweetalert2";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDoorOpen} from "@fortawesome/free-solid-svg-icons";
+import CommonUtils from "../../utils/CommonUtils";
 
 
 const EntranceInput = () => {
@@ -19,6 +20,26 @@ const EntranceInput = () => {
         roomCtx.enterRoom(invitationCodeRef.current.value);
     };
 
+    const inspectInvitationCode = () => {
+        const invitationCodeInSession = sessionStorage.getItem('invitationCode')
+        if (invitationCodeInSession) {
+            roomCtx.enterRoom(invitationCodeInSession);
+            sessionStorage.removeItem('invitationCode');
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const invitationCode = params.get('code');
+        if (invitationCode) {
+            roomCtx.enterRoom(invitationCode);
+            return;
+        }
+    }
+
+    useEffect(() => {
+        inspectInvitationCode();
+    }, []);
+
     return (
         <div id={"invitationCodeInputWrapper"} className="card p-3">
             <label htmlFor="invitationCodeInput" className="form-label"># INVITATION CODE</label>
@@ -27,11 +48,14 @@ const EntranceInput = () => {
                     <input type="text"
                            className="form-control"
                            id="invitationCodeInput"
+                           onKeyDown={(e) => CommonUtils.handleEnterKeyPress(e, clickHandler)}
                            ref={invitationCodeRef}
                     />
                 </div>
                 <div className='col-sm-1 p-1'>
-                    <button className='btn btn-outline-secondary' id="entranceBtn" onClick={clickHandler}>
+                    <button className='btn btn-outline-secondary' id="entranceBtn"
+                            onClick={clickHandler}
+                    >
                         <FontAwesomeIcon icon={faDoorOpen} style={{color: 'cornflowerblue'}}/>
                     </button>
                 </div>

@@ -56,7 +56,7 @@ const MyRoom = (props: props) => {
                  data-room-id={props.myRoom.id}
                  onClick={enterRoomHandler}>
                 <div className={'myRoomTitle'}>
-                    {props.myRoom.name}
+                    {CommonUtils.bringBackHtmlTags(props.myRoom.name)}
                     <button className={'roomLikeBtn'} onClick={roomLikeHandler}>
                         <FontAwesomeIcon icon={faStar} style={isManager && {color: 'cornflowerblue'}}/>
                     </button>

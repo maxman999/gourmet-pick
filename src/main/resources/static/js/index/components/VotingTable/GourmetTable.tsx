@@ -11,7 +11,7 @@ type props = {
 
 const GourmetTable = (props: props) => {
     const roomCtx = useContext(roomContext);
-    const empty_seat = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    const empty_seat = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     return (
         <>
@@ -20,8 +20,8 @@ const GourmetTable = (props: props) => {
                 {empty_seat.map((cnt, index) => {
                     return (
                         <Gourmet key={index}
-                                 isActive={index < roomCtx.votingGourmets.length}
-                                 nickname={roomCtx.votingGourmets[index]}
+                                 isActive={index < roomCtx.votingGourmets?.length}
+                                 nickname={roomCtx.votingGourmets[index]?.nickname}
                         />
                     )
                 })}

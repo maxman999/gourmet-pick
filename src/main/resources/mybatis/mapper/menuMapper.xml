@@ -4,8 +4,8 @@
 
 <mapper namespace="com.kjy.gourmet.mapper.MenuMapper">
     <insert id="insertMenu" parameterType="com.kjy.gourmet.domain.menu.Menu" useGeneratedKeys="true" keyProperty="id">
-        insert into menu(room_id, name, thumbnail, sober_comment, longitude, latitude, writer_id)
-        values (#{roomId}, #{name}, #{thumbnail}, #{soberComment}, #{longitude}, #{latitude}, #{writerId});
+        insert into menu(room_id, name, thumbnail, sober_comment, place_name, road_address_name, longitude, latitude, writer_id)
+        values (#{roomId}, #{name}, #{thumbnail}, #{soberComment},#{placeName},#{roadAddressName} ,#{longitude}, #{latitude}, #{writerId});
     </insert>
 
     <insert id="insertTodayPick" parameterType="long">
@@ -21,11 +21,13 @@
 
     <update id="updateMenu" parameterType="com.kjy.gourmet.domain.menu.Menu">
         update menu
-        set name          = #{name},
-            thumbnail     = #{thumbnail},
-            sober_comment = #{soberComment},
-            longitude     = #{longitude},
-            latitude      = #{latitude}
+        set name              = #{name},
+            thumbnail         = #{thumbnail},
+            sober_comment     = #{soberComment},
+            place_name        = #{placeName},
+            road_address_name = #{roadAddressName},
+            longitude         = #{longitude},
+            latitude          = #{latitude}
         where id = #{id}
     </update>
 

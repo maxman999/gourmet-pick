@@ -11,7 +11,7 @@ import RoomPhase from "../../types/RoomPhase";
 
 const MenuList = () => {
     const roomCtx = useContext(roomContext)
-    const [menuList, setMenuList] = useState<IMenu[]>();
+    const [menuList, setMenuList] = useState<IMenu[]>(null);
 
     const getMenuFromServer = async () => {
         const currentRoomId = roomCtx.roomInfo.id
@@ -51,7 +51,6 @@ const MenuList = () => {
                         menuList={menuList}
                         onMenuDelete={menuDeleteHandler}
                     />
-                    <MenuInput/>
                 </>
             }
             {!(roomCtx.roomPhase === RoomPhase.DEFAULT) &&

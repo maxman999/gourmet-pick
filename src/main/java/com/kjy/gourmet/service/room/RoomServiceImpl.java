@@ -1,11 +1,10 @@
 package com.kjy.gourmet.service.room;
 
-import com.kjy.gourmet.config.auth.dto.SessionUser;
-import com.kjy.gourmet.service.voting.dto.VotingSession;
 import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.mapper.RoomMapper;
 import com.kjy.gourmet.service.menu.MenuService;
 import com.kjy.gourmet.service.voting.VotingService;
+import com.kjy.gourmet.service.voting.dto.VotingSession;
 import com.kjy.gourmet.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -84,6 +83,12 @@ public class RoomServiceImpl implements RoomService {
 
         if (votingService.isVotingOngoing(room.getId())) {
             resultMap.put("code", -3);
+            resultMap.put("room", null);
+            return resultMap;
+        }
+
+        if (votingService.isRoomCapacityExceeded(room.getId())) {
+            resultMap.put("code", -4);
             resultMap.put("room", null);
             return resultMap;
         }

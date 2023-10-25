@@ -1,9 +1,9 @@
 import {IMenu} from "../../types/IMenu";
 import './MenuItem.css';
-import {StaticMap} from "react-kakao-maps-sdk";
+import {MapMarker, StaticMap} from "react-kakao-maps-sdk";
 import {useContext, useRef, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMapLocationDot, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faLink, faMapLocationDot, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
@@ -12,6 +12,7 @@ import CommonUtils from "../../utils/CommonUtils";
 interface props {
     menu: IMenu;
     onMenuDelete?: (menuId: number) => void;
+    isTodayPickMenu?: boolean;
 }
 
 const MenuItem = (props: props) => {
@@ -45,21 +46,29 @@ const MenuItem = (props: props) => {
         roomCtx.changeRoomPhase(RoomPhase.UPDATING);
     }
 
+    const roadAddressCopyHandler = () => {
+        CommonUtils.copyToClipboard(props.menu.roadAddressName, '주소를 복사했습니다.');
+    }
+
+    const isMenuConsoleActive = roomCtx.roomPhase === RoomPhase.DEFAULT
+        && hasMenuUpdateAuth
+        && !props.isTodayPickMenu
+
     return (
         <div className='menuItemWrapper card mt-3 p-3'>
             <div className='row mb-2'>
                 <div className='col menu-title'>
                     <div>
-                        {props.menu.name}
-                        <button className={'locationBtn btn btn-outline-success btn-sm'}
+                        <span dangerouslySetInnerHTML={{__html: props.menu.name}}></span>
+                    </div>
+                </div>
+                {isMenuConsoleActive &&
+                    <div className='col text-end p-1'>
+                        <button className={'btn btn-sm btn-outline-secondary locationBtn'}
                                 onClick={getLocationHandler}
                         >
                             <FontAwesomeIcon icon={faMapLocationDot}/>
                         </button>
-                    </div>
-                </div>
-                {roomCtx.roomPhase === RoomPhase.DEFAULT && hasMenuUpdateAuth &&
-                    <div className='col text-end'>
                         <button
                             className='btn btn-sm btn-outline-secondary menuUpdateBtn'
                             data-id={props.menu.id}
@@ -81,28 +90,39 @@ const MenuItem = (props: props) => {
             </div>
             <div className={"row mt-2"}>
                 <div className='col text-center'>
-                    <img id='menuThumbnail'
+                    <img className='menuThumbnail'
                          src={`/api/menu/getMenuImageURL?fileName=${props.menu.thumbnail}`}
-                         alt='메뉴 썸네일'/>
+                         alt='메뉴 썸네일'
+                         loading="lazy"/>
                     <hr/>
                     <div>
                         <div id={'soberCommentTitle'}>냉정한 한줄평</div>
                         <span id={'soberCommentInput'}
-                              className={'w-100'}>
-                            "{props.menu.soberComment}"
+                              className={'w-100'}
+                              dangerouslySetInnerHTML={{__html: props.menu.soberComment}}>
                         </span>
                     </div>
                 </div>
                 {isMapModalOpened &&
                     <Modal onClose={modalCloseHandler}>
-                        <div id={'mapWrapper'} className=''>
+                        <div id={'mapWrapper'} className={'text-center'}>
+                            <small className={'p-1'}> 지도를 클릭하시면 더 자세히 볼 수 있습니다.</small>
                             <StaticMap
                                 center={{lat: props.menu.latitude, lng: props.menu.longitude}}
-                                style={{width: "100%", height: "560px", border: "1px solid gray"}}
-                                marker={true}
+                                style={{width: "auto", height: "50vh", border: "1px solid gray"}}
+                                marker={{text: props.menu.placeName}}
                                 level={3}
                             >
                             </StaticMap>
+                            <div className={'row mt-2'}>
+                                <small> {props.menu.roadAddressName}
+                                    <button className={'roadAddressCopyBtn'}
+                                            onClick={roadAddressCopyHandler}
+                                    >
+                                        <FontAwesomeIcon icon={faLink}/>
+                                    </button>
+                                </small>
+                            </div>
                         </div>
                     </Modal>
                 }

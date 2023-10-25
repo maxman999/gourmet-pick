@@ -2,16 +2,17 @@ import "./SimpleUpdateForm.css"
 import {useRef} from "react";
 
 type props = {
-    title: string
-    placeholder: string
-    updateHandler: (inputValue: string) => void
+    title: string;
+    placeholder: string;
+    updateHandler: (inputValue: string) => void;
+    maxLength?: number;
 }
 
 const SimpleUpdateForm = (props: props) => {
     const roomNameInputRef = useRef(null)
 
     const submitHandler = () => {
-        const inputValue = roomNameInputRef.current.value.trim();
+        const inputValue = roomNameInputRef.current.value;
         props.updateHandler(inputValue);
     }
 
@@ -23,6 +24,7 @@ const SimpleUpdateForm = (props: props) => {
                        className="form-control"
                        id="titleUpdateInput"
                        ref={roomNameInputRef}
+                       maxLength={props.maxLength ? props.maxLength : 10}
                        placeholder={props.placeholder}/>
             </div>
             <div className={'col-md-3'}>

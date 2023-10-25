@@ -1,6 +1,7 @@
 import * as React from "react";
 import {IRoom} from "../types/IRoom";
 import {IMenu} from "../types/IMenu";
+import {IUser} from "../types/IUser";
 
 const RoomContext = React.createContext({
     roomInfo: {
@@ -19,7 +20,7 @@ const RoomContext = React.createContext({
     enterRoom: (roomCode: string) => {
     },
 
-    isMenuListEmpty: true,
+    isMenuListEmpty: null,
 
     setMenuEmptyFlag: (isMenuListEmpty: boolean) => {
     },
@@ -44,9 +45,9 @@ const RoomContext = React.createContext({
     changeVotingStatus: (votingStatus: string) => {
     },
 
-    votingGourmets: [],
+    votingGourmets: [{id: 0, nickname: ''}],
 
-    setVotingGourmets: (gourmets: string[]) => {
+    setVotingGourmets: (gourmets: IUser[]) => {
 
     },
 

@@ -7,6 +7,8 @@ import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
 import VotingStatus from "../../types/VotingStatus";
 import * as _ from "lodash";
+import CommonUtils from "../../utils/CommonUtils";
+import Swal from "sweetalert2";
 
 type props = {
     todayPickPopupFlag: boolean;
@@ -25,6 +27,17 @@ const RoomConsole = (props: props) => {
     const gourmetCallHandler = () => {
         websocketAPIs.create();
         roomCtx.setCallerFlag(true);
+
+        Swal.fire({
+            title: '투표세션이 생성됐습니다',
+            text: '냉정한 미식가들을 불러주세요',
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            didClose() {
+                CommonUtils.copyInvitationCode(roomCtx.roomInfo.invitationCode);
+            }
+        });
     }
 
     const gourmetVotingHandler = () => {
@@ -49,7 +62,7 @@ const RoomConsole = (props: props) => {
         && roomCtx.callerFlag;
 
     const exitHandler = () => {
-        document.location.reload();
+        document.location.href = "/";
     }
 
     const todayPickPopupHandler = () => {

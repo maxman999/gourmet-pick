@@ -14,6 +14,7 @@ import TodayPick from "../Menu/TodayPick";
 import * as _ from "lodash";
 import Swal from 'sweetalert2'
 import CommonUtils from "../../utils/CommonUtils";
+import {IUser} from "../../types/IUser";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
@@ -38,37 +39,43 @@ const Room = () => {
     }
 
     const onMessageHandler = async (payload: any) => {
-        let payloadData = JSON.parse(payload.body);
-        const user = CommonUtils.getUserFromSession();
+        const payloadData = JSON.parse(payload.body);
+        const sessionUser = CommonUtils.getUserFromSession();
+        const isMyMessage = sessionUser.id === payloadData.senderId;
+
         switch (payloadData.status) {
             case 'CREATE':
                 websocketAPIs.seat();
                 roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 break;
             case 'SEATING':
-                const seatingUsers = payloadData.data as string[];
+                const seatingUsers = payloadData.data as IUser[];
                 roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 roomCtx.setVotingGourmets(seatingUsers);
-                if (user.id !== payloadData.senderId) {
-                    CommonUtils.toaster(`${seatingUsers[seatingUsers.length - 1]}님이 입장하셨습니다.`, 'top');
+                if (!isMyMessage) {
+                    const filteredList = seatingUsers.filter(user => user.id !== sessionUser.id);
+                    CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
                 }
                 break;
             case 'CANCEL':
+                CommonUtils.toaster('투표가 취소되었습니다.', 'top', "info");
                 roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
                 roomCtx.setVotingGourmets([]);
                 break;
             case 'READY':
+                CommonUtils.toaster('투표를 시작할 수 있습니다!', 'top', "info");
                 roomCtx.changeRoomPhase(RoomPhase.READY);
                 break;
             case 'START':
                 await Swal.fire({
-                    title: '잠시 후 투표가 시작됩니다.',
+                    title: '잠시 후 투표가 시작됩니다',
+                    text: '방장이 투표를 시작했습니다!',
                     timer: 2000,
                     timerProgressBar: true,
                     didOpen: () => {
                         Swal.showLoading()
                     },
-                })
+                });
                 websocketAPIs.start();
                 roomCtx.changeRoomPhase(RoomPhase.STARTING);
                 roomCtx.changeVotingStatus(VotingStatus.VOTING);
@@ -82,7 +89,7 @@ const Room = () => {
                 break;
             case 'EXILE':
                 await Swal.fire({title: "방이 삭제되었습니다.", icon: 'warning'});
-                document.location.reload();
+                document.location.href = "/";
                 break
             case 'DISCONNECT':
                 const users = payloadData.data;

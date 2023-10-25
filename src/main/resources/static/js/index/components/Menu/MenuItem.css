@@ -6,8 +6,9 @@
 }
 
 .locationBtn {
-    margin-left: 15px;
-    border-radius: 50%;
+    border-color: darkolivegreen;
+    color: darkolivegreen;
+    margin-right: 15px;
 }
 
 .menuUpdateBtn {
@@ -20,4 +21,12 @@
     border-color: palevioletred;
     color: palevioletred;
     margin-right: 5px;
+}
+
+.roadAddressCopyBtn {
+    color: cornflowerblue;
+    text-decoration: none;
+    margin-left: 10px;
+    border: none;
+    background: transparent;
 }

@@ -30,7 +30,7 @@ public class VotingServiceImpl implements VotingService {
     private final Map<String, WebSocketUser> sessionMapper = new ConcurrentHashMap<>();
     private final Map<Long, VotingSession> votingSessions = new ConcurrentHashMap<>();
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    private final int ROOM_CAPACITY = 2;
+    private final int ROOM_CAPACITY = 10;
 
     private final MenuService menuService;
 
@@ -52,8 +52,14 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public boolean isVotingOngoing(long roomId) {
-        return votingSessions.containsKey(roomId) &&
-                votingSessions.get(roomId).isVotingOnGoing();
+        return votingSessions.containsKey(roomId)
+                && votingSessions.get(roomId).isVotingOnGoing();
+    }
+
+    @Override
+    public boolean isRoomCapacityExceeded(long roomId) {
+        return votingSessions.containsKey(roomId)
+                && votingSessions.get(roomId).getUsers().size() >= ROOM_CAPACITY;
     }
 
     @Override
@@ -95,10 +101,10 @@ public class VotingServiceImpl implements VotingService {
         votingSessions.get(roomId).getUsers().add(sessionId);
         // 입장 유저 수 집계
         HashSet<String> users = votingSessions.get(roomId).getUsers();
-        Message userSeatingMsg = new Message("user", userId, "people", VotingStatus.SEATING, getUserNicknamesFromUserSet(users));
+        Message userSeatingMsg = new Message("user", userId, "people", VotingStatus.SEATING, getUserNicknamesFromUserList(users));
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, userSeatingMsg);
 
-        if (users.size() >= ROOM_CAPACITY) {
+        if (users.size() >= ROOM_CAPACITY / 2) {
             Message votingReadyMsg = new Message("user", userId, "people", VotingStatus.READY, users.size());
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
         }
@@ -133,10 +139,10 @@ public class VotingServiceImpl implements VotingService {
         int currentSessionUserCnt = session.getUsers().size();
         session.getUsers().remove(sessionId);
 
-        // 최초 호출 이후, 5초 간 대기 후 강제 집계
+        // 최초 호출 이후, 일정 시간 대기 후 강제 집계
         if (finishCalls.size() == 1) {
             log.info("{}번 방에서 집계 요청", roomId);
-            executor.schedule(() -> aggregateAndSendToUser(roomId, session), 5, TimeUnit.SECONDS);
+            executor.schedule(() -> aggregateAndSendToUser(roomId, session), 4, TimeUnit.SECONDS);
         } else if (finishCalls.size() == currentSessionUserCnt) {
             aggregateAndSendToUser(roomId, session);
         }
@@ -181,7 +187,7 @@ public class VotingServiceImpl implements VotingService {
             if (users.isEmpty()) {
                 votingSessions.remove(webSocketUser.getRoomId());
             } else {
-                Message message = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserSet(users));
+                Message message = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserList(users));
                 simpMessagingTemplate.convertAndSend("/voting/" + webSocketUser.getRoomId(), message);
             }
         }
@@ -190,10 +196,9 @@ public class VotingServiceImpl implements VotingService {
         log.info("Session disconnected : {}", sessionId);
     }
 
-    private List<String> getUserNicknamesFromUserSet(HashSet<String> users) {
+    private List<WebSocketUser> getUserNicknamesFromUserList(HashSet<String> users) {
         return users.stream()
                 .map(sessionMapper::get)
-                .map(WebSocketUser::getNickname)
                 .collect(Collectors.toList());
     }
 

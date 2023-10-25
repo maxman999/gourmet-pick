@@ -9,6 +9,7 @@ import EmptyBox from "../UI/EmptyBox";
 import {useContext} from "react";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
+import MenuInput from "./MenuInput";
 
 interface props {
     menuList: IMenu[];
@@ -24,7 +25,7 @@ const MenuDisplaySwiper = (props: props) => {
 
     return (
         <>
-            {roomCtx.isMenuListEmpty &&
+            {props.menuList !== null && roomCtx.isMenuListEmpty &&
                 <div className='card mt-3 p-3'>
                     <div className='row mb-2 align-self-center'>
                         <EmptyBox minHeight={"360px"}
@@ -35,30 +36,33 @@ const MenuDisplaySwiper = (props: props) => {
                 </div>
             }
             {!roomCtx.isMenuListEmpty &&
-                <Swiper
-                    key={Math.random()}
-                    effect={"cube"}
-                    grabCursor={true}
-                    cubeEffect={{
-                        shadow: true,
-                        slideShadows: true,
-                        shadowOffset: 20,
-                        shadowScale: 0.94,
-                    }}
-                    autoplay={{delay: 3000}}
-                    scrollbar={{hide: true,}}
-                    modules={[Autoplay, EffectCube, Scrollbar]}
-                    className={'menuDisplaySwiper'}
-                >
-                    {props.menuList?.map((menuItem: IMenu) => {
-                        return (
-                            <SwiperSlide key={menuItem.id}>
-                                <MenuItem menu={menuItem}
-                                          onMenuDelete={props.onMenuDelete}/>
-                            </SwiperSlide>
-                        );
-                    })}
-                </Swiper>
+                <>
+                    <Swiper
+                        key={Math.random()}
+                        effect={"cube"}
+                        grabCursor={true}
+                        cubeEffect={{
+                            shadow: true,
+                            slideShadows: true,
+                            shadowOffset: 20,
+                            shadowScale: 0.94,
+                        }}
+                        autoplay={{delay: 3000}}
+                        scrollbar={{hide: true,}}
+                        modules={[Autoplay, EffectCube, Scrollbar]}
+                        className={'menuDisplaySwiper'}
+                    >
+                        {props.menuList?.map((menuItem: IMenu) => {
+                            return (
+                                <SwiperSlide key={menuItem.id}>
+                                    <MenuItem menu={menuItem}
+                                              onMenuDelete={props.onMenuDelete}/>
+                                </SwiperSlide>
+                            );
+                        })}
+                    </Swiper>
+                    <MenuInput/>
+                </>
             }
         </>
     );

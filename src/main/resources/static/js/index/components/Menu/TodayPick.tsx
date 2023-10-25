@@ -24,7 +24,7 @@ const TodayPick = (props: props) => {
         <>
             <div className={'todayPickWrap'}>
                 <div className='ribbon'><span>Today Pick!</span></div>
-                <MenuItem menu={props.menu}/>
+                <MenuItem menu={props.menu} isTodayPickMenu = {true}/>
                 <div className={'todayPickResetBtn btn btn-sm btn-danger'}
                      onClick={todayPickResetHandler}>
                     <FontAwesomeIcon icon={faRotateLeft}/>

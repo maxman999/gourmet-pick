@@ -19,12 +19,7 @@
     border: none;
 }
 
-#map {
-    width: 500px;
-    height: 400px;
-}
-
-#menuThumbnail {
+.menuThumbnail {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     object-fit: cover;

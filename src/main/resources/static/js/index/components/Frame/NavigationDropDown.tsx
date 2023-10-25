@@ -29,18 +29,31 @@ const NavigationDropDown = () => {
     }
 
     const nicknameUpdateHandler = async (nickname: string) => {
+        const filterNickname = CommonUtils.filterHtmlTags(nickname.trim());
+        if (filterNickname.length === 0) {
+            await CommonUtils.toaster('변경할 닉네임을 입력해주세요.', 'top', 'warning');
+            return;
+        }
+
+        if (filterNickname.length > 10) {
+            await CommonUtils.toaster('허용되지 않은 문자가 포함됐습니다.', 'top', 'warning');
+            return;
+        }
+
         const {data: result} = await axios.post('/api/user/updateNickname', {
             id: user.id,
-            nickname: nickname,
+            nickname: filterNickname,
         });
+
         if (result === 0) {
             alert("닉네임 변경에 실패했습니다. 잠시 후 다시 시도해주세요.");
             return
         }
+
         user.nickname = nickname
         sessionStorage.setItem("user", JSON.stringify(user));
-
         setIsNicknameUpdateModalPop(false);
+        CommonUtils.toaster('닉네임을 변경했습니다.', 'top');
     }
 
     return (
@@ -75,7 +88,7 @@ const NavigationDropDown = () => {
             {isNicknameUpdateModalPop &&
                 <Modal onClose={userNameModalCloseHandler} height={"140px"}>
                     <SimpleUpdateForm title={'사용할 닉네임을 입력해주세요.'}
-                                      placeholder={`${user.nickname}`}
+                                      placeholder={`${CommonUtils.bringBackHtmlTags(user.nickname)}`}
                                       updateHandler={nicknameUpdateHandler}/>
                 </Modal>
             }

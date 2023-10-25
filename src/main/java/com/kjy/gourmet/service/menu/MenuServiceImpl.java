@@ -1,7 +1,7 @@
 package com.kjy.gourmet.service.menu;
 
-import com.kjy.gourmet.domain.menu.dto.MenuThumbnail;
 import com.kjy.gourmet.domain.menu.Menu;
+import com.kjy.gourmet.domain.menu.dto.MenuThumbnail;
 import com.kjy.gourmet.mapper.MenuMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-//Todo 사진 이미지 업로드 관련 스크립트 공격 예방하는 로직 추가할것
-// 사진이름은 필요 없으니 파일명에서 제거 하고 uuid만 저장하는게 좋아보임
 
 @Slf4j
 @RequiredArgsConstructor
@@ -97,7 +94,7 @@ public class MenuServiceImpl implements MenuService {
             String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "." + fileExtension;
             try {
                 File thumbnailFile = new File(saveName); // 원본을 썸네일 파일로 저장
-                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 300, 300);
+                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 400, 400);
                 resultDTOList.add(new MenuThumbnail(uuid, folderPath, fileExtension));
             } catch (IOException e) {
                 throw new RuntimeException(e);

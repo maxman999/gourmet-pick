@@ -1,4 +1,4 @@
-import {useRef, useEffect, useContext, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import './MenuUpdateForm.css';
 import {Map, MapMarker} from "react-kakao-maps-sdk";
 import roomContext from "../../store/room-context";
@@ -11,13 +11,15 @@ import {IMenu} from "../../types/IMenu";
 import axios from "axios";
 import MenuContainer from "./MenuContainer";
 import RoomPhase from "../../types/RoomPhase";
+import {ILocationInfo} from "../../types/ILocationInfo";
+import Swal from "sweetalert2";
 
 const MenuUpdateForm = () => {
     const roomCtx = useContext(roomContext);
 
     const [menuName, setMenuName] = useState('');
     const [isMenuNameValid, setIsMenuNameValid] = useState(false);
-    const [location, setLocation] = useState({placeName: '', longitude: 0, latitude: 0});
+    const [location, setLocation] = useState<ILocationInfo>(null);
     const [thumbnail, setThumbnail] = useState<any>();
     const [prevThumbnailFileName, setPrevThumbnailFileName] = useState('');
     const [isThumbnailChanged, setIsThumbnailChanged] = useState(false);
@@ -34,28 +36,44 @@ const MenuUpdateForm = () => {
     const thumbnailImgRef = useRef(null);
 
     const isMenuModify = roomCtx.updateTargetMenuId > 0;
-    const isPlaceSelected = location.longitude + location.latitude > 0;
+    const isPlaceSelected = location?.longitude + location?.latitude > 0;
 
     const menuNameChangeHandler = _.debounce(() => {
         const inputVal = menuNameInputRef.current.value.trim();
-        if (inputVal.length > 0) {
-            setIsMenuNameValid(true);
-            setMenuName(CommonUtils.filterHtmlTags(inputVal));
-        } else {
+        const filteredInputVal = CommonUtils.filterHtmlTags(inputVal);
+
+        if (filteredInputVal.length > 15) {
+            setUploadBtnMessage('메뉴이름에 허용되지 않은 문자가 있습니다.');
             setIsMenuNameValid(false);
-            setMenuName('');
+            return;
         }
+
+        if (inputVal.length > 0) {
+            setMenuName(CommonUtils.filterHtmlTags(inputVal));
+            setIsMenuNameValid(true);
+            return;
+        }
+
+        setIsMenuNameValid(false);
+        setMenuName('');
     }, 300);
 
     const soberCommentChangeHandler = _.debounce(() => {
-        const inputVal = soberCommentInputRef.current.value.trim();
-        if (inputVal.length > 0) {
-            setIsSoberCommentValid(true);
-            setSoberComment(CommonUtils.filterHtmlTags(inputVal));
-        } else {
+        const filteredInputVal = CommonUtils.filterHtmlTags(soberCommentInputRef.current.value.trim());
+        if (filteredInputVal.length > 30) {
             setIsSoberCommentValid(false);
-            setSoberComment('');
+            setUploadBtnMessage('한줄평에 허용되지 않은 문자가 있습니다.');
+            return;
         }
+
+        if (filteredInputVal.length > 0) {
+            setIsSoberCommentValid(true);
+            setSoberComment(filteredInputVal);
+            return;
+        }
+
+        setIsSoberCommentValid(false);
+        setSoberComment('');
     }, 300);
 
     const mapUploadHandler = () => {
@@ -77,12 +95,8 @@ const MenuUpdateForm = () => {
         reader.readAsDataURL(file);
     }
 
-    const locationChangeHandler = (placeName: string, longitude: number, latitude: number) => {
-        setLocation({
-            placeName: placeName,
-            longitude: longitude,
-            latitude: latitude
-        });
+    const locationChangeHandler = (locationInfo: ILocationInfo) => {
+        setLocation(locationInfo);
     }
 
     const observeFormValidity = () => {
@@ -90,7 +104,7 @@ const MenuUpdateForm = () => {
         let isUploadPossible = true;
 
         if (!isSoberCommentValid) {
-            btnMsg = "냉정한 한줄평을 작성해주세요.";
+            btnMsg = "냉정한 한줄평을 확인해주세요.";
             isUploadPossible = false;
         }
 
@@ -104,9 +118,8 @@ const MenuUpdateForm = () => {
         }
 
         if (!isMenuNameValid) {
-            btnMsg = "메뉴이름을 입력해주세요.";
+            btnMsg = "메뉴이름을 확인해주세요.";
             isUploadPossible = false;
-            menuNameInputRef.current.focus();
         }
 
         setUploadBtnMessage(btnMsg);
@@ -127,7 +140,7 @@ const MenuUpdateForm = () => {
         axios.post('/api/menu/deleteMenuImageFile', {imageFileName: imageFileName});
     }
 
-    const submitClickHandler = async () => {
+    const submitClickHandler = _.debounce(async () => {
         const user = CommonUtils.getUserFromSession();
         const URL = `/api/menu/${isMenuModify ? 'update' : 'insert'}`;
 
@@ -136,6 +149,8 @@ const MenuUpdateForm = () => {
             name: menuName,
             latitude: location?.latitude,
             longitude: location?.longitude,
+            placeName: location?.placeName,
+            roadAddressName: location?.roadAddressName,
             soberComment: soberComment,
             thumbnail: thumbnail,
             roomId: roomCtx.roomInfo?.id,
@@ -148,9 +163,13 @@ const MenuUpdateForm = () => {
         }
 
         const {data: res} = await axios.post(URL, newMenu);
-
+        if (res > 0) {
+            CommonUtils.toaster(`메뉴가 ${isMenuModify ? '수정' : '등록'} 되었습니다!`, 'top');
+        } else {
+            await Swal.fire({title: '요청을 처리하지 못했습니다.', text: '잠시 후 다시 시도해주세요.', icon: 'error'});
+        }
         roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
-    }
+    }, 300);
 
     const updateCancelHandler = () => {
         roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
@@ -161,13 +180,13 @@ const MenuUpdateForm = () => {
     }
 
     const setTargetMenuInfo = async (menuId: number) => {
-        const {data: menu}: {
-            data: IMenu
-        } = await axios.get(`api/menu/${menuId}`);
+        const {data: menu}: { data: IMenu } = await axios.get(`api/menu/${menuId}`);
+        menu.name = CommonUtils.bringBackHtmlTags(menu.name);
         setMenuName(menu.name);
         setIsMenuNameValid(true);
         menuNameInputRef.current.value = menu.name;
 
+        menu.soberComment = CommonUtils.bringBackHtmlTags(menu.soberComment);
         setSoberComment(menu.soberComment);
         setIsSoberCommentValid(true);
         soberCommentInputRef.current.value = menu.soberComment;
@@ -176,7 +195,8 @@ const MenuUpdateForm = () => {
         setThumbnail(menu.thumbnail);
 
         setLocation({
-            placeName: '',
+            placeName: menu.placeName,
+            roadAddressName: menu.roadAddressName,
             longitude: menu.longitude,
             latitude: menu.latitude
         });
@@ -205,8 +225,10 @@ const MenuUpdateForm = () => {
                                 <input id='menuNameInput'
                                        className={'form-control'}
                                        type='text'
+                                       maxLength={15}
                                        placeholder='메뉴 이름을 입력해주세요.'
                                        onChange={menuNameChangeHandler}
+                                       onFocus={menuNameChangeHandler}
                                        ref={menuNameInputRef}/>
                             </div>
                         </div>
@@ -234,7 +256,7 @@ const MenuUpdateForm = () => {
                         <div className='col-md-5'>
                             <>
                                 {thumbnail &&
-                                    <img id='menuThumbnail'
+                                    <img className='menuThumbnail'
                                          ref={thumbnailImgRef}
                                          src={!isThumbnailChanged ? `/api/menu/getMenuImageURL?fileName=${thumbnail}` : thumbnail}
                                          alt='메뉴 썸네일 미리보기'
@@ -247,7 +269,10 @@ const MenuUpdateForm = () => {
                                               caption={"사진을 등록해주세요."}
                                     />
                                 }
-                                <input onChange={thumbnailChangeHandler} type={'file'} ref={imageUploadRef}
+                                <input onChange={thumbnailChangeHandler}
+                                       type={'file'}
+                                       accept={"image/*"}
+                                       ref={imageUploadRef}
                                        style={{display: 'none'}}/>
                             </>
                             <hr/>
@@ -258,6 +283,7 @@ const MenuUpdateForm = () => {
                                           placeholder={"냉정한 미식가의 평가를 입력해주세요."}
                                           maxLength={30}
                                           onChange={soberCommentChangeHandler}
+                                          onFocus={soberCommentChangeHandler}
                                           ref={soberCommentInputRef}
                                 />
                             </div>

@@ -8,6 +8,7 @@ import com.kjy.gourmet.service.voting.VotingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,10 +60,9 @@ public class RoomApiController {
         return votingService.setCurrentVotingSessionStatus(roomService.getMyRoomList(userId));
     }
 
-    @PostMapping("/modifyRoomName/{roomId}/{roomName}")
-    public int modifyRoomName(@PathVariable("roomId") long roomId,
-                              @PathVariable("roomName") String roomName) {
-        return roomService.modifyRoomName(roomId, roomName);
+    @PostMapping("/modifyRoomName")
+    public int modifyRoomName(@RequestBody Room nameUpdatedRoom) {
+        return roomService.modifyRoomName(nameUpdatedRoom.getId(), nameUpdatedRoom.getName());
     }
 
     @GetMapping("/menuCount/{roomId}")

@@ -17,7 +17,7 @@ type roomState = {
     updateTargetMenuId: number
     callerFlag: boolean;
     votingStatus: string;
-    votingGourmets: string[];
+    votingGourmets: IUser[];
 }
 
 type roomAction =
@@ -27,7 +27,7 @@ type roomAction =
     | { type: "SET_UPDATE_TARGET_MENU"; menuId: number; }
     | { type: "SET_CALLER_FLAG"; callerFlag: boolean; }
     | { type: "SET_VOTING_STATUS"; votingStatus: string; }
-    | { type: "SET_VOTING_GOURMETS"; votingGourmets: string[]; }
+    | { type: "SET_VOTING_GOURMETS"; votingGourmets: IUser[]; }
     | { type: "SET_TODAY_PICK"; menu: IMenu; }
     | { type: "DELETE_TODAY_PICK"; roomId: number; }
 
@@ -106,7 +106,7 @@ const roomReducer = (state: roomState, roomAction: roomAction) => {
 
 const defaultRoomState: roomState = {
     roomInfo: null,
-    isMenuListEmpty: true,
+    isMenuListEmpty: null,
     roomPhase: RoomPhase.DEFAULT,
     updateTargetMenuId: null,
     callerFlag: false,
@@ -125,6 +125,9 @@ const getRoomWithInspection = async (roomCode: string, userId: number) => {
             break;
         case -3:
             Swal.fire({title: '이미 투표가 시작된 방은 들어갈 수 없습니다.', icon: 'warning'});
+            break;
+        case -4:
+            Swal.fire({title: '입장할 수 있는 정원을 초과했습니다.', icon: 'warning'});
             break;
         case 1:
             const room = resultMap.room as IRoom;
@@ -194,7 +197,7 @@ const RoomProvider = (props: props) => {
         });
     }
 
-    const setVotingGourmetsHandler = (votingGourmets: string[]) => {
+    const setVotingGourmetsHandler = (votingGourmets: IUser[]) => {
         dispatchMenuActions({
             type: 'SET_VOTING_GOURMETS',
             votingGourmets: votingGourmets,

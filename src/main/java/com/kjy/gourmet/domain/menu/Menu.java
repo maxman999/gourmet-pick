@@ -18,4 +18,6 @@ public class Menu {
     private long writerId;
     private double longitude;
     private double latitude;
+    private String placeName;
+    private String roadAddressName;
 }
