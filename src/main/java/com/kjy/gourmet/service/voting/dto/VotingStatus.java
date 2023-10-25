@@ -1,4 +1,4 @@
-package com.kjy.gourmet.domain.dto;
+package com.kjy.gourmet.service.voting.dto;
 
 public enum VotingStatus {
     CREATE, // 투표 세션 생성
@@ -10,5 +10,6 @@ public enum VotingStatus {
     FINISH, // 투표 종료
     EXILE, // 도중에 방 삭제됨
     DISCONNECT, // 웹소켓 연결 끊어짐
+    DENIED, // 방 접근 불가
     FAIL, // 투표 실패
 }

@@ -1,7 +1,9 @@
 package com.kjy.gourmet.service.voting;
 
-import com.kjy.gourmet.domain.dto.Ballot;
-import com.kjy.gourmet.domain.dto.VotingSession;
+import com.kjy.gourmet.config.auth.dto.SessionUser;
+import com.kjy.gourmet.domain.menu.Menu;
+import com.kjy.gourmet.service.voting.dto.Ballot;
+import com.kjy.gourmet.service.voting.dto.VotingSession;
 import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.web.dto.WebSocketUser;
 
@@ -13,9 +15,11 @@ public interface VotingService {
 
     boolean isSessionDuplicated(String sessionId);
 
+    boolean isVotingOngoing(long roomId);
+
     void creatVotingSession(String sessionId, long roomId, long userId);
 
-    void syncHandler(String sessionId, long roomId, long userId);
+    List<Menu> getTodayMenuListFromSession(SessionUser user);
 
     void cancelHandler(long roomId);
 

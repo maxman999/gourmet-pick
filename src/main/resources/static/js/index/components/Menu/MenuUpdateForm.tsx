@@ -128,6 +128,7 @@ const MenuUpdateForm = () => {
     }
 
     const submitClickHandler = async () => {
+        const user = CommonUtils.getUserFromSession();
         const URL = `/api/menu/${isMenuModify ? 'update' : 'insert'}`;
 
         const newMenu: IMenu = {
@@ -138,6 +139,7 @@ const MenuUpdateForm = () => {
             soberComment: soberComment,
             thumbnail: thumbnail,
             roomId: roomCtx.roomInfo?.id,
+            writerId: user.id,
         }
 
         if (isThumbnailChanged) {

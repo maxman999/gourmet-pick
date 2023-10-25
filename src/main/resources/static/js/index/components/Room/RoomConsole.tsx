@@ -17,16 +17,14 @@ const RoomConsole = (props: props) => {
     const websocketAPIs = useContext(websocketContext);
     const roomCtx = useContext(roomContext);
 
-    const isTodayPickTooltipShow = (
-        roomCtx.roomPhase === RoomPhase.DEFAULT &&
-        !_.isEmpty(roomCtx.roomInfo.todayPick) &&
-        !props.todayPickPopupFlag
+    const isTodayPickTooltipShow = (roomCtx.roomPhase === RoomPhase.DEFAULT
+        && !_.isEmpty(roomCtx.roomInfo.todayPick)
+        && !props.todayPickPopupFlag
     );
 
     const gourmetCallHandler = () => {
-        roomCtx.changeRoomPhase(RoomPhase.CALLING);
-        roomCtx.setCallerFlag(true);
         websocketAPIs.create();
+        roomCtx.setCallerFlag(true);
     }
 
     const gourmetVotingHandler = () => {
@@ -38,15 +36,17 @@ const RoomConsole = (props: props) => {
         websocketAPIs.cancel();
     }
 
-    const isGourmetCallPossible =
-        roomCtx.roomPhase === RoomPhase.DEFAULT &&
-        !roomCtx.isMenuListEmpty &&
-        _.isEmpty(roomCtx.roomInfo.todayPick)
+    const isGourmetCallPossible = roomCtx.roomPhase === RoomPhase.DEFAULT
+        && !roomCtx.isMenuListEmpty
+        && _.isEmpty(roomCtx.roomInfo.todayPick);
 
 
-    const isVoteStartingPossible =
-        roomCtx.roomPhase === RoomPhase.READY ||
-        (roomCtx.roomPhase === RoomPhase.CALLING && roomCtx.callerFlag)
+    const isVoteStartingPossible = roomCtx.roomPhase === RoomPhase.READY
+        || (roomCtx.roomPhase === RoomPhase.CALLING && roomCtx.callerFlag)
+
+    const isVotingCancelPossible = roomCtx.roomPhase !== RoomPhase.DEFAULT
+        && roomCtx.votingStatus === VotingStatus.GATHERING
+        && roomCtx.callerFlag;
 
     const exitHandler = () => {
         document.location.reload();
@@ -55,7 +55,6 @@ const RoomConsole = (props: props) => {
     const todayPickPopupHandler = () => {
         props.todayPickPopupFlagHandler(true)
     }
-
 
     return (
         <>
@@ -76,7 +75,7 @@ const RoomConsole = (props: props) => {
                         onClick={gourmetVotingHandler}> 투 표 시 작
                     </button>
                 </div>
-                {(roomCtx.roomPhase !== RoomPhase.DEFAULT && roomCtx.votingStatus === VotingStatus.GATHERING) &&
+                {isVotingCancelPossible &&
                     <div className={"col"}>
                         <button
                             className='phaseBtn btn btn-sm btn-outline-success phase-cancel-btn'
@@ -101,7 +100,7 @@ const RoomConsole = (props: props) => {
             }
             {roomCtx.roomPhase === RoomPhase.CALLING &&
                 <Tooltip anchorSelect=".phase-start-btn" place="top" style={{zIndex: '9998'}}>
-                    과반이상 입장하거나, 방장의 요청에 의해 투표를 시작할 수 있습니다.
+                    일정 수 이상 입장하거나, 투표 요청자에 의해 투표를 시작할 수 있습니다.
                 </Tooltip>
             }
             {isTodayPickTooltipShow &&
@@ -121,8 +120,6 @@ const RoomConsole = (props: props) => {
                     </div>
                 </Tooltip>
             }
-
-
         </>
     )
 }

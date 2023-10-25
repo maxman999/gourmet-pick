@@ -1,5 +1,7 @@
 package com.kjy.gourmet.web;
 
+import com.kjy.gourmet.config.auth.LoginUser;
+import com.kjy.gourmet.config.auth.dto.SessionUser;
 import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.service.room.RoomService;
 import com.kjy.gourmet.service.voting.VotingService;
@@ -7,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api/room")
 @RequiredArgsConstructor
@@ -37,6 +40,14 @@ public class RoomApiController {
         return roomService.enterRoom(userId, roomId);
     }
 
+    @PostMapping("/enterWithInspection/{userId}/{roomCode}")
+    public Map<String, Object> enterWithInspection(@PathVariable("userId") long userId,
+                                                   @PathVariable("roomCode") String roomCode,
+                                                   @LoginUser SessionUser user) {
+        return roomService.enterRoomWithInspection(userId, roomCode, user.getEmail());
+    }
+
+
     @DeleteMapping("/exit/{userId}/{roomId}")
     public int exitRoom(@PathVariable("userId") long userId,
                         @PathVariable("roomId") long roomId) {
@@ -54,4 +65,8 @@ public class RoomApiController {
         return roomService.modifyRoomName(roomId, roomName);
     }
 
+    @GetMapping("/menuCount/{roomId}")
+    public int getMenuCount(@PathVariable("roomId") long roomId) {
+        return roomService.getCurrentRoomMenuCount(roomId);
+    }
 }

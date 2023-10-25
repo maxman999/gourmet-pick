@@ -7,6 +7,8 @@ import RoomPhase from "../types/RoomPhase";
 import VotingStatus from "../types/VotingStatus";
 import {IMenu} from "../types/IMenu";
 import {IUser} from "../types/IUser";
+import CommonUtils from "../utils/CommonUtils";
+import Swal from "sweetalert2";
 
 type roomState = {
     roomInfo: IRoom;
@@ -112,40 +114,24 @@ const defaultRoomState: roomState = {
     votingGourmets: [],
 }
 
-const inspectSessionDuplication = async () => {
-    const {data: isSessionDuplicated} = await axios.get("/voting/isSessionDuplicated");
-    return isSessionDuplicated;
-}
-
-const getRoom = async (code: string = "") => {
-    const {data: room}: { data: IRoom } = await axios.get(`/api/room/${code}`);
-    if (!room) {
-        alert("해당 방이 존재하지 않습니다.");
-        return;
-    }
-    if (room.todayPick.id === 0) delete room.todayPick;
-    return room;
-};
-
-const enterRoom = async (userId: number, roomId: number) => {
-    const fetchResult = await axios.post(`api/room/enter/${userId}/${roomId}`);
-    return Number(fetchResult.data) >= 0;
-};
-
 const getRoomWithInspection = async (roomCode: string, userId: number) => {
-    const isSessionDuplicated = await inspectSessionDuplication();
-    if (isSessionDuplicated) {
-        alert("이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.");
-        return;
-    }
-    const room: IRoom = await getRoom(roomCode);
-
-    const isEntranceSuccess = await enterRoom(userId, room.id);
-    if (isEntranceSuccess) {
-        return room;
-    } else {
-        alert("방 입장 실패");
-        return;
+    const {data: resultMap} = await axios.post(`api/room/enterWithInspection/${userId}/${roomCode}`);
+    switch (resultMap.code) {
+        case -1:
+            Swal.fire({title: '이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.', icon: 'warning'});
+            break;
+        case -2:
+            Swal.fire({title: '방이 존재하지 않습니다.', icon: 'warning'});
+            break;
+        case -3:
+            Swal.fire({title: '이미 투표가 시작된 방은 들어갈 수 없습니다.', icon: 'warning'});
+            break;
+        case 1:
+            const room = resultMap.room as IRoom;
+            if (room.todayPick.id === 0) delete room.todayPick;
+            return room;
+        default:
+            break;
     }
 }
 
@@ -165,11 +151,7 @@ const RoomProvider = (props: props) => {
     }
 
     const enterRoomHandler = async (roomCode: string) => {
-        const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
-        if (!user) {
-            alert("인증 정보를 받아올 수 없습니다. 다시 시도해주세요.")
-            document.location.reload();
-        }
+        const user = CommonUtils.getUserFromSession();
         const room = await getRoomWithInspection(roomCode, user.id);
         dispatchMenuActions({
             type: 'DEFAULT_ROOM_SETTING',

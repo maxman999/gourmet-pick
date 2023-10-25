@@ -7,6 +7,7 @@ import {faMapLocationDot, faPen, faTrash} from "@fortawesome/free-solid-svg-icon
 import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
+import CommonUtils from "../../utils/CommonUtils";
 
 interface props {
     menu: IMenu;
@@ -20,7 +21,12 @@ const MenuItem = (props: props) => {
     const menuDeleteBtnRef = useRef(null);
     const menuUpdateBtnRef = useRef(null);
 
+    const user = CommonUtils.getUserFromSession();
+    const hasMenuUpdateAuth = user.id === props.menu.writerId || user.id === roomCtx.roomInfo.managerId;
+
     const menuDeleteClickHandler = async () => {
+        const confirmResult = await CommonUtils.confirm('메뉴를 삭제하시겠습니까?', '삭제된 메뉴는 복구할 수 없습니다.', '삭 제');
+        if (!confirmResult.isConfirmed) return;
         const targetMenuId = Number(menuDeleteBtnRef.current.dataset.id);
         props.onMenuDelete(targetMenuId);
     }
@@ -48,32 +54,29 @@ const MenuItem = (props: props) => {
                         <button className={'locationBtn btn btn-outline-success btn-sm'}
                                 onClick={getLocationHandler}
                         >
-
                             <FontAwesomeIcon icon={faMapLocationDot}/>
                         </button>
                     </div>
                 </div>
-                {roomCtx.roomPhase === RoomPhase.DEFAULT && props.onMenuDelete &&
-                    <>
-                        <div className='col text-end'>
-                            <button
-                                className='btn btn-sm btn-outline-secondary menuUpdateBtn'
-                                data-id={props.menu.id}
-                                data-thumbnail={props.menu.thumbnail}
-                                ref={menuDeleteBtnRef}
-                                onClick={menuUpdateClickHandler}
-                            ><FontAwesomeIcon icon={faPen}/>
-                            </button>
-                            <button
-                                className='btn btn-sm btn-outline-secondary menuDeleteBtn'
-                                data-id={props.menu.id}
-                                data-thumbnail={props.menu.thumbnail}
-                                ref={menuUpdateBtnRef}
-                                onClick={menuDeleteClickHandler}
-                            ><FontAwesomeIcon icon={faTrash}/>
-                            </button>
-                        </div>
-                    </>
+                {roomCtx.roomPhase === RoomPhase.DEFAULT && hasMenuUpdateAuth &&
+                    <div className='col text-end'>
+                        <button
+                            className='btn btn-sm btn-outline-secondary menuUpdateBtn'
+                            data-id={props.menu.id}
+                            data-thumbnail={props.menu.thumbnail}
+                            ref={menuDeleteBtnRef}
+                            onClick={menuUpdateClickHandler}>
+                            <FontAwesomeIcon icon={faPen}/>
+                        </button>
+                        <button
+                            className='btn btn-sm btn-outline-secondary menuDeleteBtn'
+                            data-id={props.menu.id}
+                            data-thumbnail={props.menu.thumbnail}
+                            ref={menuUpdateBtnRef}
+                            onClick={menuDeleteClickHandler}>
+                            <FontAwesomeIcon icon={faTrash}/>
+                        </button>
+                    </div>
                 }
             </div>
             <div className={"row mt-2"}>

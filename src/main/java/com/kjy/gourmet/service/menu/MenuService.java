@@ -1,6 +1,6 @@
 package com.kjy.gourmet.service.menu;
 
-import com.kjy.gourmet.domain.dto.MenuThumbnail;
+import com.kjy.gourmet.domain.menu.dto.MenuThumbnail;
 import com.kjy.gourmet.domain.menu.Menu;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +21,8 @@ public interface MenuService {
     int deleteMenu(long menuId);
 
     List<Menu> getMenuList(long roomId);
+
+    List<Menu> getTodayMenuList(long roomId);
 
     ResponseEntity<List<MenuThumbnail>> uploadMenuImage(MultipartFile[] files);
 

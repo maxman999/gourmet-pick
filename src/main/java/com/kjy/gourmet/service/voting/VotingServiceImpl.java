@@ -1,9 +1,13 @@
 package com.kjy.gourmet.service.voting;
 
-import com.kjy.gourmet.domain.dto.*;
+import com.kjy.gourmet.config.auth.dto.SessionUser;
 import com.kjy.gourmet.domain.menu.Menu;
 import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.service.menu.MenuService;
+import com.kjy.gourmet.service.voting.dto.Ballot;
+import com.kjy.gourmet.service.voting.dto.Message;
+import com.kjy.gourmet.service.voting.dto.VotingSession;
+import com.kjy.gourmet.service.voting.dto.VotingStatus;
 import com.kjy.gourmet.web.dto.WebSocketUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +16,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,6 +29,7 @@ public class VotingServiceImpl implements VotingService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final Map<String, WebSocketUser> sessionMapper = new ConcurrentHashMap<>();
     private final Map<Long, VotingSession> votingSessions = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private final int ROOM_CAPACITY = 2;
 
     private final MenuService menuService;
@@ -29,8 +37,12 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void userRegisterHandler(String sessionId, WebSocketUser webSocketUser) {
+        long roomId = webSocketUser.getRoomId();
         sessionMapper.put(sessionId, webSocketUser);
-        syncHandler(sessionId, webSocketUser.getRoomId(), webSocketUser.getId());
+        // 최초 입장시 방 동기화(투표 진행 여부 검사)
+        if (votingSessions.containsKey(roomId)) {
+            userSeatingHandler(sessionId, roomId, webSocketUser.getId());
+        }
     }
 
     @Override
@@ -39,33 +51,41 @@ public class VotingServiceImpl implements VotingService {
     }
 
     @Override
+    public boolean isVotingOngoing(long roomId) {
+        return votingSessions.containsKey(roomId) &&
+                votingSessions.get(roomId).isVotingOnGoing();
+    }
+
+    @Override
     public void creatVotingSession(String sessionId, long roomId, long userId) {
         if (!votingSessions.containsKey(roomId)) {
             votingSessions.put(roomId, new VotingSession());
         } else {
-            log.error("기존에 지워지지 않은 투표 세션이 있었음 =====> 방번호 : {}", roomId);
-            log.error("세션 정보 : {}", votingSessions.get(roomId));
+            log.error("기존에 지워지지 않은 투표 세션이 있었음 =====> 방번호 : {} / 세션 정보 : {}", roomId, votingSessions.get(roomId));
             votingSessions.put(roomId, new VotingSession());
         }
-        Message votingReadyMsg = new Message("server", "people", VotingStatus.CREATE, 0);
-        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
+        // 오늘의 투표 메뉴 선정
+        List<Menu> todayMenuList = menuService.getTodayMenuList(roomId);
+        votingSessions.get(roomId).setTodayMenuList(todayMenuList);
 
         userSeatingHandler(sessionId, roomId, userId);
+
+        Message votingReadyMsg = new Message("person", userId, "people", VotingStatus.CREATE, 0);
+        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
     }
 
     @Override
-    public void syncHandler(String userEmail, long roomId, long userId) {
-        // 최초 입장시 방 동기화(투표 진행 여부 검사)
-        if (votingSessions.containsKey(roomId)) {
-            userSeatingHandler(userEmail, roomId, userId);
-        }
+    public List<Menu> getTodayMenuListFromSession(SessionUser user) {
+        long roomId = sessionMapper.get(user.getEmail()).getRoomId();
+        if (votingSessions.get(roomId) == null) return new ArrayList<>();
+        return votingSessions.get(roomId).getTodayMenuList();
     }
 
     @Override
     public void cancelHandler(long roomId) {
         votingSessions.remove(roomId);
-        Message votingReadyMsg = new Message("server", "people", VotingStatus.CANCEL, 0);
-        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
+        Message votingCancelMsg = new Message("user", 0, "people", VotingStatus.CANCEL, 0);
+        simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingCancelMsg);
     }
 
     @Override
@@ -75,18 +95,19 @@ public class VotingServiceImpl implements VotingService {
         votingSessions.get(roomId).getUsers().add(sessionId);
         // 입장 유저 수 집계
         HashSet<String> users = votingSessions.get(roomId).getUsers();
-        Message userSeatingMsg = new Message("server", "people", VotingStatus.SEATING, getUserNicknamesFromUserSet(users));
+        Message userSeatingMsg = new Message("user", userId, "people", VotingStatus.SEATING, getUserNicknamesFromUserSet(users));
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, userSeatingMsg);
 
         if (users.size() >= ROOM_CAPACITY) {
-            Message votingReadyMsg = new Message("kjy55", "people", VotingStatus.READY, users.size());
+            Message votingReadyMsg = new Message("user", userId, "people", VotingStatus.READY, users.size());
             simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
         }
     }
 
     @Override
     public void startVoting(long roomId) {
-        Message votingStartMsg = new Message("server", "people", VotingStatus.START, 0);
+        votingSessions.get(roomId).setVotingOnGoing(true);
+        Message votingStartMsg = new Message("user", 0, "people", VotingStatus.START, 0);
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingStartMsg);
     }
 
@@ -104,30 +125,20 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void finishVoting(String sessionId, long roomId) {
-        HashSet<String> finishCalls = votingSessions.get(roomId).getFinishCalls();
-        int currentSessionUserCnt = votingSessions.get(roomId).getUsers().size();
-        finishCalls.add(sessionId);
-        // 투표 끝난 유저의 세션정보 제거
-        sessionMapper.remove(sessionId);
-        votingSessions.get(roomId).getUsers().remove(sessionId);
+        VotingSession session = votingSessions.get(roomId);
+        if (session == null) return;
 
-        if (finishCalls.size() >= currentSessionUserCnt) {
-            // 투표 집계
-            HashMap<Long, Integer> votingStatus = votingSessions.get(roomId).getAggregation();
-            if (!votingStatus.isEmpty()) {
-                long todayPickMenuId = Collections.max(votingStatus.entrySet(), Map.Entry.comparingByValue()).getKey();
-                menuService.insertTodayPick(roomId, todayPickMenuId);
-                Menu todayPick = menuService.getMenuById(todayPickMenuId);
-                // 집계 결과 송출
-                Message endMessage = new Message("server", "people", VotingStatus.FINISH, todayPick);
-                simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
-            } else {
-                // 아무도 투표하지 않음.
-                Message endMessage = new Message("server", "people", VotingStatus.FAIL, 0);
-                simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
-            }
-            // session cleanup
-            votingSessions.remove(roomId);
+        HashSet<String> finishCalls = session.getFinishCalls();
+        finishCalls.add(sessionId);
+        int currentSessionUserCnt = session.getUsers().size();
+        session.getUsers().remove(sessionId);
+
+        // 최초 호출 이후, 5초 간 대기 후 강제 집계
+        if (finishCalls.size() == 1) {
+            log.info("{}번 방에서 집계 요청", roomId);
+            executor.schedule(() -> aggregateAndSendToUser(roomId, session), 5, TimeUnit.SECONDS);
+        } else if (finishCalls.size() == currentSessionUserCnt) {
+            aggregateAndSendToUser(roomId, session);
         }
     }
 
@@ -150,10 +161,9 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void exileAllUsers(long roomId) {
-        Message endMessage = new Message("server", "people", VotingStatus.EXILE, 0);
+        Message endMessage = new Message("server", 0, "people", VotingStatus.EXILE, 0);
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
     }
-
 
     @Override
     public void disconnectSession(String sessionId) {
@@ -171,7 +181,7 @@ public class VotingServiceImpl implements VotingService {
             if (users.isEmpty()) {
                 votingSessions.remove(webSocketUser.getRoomId());
             } else {
-                Message message = new Message("server", "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserSet(users));
+                Message message = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserSet(users));
                 simpMessagingTemplate.convertAndSend("/voting/" + webSocketUser.getRoomId(), message);
             }
         }
@@ -185,5 +195,23 @@ public class VotingServiceImpl implements VotingService {
                 .map(sessionMapper::get)
                 .map(WebSocketUser::getNickname)
                 .collect(Collectors.toList());
+    }
+
+    private void aggregateAndSendToUser(long roomId, VotingSession session) {
+        HashMap<Long, Integer> votingStatus = session.getAggregation();
+        if (!votingStatus.isEmpty()) {
+            long todayPickMenuId = Collections.max(votingStatus.entrySet(), Map.Entry.comparingByValue()).getKey();
+            menuService.insertTodayPick(roomId, todayPickMenuId);
+            Menu todayPick = menuService.getMenuById(todayPickMenuId);
+            // 집계 결과 송출
+            Message endMessage = new Message("server", 0, "people", VotingStatus.FINISH, todayPick);
+            simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
+        } else {
+            // 아무도 투표하지 않음.
+            Message endMessage = new Message("server", 0, "people", VotingStatus.FAIL, 0);
+            simpMessagingTemplate.convertAndSend("/voting/" + roomId, endMessage);
+        }
+        // session cleanup
+        votingSessions.remove(roomId);
     }
 }

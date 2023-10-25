@@ -1,6 +1,7 @@
 package com.kjy.gourmet.service.room;
 
-import com.kjy.gourmet.domain.dto.VotingSession;
+import com.kjy.gourmet.config.auth.dto.SessionUser;
+import com.kjy.gourmet.service.voting.dto.VotingSession;
 import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.mapper.RoomMapper;
 import com.kjy.gourmet.service.menu.MenuService;
@@ -9,7 +10,9 @@ import com.kjy.gourmet.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -64,6 +67,34 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public Map<String, Object> enterRoomWithInspection(long userId, String roomCode, String sessionId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        if (votingService.isSessionDuplicated(sessionId)) {
+            resultMap.put("code", -1);
+            resultMap.put("room", null);
+            return resultMap;
+        }
+
+        Room room = getRoomByCode(roomCode);
+        if (room == null) {
+            resultMap.put("code", -2);
+            resultMap.put("room", null);
+            return resultMap;
+        }
+
+        if (votingService.isVotingOngoing(room.getId())) {
+            resultMap.put("code", -3);
+            resultMap.put("room", null);
+            return resultMap;
+        }
+
+        enterRoom(userId, room.getId());
+        resultMap.put("code", 1);
+        resultMap.put("room", room);
+        return resultMap;
+    }
+
+    @Override
     public int exitRoom(long userId, long roomId) {
         return roomMapper.deleteFavoriteRoom(userId, roomId);
     }
@@ -76,5 +107,10 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<Room> getMyRoomList(long userId) {
         return roomMapper.selectFavoriteRoomList(userId);
+    }
+
+    @Override
+    public int getCurrentRoomMenuCount(long roomId) {
+        return roomMapper.getCurrentRoomMenuCount(roomId);
     }
 }

@@ -2,7 +2,8 @@ package com.kjy.gourmet.web;
 
 import com.kjy.gourmet.config.auth.LoginUser;
 import com.kjy.gourmet.config.auth.dto.SessionUser;
-import com.kjy.gourmet.domain.dto.Ballot;
+import com.kjy.gourmet.domain.menu.Menu;
+import com.kjy.gourmet.service.voting.dto.Ballot;
 import com.kjy.gourmet.service.voting.VotingService;
 import com.kjy.gourmet.utils.AuthUtil;
 import com.kjy.gourmet.web.dto.WebSocketUser;
@@ -14,8 +15,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +31,16 @@ public class VotingApiController {
     @GetMapping("/voting/isSessionDuplicated")
     public boolean isSessionDuplicated(@LoginUser SessionUser user) {
         return votingService.isSessionDuplicated(user.getEmail());
+    }
+
+    @GetMapping("/voting/isVotingOngoing")
+    public boolean isVotingOngoing(@RequestParam long roomId) {
+        return votingService.isVotingOngoing(roomId);
+    }
+
+    @GetMapping("/voting/getTodayMenuList")
+    public List<Menu> getTodayMenuList(@LoginUser SessionUser user) {
+        return votingService.getTodayMenuListFromSession(user);
     }
 
     @MessageMapping("/voting/register")

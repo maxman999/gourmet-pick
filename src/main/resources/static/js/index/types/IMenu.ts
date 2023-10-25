@@ -5,5 +5,6 @@ export interface IMenu {
     soberComment?: string;
     longitude?: number;
     latitude?: number;
-    roomId?: number;
+    roomId: number;
+    writerId: number;
 }

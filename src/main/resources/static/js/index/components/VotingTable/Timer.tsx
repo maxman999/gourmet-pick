@@ -29,10 +29,10 @@ const Timer = () => {
         <div className='swiper-timer__wrapper'>
             <CountdownCircleTimer
                 isPlaying={websocketAPIs.websocketState.isVotingPossible}
-                duration={8}
+                duration={7}
                 strokeWidth={10}
                 size={70}
-                colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                colors={['#007722', '#F7B801', '#A30000', '#A30000']}
                 colorsTime={[9, 5, 2, 0]}
                 onComplete={timerCompleteHandler}
             >

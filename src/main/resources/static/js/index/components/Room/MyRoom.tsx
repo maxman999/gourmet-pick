@@ -7,10 +7,14 @@ import {useContext} from "react";
 import roomContext from "../../store/room-context";
 import {IUser} from "../../types/IUser";
 import axios from "axios";
+import Swal from 'sweetalert2'
+import CommonUtils from "../../utils/CommonUtils";
+
 
 type props = {
     myRoom: IRoom,
     userId: number,
+    myRoomDeleteHandler: (roomId: number) => void,
 }
 
 const MyRoom = (props: props) => {
@@ -24,18 +28,26 @@ const MyRoom = (props: props) => {
     const roomLikeHandler = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (isManager) {
-            alert("방장은 즐겨찾기를 해제할 수 없습니다.");
+            await Swal.fire({title: '방장은 즐겨찾기를 해제할 수 없습니다.', icon: 'warning'});
             return;
         }
+        const confirmResult = await CommonUtils.confirm(
+            '내방 목록에서 제거됩니다',
+            '목록에서 제거된 방은 코드가 없으면 들어갈 수 없습니다.',
+            '삭 제'
+        );
+        if (!confirmResult.isConfirmed) return;
         const targetRoomId = props.myRoom.id
-        const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
+        const user = CommonUtils.getUserFromSession();
         const {data: result} = await axios.delete(`/api/room/exit/${user.id}/${targetRoomId}`);
         if (result === 0) {
-            alert("방을 나가지 못했습니다. 잠시 후 다시 시도해주세요.");
+            Swal.fire({title: '삭제하지 못했습니다. 잠시 후 다시 시도해주세요.'});
             document.location.reload();
             return;
         }
-        console.log("방삭제성공")
+
+        CommonUtils.toaster('내방목록에서 제거되었습니다.', 'center');
+        props.myRoomDeleteHandler(targetRoomId);
     }
 
     return (
@@ -45,7 +57,7 @@ const MyRoom = (props: props) => {
                  onClick={enterRoomHandler}>
                 <div className={'myRoomTitle'}>
                     {props.myRoom.name}
-                    <button className={'roomManagementBtn roomLikeBtn'} onClick={roomLikeHandler}>
+                    <button className={'roomLikeBtn'} onClick={roomLikeHandler}>
                         <FontAwesomeIcon icon={faStar} style={isManager && {color: 'cornflowerblue'}}/>
                     </button>
                 </div>

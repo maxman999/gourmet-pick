@@ -1,6 +1,6 @@
 package com.kjy.gourmet.web;
 
-import com.kjy.gourmet.domain.dto.MenuThumbnail;
+import com.kjy.gourmet.domain.menu.dto.MenuThumbnail;
 import com.kjy.gourmet.domain.menu.Menu;
 import com.kjy.gourmet.service.menu.MenuService;
 import lombok.RequiredArgsConstructor;

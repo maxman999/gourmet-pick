@@ -2,18 +2,31 @@ import "./MenuDecisionSwiper.css"
 import {IMenu} from "../../types/IMenu";
 import MenuItem from "./MenuItem";
 import {Scrollbar, EffectCube} from "swiper";
-import {Swiper, SwiperSlide, useSwiper} from "swiper/react";
+import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-cube";
 import GourmetTable from "../VotingTable/GourmetTable";
 import Timer from "../VotingTable/Timer";
-import {memo} from "react";
+import {memo, useContext, useEffect, useState} from "react";
+import axios from "axios";
+import roomContext from "../../store/room-context";
 
 interface props {
     menuList: IMenu[];
 }
 
 const MenuDecisionSwiper = (props: props) => {
+    const [candidateItem, setCandidateItem] = useState<IMenu[]>([]);
+
+    const getTodayMenuList = async () => {
+        const {data: todayMenuList} = await axios.get('/voting/getTodayMenuList');
+        setCandidateItem(todayMenuList);
+    }
+
+    useEffect(() => {
+        getTodayMenuList().then();
+    }, []);
+
     return (
         <>
             <Swiper
@@ -32,7 +45,7 @@ const MenuDecisionSwiper = (props: props) => {
                 className="menuDecisionSwiper slide-in"
             >
                 {/* 메뉴 슬라이드 */}
-                {props.menuList?.map((menuItem: IMenu) => {
+                {candidateItem?.map((menuItem: IMenu) => {
                     return (
                         <SwiperSlide key={menuItem.id}>
                             <MenuItem menu={menuItem}/>

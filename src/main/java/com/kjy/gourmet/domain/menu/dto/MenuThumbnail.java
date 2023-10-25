@@ -1,4 +1,4 @@
-package com.kjy.gourmet.domain.dto;
+package com.kjy.gourmet.domain.menu.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

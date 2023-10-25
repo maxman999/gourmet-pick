@@ -1,4 +1,4 @@
-package com.kjy.gourmet.domain.dto;
+package com.kjy.gourmet.service.voting.dto;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.kjy.gourmet.service.menu;
 
-import com.kjy.gourmet.domain.dto.MenuThumbnail;
+import com.kjy.gourmet.domain.menu.dto.MenuThumbnail;
 import com.kjy.gourmet.domain.menu.Menu;
 import com.kjy.gourmet.mapper.MenuMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,6 +74,14 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public List<Menu> getMenuList(long roomId) {
         return menuMapper.selectMenuList(roomId);
+    }
+
+    @Override
+    public List<Menu> getTodayMenuList(long roomId) {
+        // todo 각종 정보 수집하여, 랜덤추출이 아닌 선호도 반영된 리스트로 변경
+        List<Menu> menuList = menuMapper.selectMenuList(roomId);
+        Collections.shuffle(menuList);
+        return menuList.subList(0, Math.min(menuList.size(), 6));
     }
 
     @Override

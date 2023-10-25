@@ -8,14 +8,17 @@ import axios from "axios";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
 import {IUser} from "../../types/IUser";
+import Swal from "sweetalert2";
+import CommonUtils from "../../utils/CommonUtils";
 
 const NavigationDropDown = () => {
     const roomCtx = useContext(roomContext);
     const [isNicknameUpdateModalPop, setIsNicknameUpdateModalPop] = useState(false);
+    const user = CommonUtils.getUserFromSession();
 
     const modalPopupHandler = () => {
         if (roomCtx.roomPhase !== RoomPhase.DEFAULT) {
-            alert("투표가 진행 중일 때는 닉네임을 변경할 수 없습니다.")
+            Swal.fire({title: '투표가 진행 중일 때는 닉네임을 변경할 수 없습니다.', icon: 'warning'});
             return;
         }
         setIsNicknameUpdateModalPop(true);
@@ -26,7 +29,6 @@ const NavigationDropDown = () => {
     }
 
     const nicknameUpdateHandler = async (nickname: string) => {
-        const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
         const {data: result} = await axios.post('/api/user/updateNickname', {
             id: user.id,
             nickname: nickname,
@@ -73,7 +75,7 @@ const NavigationDropDown = () => {
             {isNicknameUpdateModalPop &&
                 <Modal onClose={userNameModalCloseHandler} height={"140px"}>
                     <SimpleUpdateForm title={'사용할 닉네임을 입력해주세요.'}
-                                      placeholder={''}
+                                      placeholder={`${user.nickname}`}
                                       updateHandler={nicknameUpdateHandler}/>
                 </Modal>
             }

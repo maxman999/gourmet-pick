@@ -11,9 +11,13 @@
 }
 
 .menuUpdateBtn {
+    border-color: cornflowerblue;
+    color: cornflowerblue;
     margin-right: 15px;
 }
 
 .menuDeleteBtn {
+    border-color: palevioletred;
+    color: palevioletred;
     margin-right: 5px;
 }

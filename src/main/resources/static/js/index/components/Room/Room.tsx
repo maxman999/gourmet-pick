@@ -1,7 +1,7 @@
+import './Room.css';
 import {useContext, useEffect, useState} from "react";
 import RoomHeader from "./RoomHeader";
 import MenuList from "../Menu/MenuList";
-import './Room.css';
 import websocketContext from "../../store/websocket-context";
 import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
@@ -12,6 +12,8 @@ import VotingStatus from "../../types/VotingStatus";
 import {IMenu} from "../../types/IMenu";
 import TodayPick from "../Menu/TodayPick";
 import * as _ from "lodash";
+import Swal from 'sweetalert2'
+import CommonUtils from "../../utils/CommonUtils";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
@@ -35,16 +37,21 @@ const Room = () => {
         setTodayPickPopupFlag(popupFlag)
     }
 
-    const onMessageHandler = (payload: any) => {
+    const onMessageHandler = async (payload: any) => {
         let payloadData = JSON.parse(payload.body);
+        const user = CommonUtils.getUserFromSession();
         switch (payloadData.status) {
-            case "CREATE":
+            case 'CREATE':
                 websocketAPIs.seat();
                 roomCtx.changeRoomPhase(RoomPhase.CALLING);
                 break;
             case 'SEATING':
+                const seatingUsers = payloadData.data as string[];
                 roomCtx.changeRoomPhase(RoomPhase.CALLING);
-                roomCtx.setVotingGourmets(payloadData.data);
+                roomCtx.setVotingGourmets(seatingUsers);
+                if (user.id !== payloadData.senderId) {
+                    CommonUtils.toaster(`${seatingUsers[seatingUsers.length - 1]}님이 입장하셨습니다.`, 'top');
+                }
                 break;
             case 'CANCEL':
                 roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
@@ -54,6 +61,14 @@ const Room = () => {
                 roomCtx.changeRoomPhase(RoomPhase.READY);
                 break;
             case 'START':
+                await Swal.fire({
+                    title: '잠시 후 투표가 시작됩니다.',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    },
+                })
                 websocketAPIs.start();
                 roomCtx.changeRoomPhase(RoomPhase.STARTING);
                 roomCtx.changeVotingStatus(VotingStatus.VOTING);
@@ -66,11 +81,10 @@ const Room = () => {
                 voteFinishingModalPopHandler(true);
                 break;
             case 'EXILE':
-                alert("방이 삭제되었습니다. 메인 화면으로 돌아갑니다.")
+                await Swal.fire({title: "방이 삭제되었습니다.", icon: 'warning'});
                 document.location.reload();
                 break
             case 'DISCONNECT':
-                // 임시로직
                 const users = payloadData.data;
                 const currentUserCnt = users.length;
                 if (currentUserCnt < 2) {
@@ -79,8 +93,13 @@ const Room = () => {
                 roomCtx.setVotingGourmets(users);
                 break
             case 'FAIL':
-                alert("결과를 집계할 수 없습니다. 메인 화면으로 돌아갑니다.");
-                document.location.reload();
+                await Swal.fire({
+                    title: '투표 결과를 집계할 수 없습니다',
+                    text: '아무도 투표하지 않은 것으로 보입니다.',
+                    icon: 'warning',
+                });
+                roomCtx.changeVotingStatus(VotingStatus.GATHERING);
+                roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
                 break;
             default :
                 break;
@@ -90,10 +109,6 @@ const Room = () => {
     const onPrivateMessageHandler = (payload: any) => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
-            case 'SYNC':
-                roomCtx.changeRoomPhase(RoomPhase.CALLING);
-                roomCtx.setVotingGourmets(payloadData.data);
-                break
             default :
                 break;
         }
@@ -103,12 +118,7 @@ const Room = () => {
         const sessionInfo = {
             topic: 'voting',
             roomId: roomCtx.roomInfo.id,
-            user: JSON.parse(sessionStorage.getItem('user')),
-        }
-
-        if (!sessionInfo.user) {
-            alert("인증 정보를 받아올 수 없습니다. 다시 시도해주세요.")
-            document.location.reload();
+            user: CommonUtils.getUserFromSession(),
         }
         websocketAPIs.register(sessionInfo, onMessageHandler, onPrivateMessageHandler);
 
@@ -143,8 +153,7 @@ const Room = () => {
                 </Modal>
             }
         </>
-    )
-        ;
+    );
 }
 
 export default Room;

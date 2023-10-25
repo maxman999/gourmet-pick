@@ -15,6 +15,7 @@ public class Menu {
     private String name;
     private String thumbnail;
     private String soberComment;
+    private long writerId;
     private double longitude;
     private double latitude;
 }

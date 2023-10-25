@@ -53,6 +53,12 @@
         where id = #{roomId}
     </update>
 
+    <select id="getCurrentRoomMenuCount" parameterType="long" resultType="java.lang.Integer">
+        select count(id)
+        from menu
+        where room_id = #{roomId}
+    </select>
+
 
     <delete id="deleteAllRoom">
         delete

@@ -10,6 +10,7 @@ import CommonUtils from "../../utils/CommonUtils";
 import RoomPhase from "../../types/RoomPhase";
 import SimpleUpdateForm from "../UI/SimpleUpdateForm";
 import {IUser} from "../../types/IUser";
+import Swal from "sweetalert2";
 
 interface props {
     isConsoleActive: boolean;
@@ -23,7 +24,7 @@ const RoomHeader = (props: props) => {
     const [isTitleUpdateModalPopped, setIsTitleUpdateModalPopped] = useState(false);
     const [currentRoomName, setCurrentRoomName] = useState(roomCtx.roomInfo.name);
 
-    const user = JSON.parse(sessionStorage.getItem('user')) as IUser;
+    const user = CommonUtils.getUserFromSession();
     const isManager = roomCtx.roomInfo.managerId === user.id;
 
     const nameUpdatePopUpHandler = async () => {
@@ -36,7 +37,7 @@ const RoomHeader = (props: props) => {
 
     const nameUpdateHandler = async (newRoomName: string) => {
         if (newRoomName.length === 0) {
-            alert("변경할 이름을 입력해주세요.");
+            await CommonUtils.toaster('변경할 이름을 입력해주세요.', 'top', 'warning');
             return;
         }
         newRoomName = CommonUtils.filterHtmlTags(newRoomName)
@@ -51,15 +52,21 @@ const RoomHeader = (props: props) => {
     }
 
     const roomDeleteHandler = async () => {
+        const confirmResult = await CommonUtils.confirm('방을 삭제하시겠습니까?', '메뉴 정보도 함께 삭제되며, 복구할 수 없습니다.', '삭 제');
+        if (!confirmResult.isConfirmed) return;
+
         const targetRoomId = roomCtx.roomInfo.id;
         const {data: result} = await axios.delete(`/api/room/${targetRoomId}`);
         if (result === -1) {
-            alert("현재 진행 중인 투표가 있습니다. 해당 투표 종료 후 시도해주세요.");
+            await Swal.fire({
+                title: '방을 삭제할 수 없습니다.',
+                text: '현재 진행 중인 투표가 있습니다.',
+                icon: 'info'
+            });
             return;
         } else if (result === 0) {
             alert("방을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.")
         }
-        document.location.reload();
     }
 
     const linkClipHandler = () => {

@@ -1,4 +1,4 @@
-package com.kjy.gourmet.domain.dto;
+package com.kjy.gourmet.service.voting.dto;
 
 import lombok.*;
 
@@ -8,6 +8,7 @@ import lombok.*;
 @Getter
 public class Message {
     private String senderName;
+    private long senderId;
     private String receiverName;
     private VotingStatus status;
     private Object data;

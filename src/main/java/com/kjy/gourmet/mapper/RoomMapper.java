@@ -26,6 +26,8 @@ public interface RoomMapper {
 
     int modifyRoomName(@Param("roomId") long roomId, @Param("roomName") String roomName);
 
+    int getCurrentRoomMenuCount(long roomId);
+
     int deleteAllRoom();
 
     int deleteAllRoomFavorites();

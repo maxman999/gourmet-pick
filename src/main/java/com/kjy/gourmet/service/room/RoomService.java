@@ -3,6 +3,7 @@ package com.kjy.gourmet.service.room;
 import com.kjy.gourmet.domain.room.Room;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RoomService {
     Room makeRoom(String roomName, long managerId);
@@ -21,4 +22,7 @@ public interface RoomService {
 
     int modifyRoomName(long roomId, String roomName);
 
+    Map<String, Object> enterRoomWithInspection(long roomId, String roomCode, String sessionId);
+
+    int getCurrentRoomMenuCount(long roomId);
 }

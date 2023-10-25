@@ -26,6 +26,12 @@ const App = () => {
         setIsAuthenticated(isAuthenticated);
     }
 
+    const myRoomDeleteHandler = async (roomId: number) => {
+        setMyRoomList((prevState => {
+            return prevState.filter(room => room.id !== roomId);
+        }));
+    }
+
     useEffect(() => {
         authenticateHandler();
     }, []);
@@ -39,7 +45,7 @@ const App = () => {
                             {!roomCtx.roomInfo &&
                                 <div id={'roomEntranceContainer'} className={`container`}>
                                     <EntranceInput/>
-                                    <MyRoomList myRoomList={myRoomList}/>
+                                    <MyRoomList myRoomList={myRoomList} myRoomDeleteHandler={myRoomDeleteHandler}/>
                                 </div>
                             }
                             {roomCtx.roomInfo &&
