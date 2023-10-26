@@ -22,18 +22,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int signUp(User user) {
-        return userMapper.insertUser(user);
-    }
-
-    @Override
     public int signOutById(long userId) {
         return userMapper.deleteUserById(userId);
-    }
-
-    @Override
-    public int signOutByEmail(String email) {
-        return userMapper.deleteUserByEmail(email);
     }
 
     @Override

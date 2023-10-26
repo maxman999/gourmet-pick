@@ -3,18 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.kjy.gourmet.mapper.UserMapper">
-
-    <insert id="insertUser" parameterType="com.kjy.gourmet.domain.user.User">
-        insert into user(email, nickname, role)
-        values (#{email}, #{nickname}, #{role});
-    </insert>
-
     <insert id="insertOrUpdateUser" parameterType="com.kjy.gourmet.domain.user.User" useGeneratedKeys="true"
             keyProperty="id">
-        insert into user(email, nickname, role)
-        values (#{email}, #{nickname}, #{role})
-        on duplicate key update email    = VALUES(email),
-                                role     = VALUES(role)
+        insert into user(email, role)
+        values (#{email}, #{role})
+        on duplicate key update email = VALUES(email),
+                                role  = VALUES(role)
     </insert>
 
     <select id="selectUserById" parameterType="long" resultType="com.kjy.gourmet.domain.user.User">
@@ -39,12 +33,6 @@
         delete
         from user
         where id = #{userId}
-    </delete>
-
-    <delete id="deleteUserByEmail" parameterType="String">
-        delete
-        from user
-        where email = #{email}
     </delete>
 
 </mapper>

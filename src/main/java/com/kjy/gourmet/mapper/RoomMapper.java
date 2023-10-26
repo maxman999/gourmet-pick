@@ -28,8 +28,4 @@ public interface RoomMapper {
 
     int getCurrentRoomMenuCount(long roomId);
 
-    int deleteAllRoom();
-
-    int deleteAllRoomFavorites();
-
 }

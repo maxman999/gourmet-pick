@@ -5,6 +5,7 @@ import com.kjy.gourmet.domain.user.User;
 import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.service.user.UserService;
 import com.kjy.gourmet.service.room.RoomService;
+import com.kjy.gourmet.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,62 +26,58 @@ public class RoomServiceTests {
     @Autowired
     RoomService roomService;
 
-    List<String> invitationCodes = new ArrayList<>();
+    User dummyUser;
+    List<Room> dummyRoomList = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
-        User newbie = User.builder()
-                .email("test1@naver.com")
-                .nickname("고든램지")
-                .role(Role.USER)
-                .build();
-        userService.signUp(newbie);
+        User newbie = TestUtils.getDummyUser();
+        userService.signUpOrUpdateUser(newbie);
+        dummyUser = newbie;
 
+        User userInDB = userService.getUserByEmail(newbie.getEmail());
         for (int i = 0; i < 2; i++) {
-            Room room = roomService.makeRoom("점심책임방" + i, 0);
-            invitationCodes.add(room.getInvitationCode());
+            Room newRoom = TestUtils.getDummyRoom(userInDB.getId());
+            Room roomInDB = roomService.makeRoom(newRoom.getName(), userInDB.getId());
+            dummyRoomList.add(roomInDB);
         }
     }
 
     @AfterEach
     public void cleanUp() {
-        long memId = userService.getUserByEmail("test1@naver.com").getId();
-        invitationCodes.forEach(code -> {
-            long roomId = roomService.getRoomByCode(code).getId();
-            roomService.exitRoom(memId, roomId);
-            roomService.deleteRoomById(roomId);
+        User user = userService.getUserByEmail(dummyUser.getEmail());
+        dummyRoomList.forEach(room -> {
+            roomService.exitRoom(user.getId(), room.getId());
+            roomService.deleteRoomById(room.getId());
         });
-        userService.signOutById(memId);
+        userService.signOutById(user.getId());
     }
 
     @Test
     public void getRoomTest() {
-        for (int i = 0; i < 2; i++) {
-            String roomName = roomService.getRoomByCode(invitationCodes.get(i)).getName();
-            assertThat(roomName).isEqualTo("점심책임방" + i);
-        }
+        dummyRoomList.forEach(room -> {
+            Room roomInDB = roomService.getRoomByCode(room.getInvitationCode());
+            assertThat(roomInDB.getName()).isEqualTo(room.getName());
+        });
     }
 
     @Test
     public void enterRoomTest() {
-        long userId = userService.getUserByEmail("test1@naver.com").getId();
-        for (int i = 0; i < 2; i++) {
-            long roomId = roomService.getRoomByCode("123ZXCa" + i).getId();
-            roomService.enterRoom(userId, roomId);
-        }
-        List<Room> myRoomList = roomService.getMyRoomList(userId);
-        for (int i = 0; i < 2; i++) {
-            String roomName = myRoomList.get(i).getName();
-            assertThat(roomName).isEqualTo("점심책임방" + i);
+        User user = userService.getUserByEmail(dummyUser.getEmail());
+        dummyRoomList.forEach(room -> roomService.enterRoom(user.getId(), room.getId()));
+
+        List<Room> myRoomList = roomService.getMyRoomList(user.getId());
+        for (int i = 0; i < myRoomList.size(); i++) {
+            assertThat(myRoomList.get(i).getName()).isEqualTo(dummyRoomList.get(i).getName());
         }
     }
 
     @Test
     public void modifyRoomNameTest() {
-        String targetCode = invitationCodes.get(0);
-        long roomId = roomService.getRoomByCode(targetCode).getId();
-        roomService.modifyRoomName(roomId, "계란빵방");
-        String modifiedRoomName = roomService.getRoomByCode(targetCode).getName();
-        assertThat(modifiedRoomName).isEqualTo("계란빵방");
+        dummyRoomList.forEach(room -> {
+            roomService.modifyRoomName(room.getId(), "newName");
+            String modifiedRoomName = roomService.getRoomByCode(room.getInvitationCode()).getName();
+            assertThat(modifiedRoomName).isEqualTo("newName");
+        });
     }
 }

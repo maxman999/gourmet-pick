@@ -14,7 +14,7 @@ public class UserApiController {
 
     @PostMapping("/signUp")
     public int signUp(@RequestBody User user) {
-        return userService.signUp(user);
+        return userService.signUpOrUpdateUser(user);
     }
 
     @DeleteMapping("/{userId}")

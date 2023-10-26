@@ -13,6 +13,7 @@ public interface MenuMapper {
 
     int insertTodayPick(long roomId, long menuId);
 
+    // Todo room domain에서 처리하는 게 맞는거 같음
     int deleteTodayPick(long roomId);
 
     int updateMenu(Menu menu);
@@ -24,6 +25,4 @@ public interface MenuMapper {
     int deleteMenu(long menuId);
 
     List<String> getAllThumbnailsById(long roomId);
-
-    int deleteAllMenu();
 }

@@ -1,9 +1,9 @@
 package com.kjy.gourmet.web;
 
-import com.kjy.gourmet.domain.user.Role;
-import com.kjy.gourmet.domain.user.User;
-import com.kjy.gourmet.mapper.UserMapper;
 import com.google.gson.Gson;
+import com.kjy.gourmet.domain.user.User;
+import com.kjy.gourmet.service.user.UserService;
+import com.kjy.gourmet.utils.TestUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,55 +19,56 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserApiControllerTests {
 
-    @Autowired private WebApplicationContext ctx;
-    @Autowired private UserMapper userMapper;
+    @Autowired
+    private WebApplicationContext ctx;
+    @Autowired
+    UserService userService;
 
-    private MockMvc mockMvc;Gson gson = new Gson();
+    private MockMvc mockMvc;
+    Gson gson = new Gson();
+    User dummyUser = TestUtils.getDummyUser();
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
+        userService.signUpOrUpdateUser(dummyUser);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
     }
 
-    @Order(1)
+    @AfterEach
+    public void cleanUp() {
+        User userInDB = userService.getUserByEmail(dummyUser.getEmail());
+        if (userInDB != null) userService.signOutById(userInDB.getId());
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+    }
+
     @Test
-    public void signUpTest() throws Exception{
-        User newbie = User.builder()
-                .email("test1@naver.com")
-                .nickname("웹램지")
-                .role(Role.USER)
-                .build();
-        String newbieJson = gson.toJson(newbie);
+    public void signUpTest() throws Exception {
+        String newbieJson = gson.toJson(dummyUser);
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/user/signUp")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newbieJson))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void getUserTest() throws Exception {
+        User user = userService.getUserByEmail(dummyUser.getEmail());
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/user/signUp")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(newbieJson)
+                        MockMvcRequestBuilders.get("/api/user/" + user.getId())
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Order(2)
     @Test
-    public void getUserTest() throws Exception{
-        long userId =  userMapper.selectUserByEmail("test1@naver.com").getId();
+    public void signOutTest() throws Exception {
+        User user = userService.getUserByEmail(dummyUser.getEmail());
         mockMvc.perform(
-            MockMvcRequestBuilders.get("/api/user/"+userId)
-        )
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Order(3)
-    @Test
-    public void signOutTest() throws Exception{
-        long userId = userMapper.selectUserByEmail("test1@naver.com").getId();
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.delete("/api/user/"+userId)
-        )
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andDo(MockMvcResultHandlers.print());
+                        MockMvcRequestBuilders.delete("/api/user/" + user.getId())
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print());
     }
 
 }

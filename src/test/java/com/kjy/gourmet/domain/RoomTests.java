@@ -7,6 +7,7 @@ import com.kjy.gourmet.domain.room.Room;
 import com.kjy.gourmet.mapper.MenuMapper;
 import com.kjy.gourmet.mapper.UserMapper;
 import com.kjy.gourmet.mapper.RoomMapper;
+import com.kjy.gourmet.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,80 +29,74 @@ public class RoomTests {
     @Autowired
     private MenuMapper menuMapper;
 
-    List<String> invitationCodes = new ArrayList<>();
+    User dummyUser = TestUtils.getDummyUser();
+    List<Room> dummyRoomList = new ArrayList<>();
 
     @BeforeEach
     public void setUp() {
-        User newbie = User.builder()
-                .email("test1@naver.com")
-                .nickname("고든램지")
-                .role(Role.USER)
-                .build();
-        userMapper.insertUser(newbie);
-
+        userMapper.insertOrUpdateUser(dummyUser);
+        User userInDB = userMapper.selectUserByEmail(dummyUser.getEmail());
         for (int i = 0; i < 2; i++) {
-            Room room = Room.builder()
-                    .name("점심책임방" + i)
-                    .invitationCode("123ZXCa" + i)
-                    .build();
+            Room room = TestUtils.getDummyRoom(userInDB.getId());
             roomMapper.insertRoom(room);
-            this.invitationCodes.add(room.getInvitationCode());
+            dummyRoomList.add(room); // room에 id 추가됨
         }
     }
 
     @AfterEach
     public void cleanUp() {
-        roomMapper.deleteAllRoomFavorites();
-        roomMapper.deleteAllRoom();
-        long id = userMapper.selectUserByEmail("test1@naver.com").getId();
-        userMapper.deleteUserById(id);
+        dummyRoomList.forEach(room -> {
+            roomMapper.deleteFavoriteRoom(dummyUser.getId(), room.getId());
+            roomMapper.deleteRoomById(roomMapper.selectRoomByCode(room.getInvitationCode()).getId());
+        });
+        userMapper.deleteUserById(dummyUser.getId());
     }
 
     @Test
     public void selectRoomByCodeTest() {
-        Room room = roomMapper.selectRoomByCode("123ZXCa0");
-        assertThat(room.getName()).isEqualTo("점심책임방0");
+        dummyRoomList.forEach(room -> {
+            Room roomInDB = roomMapper.selectRoomById(room.getId());
+            assertThat(roomInDB.getName()).isEqualTo(room.getName());
+        });
     }
 
     @Test
     public void insertFavoriteRoomTest() {
-        User user = userMapper.selectUserByEmail("test1@naver.com");
-        this.invitationCodes.forEach(code -> {
-            Room room = roomMapper.selectRoomByCode(code);
-            roomMapper.insertFavoriteRoom(user.getId(), room.getId());
-        });
+        User user = userMapper.selectUserByEmail(dummyUser.getEmail());
+        this.dummyRoomList.forEach(room -> roomMapper.insertFavoriteRoom(user.getId(), room.getId()));
         List<Room> favoriteRoomList = roomMapper.selectFavoriteRoomList(user.getId());
-        for (int i = 0; i < 2; i++) {
-            assertThat(favoriteRoomList.get(i).getName()).isEqualTo("점심책임방" + i);
+
+        for (int i = 0; i < favoriteRoomList.size(); i++) {
+            assertThat(favoriteRoomList.get(i).getName())
+                    .isEqualTo(dummyRoomList.get(i).getName());
         }
     }
 
     @Test
     public void modifyRoomNameTest() {
-        Room room = roomMapper.selectRoomByCode("123ZXCa0");
-        roomMapper.modifyRoomName(room.getId(), "계란빵방");
-        String modifiedName = roomMapper.selectRoomByCode("123ZXCa0").getName();
-        assertThat(modifiedName).isEqualTo("계란빵방");
+        dummyRoomList.forEach(room -> {
+            roomMapper.modifyRoomName(room.getId(), "newName");
+        });
+
+        dummyRoomList.forEach(room -> {
+            String modifiedName = roomMapper.selectRoomByCode(room.getInvitationCode()).getName();
+            assertThat(modifiedName).isEqualTo("newName");
+        });
     }
 
     @Test
     public void insertTodayPickTest() {
-        Room room = roomMapper.selectRoomByCode("123ZXCa0");
-        Menu menu = Menu.builder()
-                .roomId(room.getId())
-                .name("명가 돌솥 설렁탕")
-                .thumbnail("test")
-                .soberComment("냉맛평")
-                .latitude(123.12345)
-                .longitude(123.1234)
-                .build();
-        menuMapper.insertMenu(menu);
-        menuMapper.insertTodayPick(room.getId(), menu.getId());
-        Room roomAfterInsertTodayPick = roomMapper.selectRoomByCode("123ZXCa0");
-        assertThat(roomAfterInsertTodayPick.getTodayPick().getId()).isEqualTo(menu.getId());
+        User user = userMapper.selectUserByEmail(dummyUser.getEmail());
+        dummyRoomList.forEach(room -> {
+            Menu menu = TestUtils.getDummyMenu(room.getId(), user.getId());
+            menuMapper.insertMenu(menu);
+            menuMapper.insertTodayPick(room.getId(), menu.getId());
+            Room roomAfterInsertTodayPick = roomMapper.selectRoomByCode(room.getInvitationCode());
+            assertThat(roomAfterInsertTodayPick.getTodayPick().getId()).isEqualTo(menu.getId());
 
-        menuMapper.deleteTodayPick(room.getId());
-        Room roomAfterTodayPickDelete = roomMapper.selectRoomByCode("123ZXCa0");
-        assertThat(roomAfterTodayPickDelete.getTodayPick().getId()).isNotEqualTo(menu.getId());
+            menuMapper.deleteTodayPick(room.getId());
+            Room roomAfterTodayPickDelete = roomMapper.selectRoomByCode(room.getInvitationCode());
+            assertThat(roomAfterTodayPickDelete.getTodayPick().getId()).isNotEqualTo(menu.getId());
+        });
     }
 }

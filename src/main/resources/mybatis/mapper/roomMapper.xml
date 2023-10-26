@@ -8,7 +8,7 @@
         values (#{name}, #{invitationCode}, #{managerId})
     </insert>
 
-    <select id="selectRoomById" parameterType="String" resultType="com.kjy.gourmet.domain.room.Room">
+    <select id="selectRoomById" parameterType="long" resultType="com.kjy.gourmet.domain.room.Room">
         select *
         from room
         where id = #{id};
@@ -58,17 +58,6 @@
         from menu
         where room_id = #{roomId}
     </select>
-
-
-    <delete id="deleteAllRoom">
-        delete
-        from room;
-    </delete>
-
-    <delete id="deleteAllRoomFavorites">
-        delete
-        from room_favorites;
-    </delete>
 
     <resultMap id="roomResultMap" type="com.kjy.gourmet.domain.room.Room">
         <id property="id" column="id"/>
