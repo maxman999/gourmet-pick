@@ -106,14 +106,20 @@ const RoomConsole = (props: props) => {
                     </button>
                 </div>
             </div>
-            {roomCtx.roomPhase === RoomPhase.DEFAULT && !roomCtx.isMenuListEmpty &&
-                <Tooltip anchorSelect=".phase-call-btn" place="top" style={{zIndex: '9998'}}>
+            {roomCtx.roomPhase === RoomPhase.DEFAULT && !roomCtx.isMenuListEmpty && _.isEmpty(roomCtx.roomInfo.todayPick) &&
+                <Tooltip anchorSelect=".phase-call-btn"
+                         place="top"
+                         isOpen={true}
+                         style={{zIndex: '1021'}}>
                     버튼을 누르면 투표를 진행할 수 있습니다.
                 </Tooltip>
             }
             {roomCtx.roomPhase === RoomPhase.CALLING &&
-                <Tooltip anchorSelect=".phase-start-btn" place="top" style={{zIndex: '9998'}}>
-                    일정 수 이상 입장하거나, 투표 요청자에 의해 투표를 시작할 수 있습니다.
+                <Tooltip anchorSelect=".phase-start-btn"
+                         place="top"
+                         isOpen={true}
+                         style={{zIndex: '1021'}}>
+                    과반 이상 입장 또는 방장에 의해 투표를 시작할 수 있습니다.
                 </Tooltip>
             }
             {isTodayPickTooltipShow &&

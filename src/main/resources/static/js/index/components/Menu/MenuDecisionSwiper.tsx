@@ -1,25 +1,23 @@
 import "./MenuDecisionSwiper.css"
 import {IMenu} from "../../types/IMenu";
 import MenuItem from "./MenuItem";
-import {EffectCube, Scrollbar} from "swiper";
+import {EffectCube} from "swiper";
 import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
 import "swiper/css/effect-cube";
+import "swiper/css/pagination";
 import GourmetTable from "../VotingTable/GourmetTable";
 import Timer from "../VotingTable/Timer";
 import {memo, useEffect, useState} from "react";
 import axios from "axios";
 
-interface props {
-    menuList: IMenu[];
-}
 
-const MenuDecisionSwiper = (props: props) => {
-    const [candidateItem, setCandidateItem] = useState<IMenu[]>([]);
+const MenuDecisionSwiper = () => {
+    const [candidateItems, setCandidateItems] = useState<IMenu[]>([]);
 
     const getTodayMenuList = async () => {
         const {data: todayMenuList} = await axios.get('/voting/getTodayMenuList');
-        setCandidateItem(todayMenuList);
+        setCandidateItems(todayMenuList);
     }
 
     useEffect(() => {
@@ -28,24 +26,18 @@ const MenuDecisionSwiper = (props: props) => {
 
     return (
         <>
-            {(candidateItem.length > 0) &&
+            {(candidateItems.length > 0) &&
                 <Swiper
                     key={Math.random()}
                     effect={"cube"}
-                    cubeEffect={{
-                        shadow: true,
-                        slideShadows: true,
-                        shadowOffset: 20,
-                        shadowScale: 0.94,
-                    }}
-                    scrollbar={{hide: true,}}
                     loop={false}
+                    lazy={true}
                     allowTouchMove={false}
-                    modules={[Scrollbar, EffectCube]}
+                    modules={[EffectCube]}
                     className="menuDecisionSwiper slide-in"
                 >
                     {/* 메뉴 슬라이드 */}
-                    {candidateItem?.map((menuItem: IMenu) => {
+                    {candidateItems?.map((menuItem: IMenu) => {
                         return (
                             <SwiperSlide key={menuItem.id}>
                                 <MenuItem menu={menuItem}/>
@@ -53,8 +45,8 @@ const MenuDecisionSwiper = (props: props) => {
                         );
                     })}
                     {/* 투표 영역 */}
-                    <Timer/>
-                    <GourmetTable menuList={props.menuList}/>
+                    <Timer listSize={candidateItems.length}/>
+                    <GourmetTable menuList={candidateItems}/>
                 </Swiper>
             }
         </>

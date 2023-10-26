@@ -1,6 +1,6 @@
 .swiper-timer__wrapper {
     z-index: 10;
     position: absolute;
-    top: 4%;
-    left: 85%;
+    top: 5%;
+    right: 5%;
 }

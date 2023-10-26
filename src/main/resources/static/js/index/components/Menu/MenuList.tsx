@@ -1,5 +1,4 @@
 import {useContext, useEffect, useState} from "react";
-import MenuInput from "./MenuInput";
 import {IMenu} from "../../types/IMenu";
 import axios from "axios";
 import MenuDisplaySwiper from "./MenuDisplaySwiper";
@@ -54,7 +53,7 @@ const MenuList = () => {
                 </>
             }
             {!(roomCtx.roomPhase === RoomPhase.DEFAULT) &&
-                <MenuDecisionSwiper menuList={menuList}/>
+                <MenuDecisionSwiper/>
             }
         </MenuContainer>
     );

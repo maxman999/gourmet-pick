@@ -7,6 +7,7 @@ import com.kjy.gourmet.service.voting.dto.Ballot;
 import com.kjy.gourmet.service.voting.VotingService;
 import com.kjy.gourmet.utils.AuthUtil;
 import com.kjy.gourmet.web.dto.WebSocketUser;
+import com.mysql.cj.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -47,7 +48,6 @@ public class VotingApiController {
     public void register(WebSocketUser webSocketUser, SimpMessageHeaderAccessor headerAccessor) {
         String userEmail = AuthUtil.extractUserEmailFromSimpHeader(headerAccessor);
         votingService.userRegisterHandler(userEmail, webSocketUser);
-        log.info("{}번 방에 {}님 입장", webSocketUser.getRoomId(), webSocketUser.getNickname());
     }
 
     @MessageMapping("/voting/create/{userId}/{roomId}")

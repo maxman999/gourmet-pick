@@ -30,9 +30,10 @@ const MapUploadTool = (props: props) => {
     }
 
     const searchClickHandler = _.debounce(() => {
-        const inputValue = placeSearchInputRef.current.value;
+        const inputValue = placeSearchInputRef.current.value.trim();
+        if (inputValue.length === 0) return;
         setSearchKeyword(inputValue);
-    },200);
+    }, 300);
 
     const placeClickHandler = (index: number) => {
         const targetEl = placeListRefs.current[index] as HTMLElement;
@@ -65,7 +66,6 @@ const MapUploadTool = (props: props) => {
 
         ps.keywordSearch(searchKeyword, (data, status, _pagination) => {
             setSearchResult(data)
-            console.log({searchResult})
             if (status === kakao.maps.services.Status.OK) {
                 // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
                 // LatLngBounds 객체에 좌표를 추가합니다
@@ -130,6 +130,7 @@ const MapUploadTool = (props: props) => {
                                onKeyDown={(e) => CommonUtils.handleEnterKeyPress(e, searchClickHandler)}
                                placeholder={'검색어를 입력해주세요'}
                                ref={placeSearchInputRef}
+                               onChange={searchClickHandler}
                         />
                         <button className="btn btn-success btn-sm" onClick={searchClickHandler}>O</button>
                     </div>

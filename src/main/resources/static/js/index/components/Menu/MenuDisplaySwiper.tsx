@@ -1,14 +1,14 @@
-import {Swiper, SwiperSlide} from "swiper/react";
-import {Autoplay, Scrollbar, EffectCube} from "swiper";
+import './MenuDisplaySwiper.css';
 import "swiper/css";
 import "swiper/css/effect-cube";
 import {IMenu} from "../../types/IMenu";
-import MenuItem from "./MenuItem";
-import './MenuDisplaySwiper.css';
-import EmptyBox from "../UI/EmptyBox";
 import {useContext} from "react";
-import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
+import roomContext from "../../store/room-context";
+import {Swiper, SwiperSlide} from "swiper/react";
+import {Autoplay, EffectCube} from "swiper";
+import MenuItem from "./MenuItem";
+import EmptyBox from "../UI/EmptyBox";
 import MenuInput from "./MenuInput";
 
 interface props {
@@ -26,10 +26,10 @@ const MenuDisplaySwiper = (props: props) => {
     return (
         <>
             {props.menuList !== null && roomCtx.isMenuListEmpty &&
-                <div className='card mt-3 p-3'>
-                    <div className='row mb-2 align-self-center'>
-                        <EmptyBox minHeight={"360px"}
-                                  width={"360px"}
+                <div className='menuEmptyBox card mt-5 p-3'>
+                    <div className='row mb-2 align-self-center w-100'>
+                        <EmptyBox minHeight={"400px"}
+                                  width={"100%"}
                                   clickHandler={menuAddingHandler}
                                   caption={"등록된 메뉴가 없습니다."}/>
                     </div>
@@ -41,15 +41,9 @@ const MenuDisplaySwiper = (props: props) => {
                         key={Math.random()}
                         effect={"cube"}
                         grabCursor={true}
-                        cubeEffect={{
-                            shadow: true,
-                            slideShadows: true,
-                            shadowOffset: 20,
-                            shadowScale: 0.94,
-                        }}
-                        autoplay={{delay: 3000}}
-                        scrollbar={{hide: true,}}
-                        modules={[Autoplay, EffectCube, Scrollbar]}
+                        autoplay={{delay: 4000}}
+                        lazy={true}
+                        modules={[Autoplay, EffectCube]}
                         className={'menuDisplaySwiper'}
                     >
                         {props.menuList?.map((menuItem: IMenu) => {

@@ -9,6 +9,7 @@ import com.kjy.gourmet.service.voting.dto.Message;
 import com.kjy.gourmet.service.voting.dto.VotingSession;
 import com.kjy.gourmet.service.voting.dto.VotingStatus;
 import com.kjy.gourmet.web.dto.WebSocketUser;
+import com.mysql.cj.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -42,6 +43,7 @@ public class VotingServiceImpl implements VotingService {
         // 최초 입장시 방 동기화(투표 진행 여부 검사)
         if (votingSessions.containsKey(roomId)) {
             userSeatingHandler(sessionId, roomId, webSocketUser.getId());
+            log.info("{}번 방에 {}님 입장", webSocketUser.getRoomId(), webSocketUser.getNickname());
         }
     }
 

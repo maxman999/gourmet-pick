@@ -1,5 +1,6 @@
 import "./SimpleUpdateForm.css"
 import {useRef} from "react";
+import CommonUtils from "../../utils/CommonUtils";
 
 type props = {
     title: string;
@@ -24,6 +25,7 @@ const SimpleUpdateForm = (props: props) => {
                        className="form-control"
                        id="titleUpdateInput"
                        ref={roomNameInputRef}
+                       onKeyDown={(e) => CommonUtils.handleEnterKeyPress(e, submitHandler)}
                        maxLength={props.maxLength ? props.maxLength : 10}
                        placeholder={props.placeholder}/>
             </div>

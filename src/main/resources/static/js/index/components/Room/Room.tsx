@@ -24,8 +24,12 @@ const Room = () => {
     const [todayPickPopupFlag, setTodayPickPopupFlag] = useState(!_.isEmpty(roomCtx.roomInfo.todayPick));
 
     const voteFinishingModalCloseHandler = () => {
-        roomCtx.changeVotingStatus(VotingStatus.GATHERING);
-        roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
+        if (roomCtx.votingStatus !== VotingStatus.GATHERING) {
+            roomCtx.changeVotingStatus(VotingStatus.GATHERING);
+        }
+        if (roomCtx.roomPhase !== RoomPhase.DEFAULT) {
+            roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
+        }
         setIsTodayPickElected(false);
         setTodayPickPopupFlag(false);
     }
@@ -54,7 +58,9 @@ const Room = () => {
                 roomCtx.setVotingGourmets(seatingUsers);
                 if (!isMyMessage) {
                     const filteredList = seatingUsers.filter(user => user.id !== sessionUser.id);
-                    CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
+                    if (Swal.isVisible()) {
+                        CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
+                    }
                 }
                 break;
             case 'CANCEL':
@@ -72,6 +78,7 @@ const Room = () => {
                     text: '방장이 투표를 시작했습니다!',
                     timer: 2000,
                     timerProgressBar: true,
+                    allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading()
                     },
@@ -156,7 +163,7 @@ const Room = () => {
             </RoomContainer>
             {(todayPickPopupFlag || isTodayPickElected) &&
                 <Modal onClose={voteFinishingModalCloseHandler} top={"10%"}>
-                    <TodayPick menu={roomCtx.roomInfo.todayPick} modalCloseHandler={voteFinishingModalCloseHandler}/>
+                    <TodayPick modalCloseHandler={voteFinishingModalCloseHandler}/>
                 </Modal>
             }
         </>

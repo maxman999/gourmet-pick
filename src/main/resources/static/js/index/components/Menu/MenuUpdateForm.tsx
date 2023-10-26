@@ -256,7 +256,7 @@ const MenuUpdateForm = () => {
                         <div className='col-md-5'>
                             <>
                                 {thumbnail &&
-                                    <img className='menuThumbnail'
+                                    <img className='menuThumbnailUpdateForm'
                                          ref={thumbnailImgRef}
                                          src={!isThumbnailChanged ? `/api/menu/getMenuImageURL?fileName=${thumbnail}` : thumbnail}
                                          alt='메뉴 썸네일 미리보기'

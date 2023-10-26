@@ -15,7 +15,12 @@ public class AuthUtil {
         Object authToken = headerAccessor.getMessageHeaders().get("simpUser");
         if (authToken instanceof OAuth2AuthenticationToken) {
             OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authToken;
-            userEmail = (String) token.getPrincipal().getAttributes().get("email");
+            if (token.getAuthorizedClientRegistrationId().equals("kakao")) {
+                userEmail = token.getPrincipal().getAttributes().get("id") + "@kakao";
+            } else {
+                // google
+                userEmail = (String) token.getPrincipal().getAttributes().get("email");
+            }
         } else if (authToken instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authToken;
             userEmail = token.getName();

@@ -14,7 +14,6 @@
         insert into user(email, nickname, role)
         values (#{email}, #{nickname}, #{role})
         on duplicate key update email    = VALUES(email),
-                                nickname = VALUES(nickname),
                                 role     = VALUES(role)
     </insert>
 
