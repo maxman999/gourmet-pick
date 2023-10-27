@@ -58,11 +58,9 @@ const Room = () => {
                 roomCtx.setVotingGourmets(seatingUsers);
                 if (!isMyMessage) {
                     const filteredList = seatingUsers.filter(user => user.id !== sessionUser.id);
-                    if (Swal.isVisible()) {
-                        setTimeout(() => {
-                            CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
-                        }, 500);
-                    }
+                    setTimeout(() => {
+                        CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
+                    }, 500);
                 }
                 break;
             case 'CANCEL':
