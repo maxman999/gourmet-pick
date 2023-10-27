@@ -40,11 +40,11 @@ type websocketAction =
     | { type: "FINISH" }
     | { type: "DISCONNECT" };
 
-const WEBSOCKET_SERVER_URL: string = `${window.location.protocol}//${window.location.host}/ws`;
+const WEBSOCKET_SERVER_URL: string = `${window.location.protocol}//${window.location.hostname}:8080/ws`;
 let stompClient: Client = null;
 
 const onError = (err: any) => {
-    alert("서버와 통신할 수 없습니다. 잠시 후 다시 시도해주세요.");
+    alert("서버와 통신이 끊겼습니다. 잠시 후 다시 시도해주세요.");
     document.location.href = "/";
 }
 

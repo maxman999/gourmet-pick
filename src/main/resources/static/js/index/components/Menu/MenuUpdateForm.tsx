@@ -309,7 +309,7 @@ const MenuUpdateForm = () => {
                 </div>
             </div>
             {isUpdateModalPopped &&
-                <Modal
+                <Modal top={'3vh'}
                     onClose={modalCloseHandler}>
                     <MapUploadTool onLocationChange={locationChangeHandler}
                                    onModalClose={modalCloseHandler}

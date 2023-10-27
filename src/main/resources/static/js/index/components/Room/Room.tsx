@@ -59,7 +59,9 @@ const Room = () => {
                 if (!isMyMessage) {
                     const filteredList = seatingUsers.filter(user => user.id !== sessionUser.id);
                     if (Swal.isVisible()) {
-                        CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
+                        setTimeout(() => {
+                            CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
+                        }, 500);
                     }
                 }
                 break;

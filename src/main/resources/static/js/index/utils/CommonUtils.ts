@@ -60,18 +60,36 @@ class CommonUtils {
     }
 
     static copyToClipboard = (textToCopy: string, titleOnSuccess?: string) => {
-        navigator.clipboard.writeText(textToCopy)
-            .then(() => {
-                if (!titleOnSuccess) return;
-                Swal.fire({
-                    position: 'top',
-                    icon: 'success',
-                    timer: 2000,
-                    toast: true,
-                    title: titleOnSuccess,
-                    showConfirmButton: false,
-                });
+        if (navigator.clipboard === undefined) {
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            textarea.style.position = 'fixed';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            Swal.fire({
+                position: 'top',
+                icon: 'success',
+                timer: 2000,
+                toast: true,
+                title: titleOnSuccess || '',
+                showConfirmButton: false,
             });
+        } else {
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    if (!titleOnSuccess) return;
+                    Swal.fire({
+                        position: 'top',
+                        icon: 'success',
+                        timer: 2000,
+                        toast: true,
+                        title: titleOnSuccess,
+                        showConfirmButton: false,
+                    });
+                });
+        }
     }
 
     static copyInvitationCode = (invitationCode: string) => {

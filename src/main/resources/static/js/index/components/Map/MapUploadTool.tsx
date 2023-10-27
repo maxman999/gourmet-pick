@@ -37,10 +37,12 @@ const MapUploadTool = (props: props) => {
 
     const placeClickHandler = (index: number) => {
         const targetEl = placeListRefs.current[index] as HTMLElement;
-        // cleanup
+        if (!targetEl) return;
+
         placeListRefs.current.forEach(el => {
             el.style.backgroundColor = '';
         })
+        // cleanup
         targetEl.style.backgroundColor = 'aliceblue';
 
         const placeName = targetEl.dataset.placeName;
@@ -107,6 +109,7 @@ const MapUploadTool = (props: props) => {
                     }}
                     level={3}
                     onCreate={setMap}
+                    zoomable={false}
                 >
                     {markers.map((marker) => (
                         <MapMarker
