@@ -28,10 +28,10 @@ module.exports = {
     devServer: {
         static: './dist',
         hot: true,
-        host: "127.0.0.1",
+        host: "localhost",
         port: 3000,
         proxy: {
-            "**": "http://127.0.0.1:8080",
+            "**": "http://localhost:8080",
         }
     },
 }

@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf().disable().headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/getAuthenticatedUserId", "/css/**", "/images/**", "/js/**").permitAll()
+                .antMatchers("/", "/getAuthenticatedUserId", "/dist/**", "/css/**", "/images/**", "/js/**").permitAll()
                 .antMatchers("/api/**", "/ws/**").hasAnyRole(Role.USER.name(), Role.GUEST.name())
                 .anyRequest().authenticated()
                 .and()

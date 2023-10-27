@@ -40,7 +40,7 @@ type websocketAction =
     | { type: "FINISH" }
     | { type: "DISCONNECT" };
 
-const WEBSOCKET_SERVER_URL: string = 'http://127.0.0.1:8080/ws'
+const WEBSOCKET_SERVER_URL: string = `${window.location.protocol}//${window.location.host}/ws`;
 let stompClient: Client = null;
 
 const onError = (err: any) => {
@@ -62,6 +62,9 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
             },
             onError
         );
+
+        stompClient.debug = () => {
+        };
 
         return {
             ...state,
