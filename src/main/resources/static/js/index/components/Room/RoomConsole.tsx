@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowRightFromBracket, faEye} from "@fortawesome/free-solid-svg-icons";
 import {Tooltip} from "react-tooltip";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import websocketContext from "../../store/websocket-context";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
@@ -18,7 +18,8 @@ type props = {
 const RoomConsole = (props: props) => {
     const websocketAPIs = useContext(websocketContext);
     const roomCtx = useContext(roomContext);
-
+    const [isPhaseCallTooltipOpen, setIsPhaseCallTooltipOpen] = useState(true);
+    const [isPhaseStartTooltipOpen, setIsPhaseStartTooltipOpen] = useState(true);
     const isTodayPickTooltipShow = (roomCtx.roomPhase === RoomPhase.DEFAULT
         && !_.isEmpty(roomCtx.roomInfo.todayPick)
         && !props.todayPickPopupFlag
@@ -108,16 +109,18 @@ const RoomConsole = (props: props) => {
             </div>
             {roomCtx.roomPhase === RoomPhase.DEFAULT && !roomCtx.isMenuListEmpty && _.isEmpty(roomCtx.roomInfo.todayPick) &&
                 <Tooltip anchorSelect=".phase-call-btn"
-                         place="top"
-                         isOpen={true}
+                         place="bottom"
+                         isOpen={isPhaseCallTooltipOpen}
+                         afterShow={() => setTimeout(() => setIsPhaseCallTooltipOpen(false), 4000)}
                          style={{zIndex: '1021'}}>
-                    버튼을 누르면 투표를 진행할 수 있습니다.
+                    투표 세션을 생성하고, 투표를 진행할 수 있게 됩니다.
                 </Tooltip>
             }
             {roomCtx.roomPhase === RoomPhase.CALLING &&
                 <Tooltip anchorSelect=".phase-start-btn"
-                         place="top"
-                         isOpen={true}
+                         place="bottom"
+                         isOpen={isPhaseStartTooltipOpen}
+                         afterShow={() => setTimeout(() => setIsPhaseStartTooltipOpen(false), 4000)}
                          style={{zIndex: '1021'}}>
                     과반 이상 입장 또는 방장에 의해 투표를 시작할 수 있습니다.
                 </Tooltip>

@@ -20,7 +20,7 @@ const App = () => {
         const isAuthenticated = !!user;
         if (user) {
             const {data: myRoomList}: { data: IRoom[] } = await axios.get(`/api/room/getMyRoomList?userId=${user.id}`);
-            setMyRoomList(myRoomList);
+            if (Array.isArray(myRoomList)) setMyRoomList(myRoomList);
             sessionStorage.setItem('user', JSON.stringify(user));
         }
         setIsAuthenticated(isAuthenticated);

@@ -13,6 +13,7 @@ const MenuInput = () => {
             await Swal.fire({title: '메뉴는 15개 이상 등록할 수 없습니다.', icon: 'warning'});
             return;
         }
+        window.scroll(0,0);
         roomCtx.changeRoomPhase(RoomPhase.UPDATING);
     }
 

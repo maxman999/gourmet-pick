@@ -1,7 +1,6 @@
 package com.kjy.gourmet.config.auth;
 
 import com.kjy.gourmet.domain.user.Role;
-import com.kjy.gourmet.utils.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -39,22 +38,25 @@ public class SecurityConfig {
                 .antMatchers("/api/**", "/ws/**").hasAnyRole(Role.USER.name(), Role.GUEST.name())
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().successForwardUrl("/guest").permitAll()
+                .formLogin()
+                .successForwardUrl("/guest")
+                .failureForwardUrl("/logout")
+                .permitAll()
                 .and()
                 .logout().logoutSuccessUrl("/")
                 .and()
                 .oauth2Login()
                 .loginPage("/")
+                .failureUrl("/logout")
                 .userInfoEndpoint()
                 .userService(customOauth2UserService);
-
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         List<UserDetails> guests = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= 10; i++) {
             UserDetails guest = User.builder().username("GUEST#" + i)
                     .password(passwordEncoder().encode("GUEST#" + i))
                     .roles(Role.GUEST.name())

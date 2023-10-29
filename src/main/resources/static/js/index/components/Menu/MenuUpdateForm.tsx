@@ -42,8 +42,14 @@ const MenuUpdateForm = () => {
         const inputVal = menuNameInputRef.current.value.trim();
         const filteredInputVal = CommonUtils.filterHtmlTags(inputVal);
 
+        if (filteredInputVal.length === 0) {
+            setUploadBtnMessage('메뉴 이름이 입력되지 않았습니다.');
+            setIsMenuNameValid(false);
+            return;
+        }
+
         if (filteredInputVal.length > 15) {
-            setUploadBtnMessage('메뉴이름에 허용되지 않은 문자가 있습니다.');
+            setUploadBtnMessage('메뉴 이름에 허용되지 않은 문자가 있습니다.');
             setIsMenuNameValid(false);
             return;
         }
@@ -60,6 +66,13 @@ const MenuUpdateForm = () => {
 
     const soberCommentChangeHandler = _.debounce(() => {
         const filteredInputVal = CommonUtils.filterHtmlTags(soberCommentInputRef.current.value.trim());
+
+        if (filteredInputVal.length === 0) {
+            setIsSoberCommentValid(false);
+            setUploadBtnMessage('냉정한 한줄평이 입력되지 않았습니다.');
+            return;
+        }
+
         if (filteredInputVal.length > 30) {
             setIsSoberCommentValid(false);
             setUploadBtnMessage('한줄평에 허용되지 않은 문자가 있습니다.');
@@ -118,7 +131,7 @@ const MenuUpdateForm = () => {
         }
 
         if (!isMenuNameValid) {
-            btnMsg = "메뉴이름을 확인해주세요.";
+            btnMsg = "메뉴 이름을 확인해주세요.";
             isUploadPossible = false;
         }
 
@@ -310,7 +323,7 @@ const MenuUpdateForm = () => {
             </div>
             {isUpdateModalPopped &&
                 <Modal top={'3vh'}
-                    onClose={modalCloseHandler}>
+                       onClose={modalCloseHandler}>
                     <MapUploadTool onLocationChange={locationChangeHandler}
                                    onModalClose={modalCloseHandler}
                     />
