@@ -36,4 +36,5 @@
     border-radius: 10px;
     width: 320px;
     height: 320px;
+    max-width: 100%;
 }
