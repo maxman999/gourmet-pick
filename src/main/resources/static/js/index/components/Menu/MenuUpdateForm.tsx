@@ -13,6 +13,8 @@ import MenuContainer from "./MenuContainer";
 import RoomPhase from "../../types/RoomPhase";
 import {ILocationInfo} from "../../types/ILocationInfo";
 import Swal from "sweetalert2";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 
 const MenuUpdateForm = () => {
     const roomCtx = useContext(roomContext);
@@ -28,6 +30,7 @@ const MenuUpdateForm = () => {
     const [isUpdateModalPopped, setIsUpdateModalPopped] = useState(false);
     const [uploadBtnMessage, setUploadBtnMessage] = useState('')
     const [isUploadPossible, setIsUploadPossible] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const menuNameInputRef = useRef(null);
     const soberCommentInputRef = useRef(null);
@@ -154,6 +157,8 @@ const MenuUpdateForm = () => {
     }
 
     const submitClickHandler = _.debounce(async () => {
+        setIsSubmitting(true);
+
         const user = CommonUtils.getUserFromSession();
         const URL = `/api/menu/${isMenuModify ? 'update' : 'insert'}`;
 
@@ -180,6 +185,7 @@ const MenuUpdateForm = () => {
             CommonUtils.toaster(`메뉴가 ${isMenuModify ? '수정' : '등록'} 되었습니다!`, 'top');
         } else {
             await Swal.fire({title: '요청을 처리하지 못했습니다.', text: '잠시 후 다시 시도해주세요.', icon: 'error'});
+            setIsSubmitting(false);
         }
         roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
     }, 300);
@@ -193,7 +199,7 @@ const MenuUpdateForm = () => {
     }
 
     const setTargetMenuInfo = async (menuId: number) => {
-        const {data: menu}: { data: IMenu } = await axios.get(`api/menu/${menuId}`);
+        const {data:menu}:{data:IMenu} = await axios.get(`api/menu/${menuId}`);
         menu.name = CommonUtils.bringBackHtmlTags(menu.name);
         setMenuName(menu.name);
         setIsMenuNameValid(true);
@@ -308,15 +314,21 @@ const MenuUpdateForm = () => {
                         <button className="btn btn-outline-primary w-100"
                                 onClick={submitClickHandler}
                                 ref={submitButtonRef}
-                                disabled={!isUploadPossible}
+                                disabled={!isUploadPossible || isSubmitting}
                         >
-                            {uploadBtnMessage}
+                            {!isSubmitting && uploadBtnMessage}
+                            {isSubmitting &&
+                                <>
+                                    <FontAwesomeIcon icon={faSpinner} spinPulse size={'lg'}/>
+                                </>
+                            }
                         </button>
                     </div>
                     <div id={'updateCancelBtnWrap'} className={'col-md-2 mt-2 mb-3'}>
                         <button id={'updateCancelBtn'}
                                 className={'btn btn-outline-danger w-100'}
-                                onClick={updateCancelHandler}> 취소
+                                onClick={updateCancelHandler}
+                                disabled={isSubmitting}> 취소
                         </button>
                     </div>
                 </div>
