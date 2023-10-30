@@ -40,7 +40,9 @@ type websocketAction =
     | { type: "FINISH" }
     | { type: "DISCONNECT" };
 
-const WEBSOCKET_SERVER_URL: string = `${window.location.protocol}//${window.location.hostname}:8080/ws`;
+const currentProtocol = window.location.protocol;
+const currentPort = currentProtocol === 'https:' ? '443' : '8080';
+const WEBSOCKET_SERVER_URL: string = `${currentProtocol}//${window.location.hostname}:${currentPort}/ws`;
 let stompClient: Client = null;
 
 const onError = (err: any) => {
