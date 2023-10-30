@@ -55,8 +55,7 @@ const RoomConsole = (props: props) => {
         && _.isEmpty(roomCtx.roomInfo.todayPick);
 
 
-    const isVoteStartingPossible = roomCtx.roomPhase === RoomPhase.READY
-        || (roomCtx.roomPhase === RoomPhase.CALLING && roomCtx.callerFlag)
+    const isVoteStartingPossible = (roomCtx.roomPhase === RoomPhase.CALLING && roomCtx.callerFlag);
 
     const isVotingCancelPossible = roomCtx.roomPhase !== RoomPhase.DEFAULT
         && roomCtx.votingStatus === VotingStatus.GATHERING
@@ -122,7 +121,7 @@ const RoomConsole = (props: props) => {
                          isOpen={isPhaseStartTooltipOpen}
                          afterShow={() => setTimeout(() => setIsPhaseStartTooltipOpen(false), 4000)}
                          style={{zIndex: '1021'}}>
-                    과반 이상 입장 또는 방장에 의해 투표를 시작할 수 있습니다.
+                    방장의 요청으로 투표를 시작할 수 있습니다.
                 </Tooltip>
             }
             {isTodayPickTooltipShow &&

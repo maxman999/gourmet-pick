@@ -59,7 +59,7 @@ const Room = () => {
                 if (!isMyMessage) {
                     const filteredList = seatingUsers.filter(user => user.id !== sessionUser.id);
                     setTimeout(() => {
-                        CommonUtils.toaster(`${filteredList.pop()?.nickname}님이 입장하셨습니다.`, 'top');
+                        CommonUtils.toaster(`${payloadData.senderName}님이 입장하셨습니다.`, 'top');
                     }, 500);
                 }
                 break;
@@ -100,10 +100,6 @@ const Room = () => {
                 break
             case 'DISCONNECT':
                 const users = payloadData.data;
-                const currentUserCnt = users.length;
-                if (currentUserCnt < 2) {
-                    if (roomCtx.roomPhase === RoomPhase.STARTING) roomCtx.changeRoomPhase(RoomPhase.CALLING);
-                }
                 roomCtx.setVotingGourmets(users);
                 break
             case 'FAIL':
@@ -120,9 +116,14 @@ const Room = () => {
         }
     }
 
-    const onPrivateMessageHandler = (payload: any) => {
+    const onPrivateMessageHandler = async (payload: any) => {
         let payloadData = JSON.parse(payload.body);
         switch (payloadData.status) {
+            case 'PROMOTION' :
+                CommonUtils.toaster("방장이 나갔습니다. 권한을 위임받습니다.", "top", "info")
+
+                roomCtx.setCallerFlag(true);
+                break;
             default :
                 break;
         }

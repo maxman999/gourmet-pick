@@ -10,6 +10,7 @@ import GourmetTable from "../VotingTable/GourmetTable";
 import Timer from "../VotingTable/Timer";
 import {memo, useEffect, useState} from "react";
 import axios from "axios";
+import * as _ from "lodash";
 
 
 const MenuDecisionSwiper = () => {
@@ -17,6 +18,11 @@ const MenuDecisionSwiper = () => {
 
     const getTodayMenuList = async () => {
         const {data: todayMenuList} = await axios.get('/voting/getTodayMenuList');
+        if (_.isEmpty(todayMenuList)) {
+            alert("데이터를 불러올 수 없습니다. 다시 로그인해 주세요.");
+            document.location.reload();
+            return;
+        }
         setCandidateItems(todayMenuList);
     }
 

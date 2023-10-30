@@ -66,12 +66,12 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public void creatVotingSession(String sessionId, long roomId, long userId) {
-        if (!votingSessions.containsKey(roomId)) {
-            votingSessions.put(roomId, new VotingSession());
-        } else {
+        if (votingSessions.containsKey(roomId)) {
             log.error("기존에 지워지지 않은 투표 세션이 있었음 =====> 방번호 : {} / 세션 정보 : {}", roomId, votingSessions.get(roomId));
-            votingSessions.put(roomId, new VotingSession());
         }
+        votingSessions.put(roomId, new VotingSession());
+        votingSessions.get(roomId).setVotingCaller(userId);
+
         // 오늘의 투표 메뉴 선정
         List<Menu> todayMenuList = menuService.getTodayMenuList(roomId);
         votingSessions.get(roomId).setTodayMenuList(todayMenuList);
@@ -84,6 +84,10 @@ public class VotingServiceImpl implements VotingService {
 
     @Override
     public List<Menu> getTodayMenuListFromSession(SessionUser user) {
+        if (!sessionMapper.containsKey(user.getEmail())) {
+
+            return null;
+        }
         long roomId = sessionMapper.get(user.getEmail()).getRoomId();
         if (votingSessions.get(roomId) == null) return new ArrayList<>();
         return votingSessions.get(roomId).getTodayMenuList();
@@ -103,13 +107,9 @@ public class VotingServiceImpl implements VotingService {
         votingSessions.get(roomId).getUsers().add(sessionId);
         // 입장 유저 수 집계
         HashSet<String> users = votingSessions.get(roomId).getUsers();
-        Message userSeatingMsg = new Message("user", userId, "people", VotingStatus.SEATING, getUserNicknamesFromUserList(users));
+        String senderNickname = sessionMapper.get(sessionId).getNickname();
+        Message userSeatingMsg = new Message(senderNickname, userId, "people", VotingStatus.SEATING, getUserNicknamesFromUserList(users));
         simpMessagingTemplate.convertAndSend("/voting/" + roomId, userSeatingMsg);
-
-        if (users.size() >= ROOM_CAPACITY / 2) {
-            Message votingReadyMsg = new Message("user", userId, "people", VotingStatus.READY, users.size());
-            simpMessagingTemplate.convertAndSend("/voting/" + roomId, votingReadyMsg);
-        }
     }
 
     @Override
@@ -189,8 +189,17 @@ public class VotingServiceImpl implements VotingService {
             if (users.isEmpty()) {
                 votingSessions.remove(webSocketUser.getRoomId());
             } else {
-                Message message = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserList(users));
-                simpMessagingTemplate.convertAndSend("/voting/" + webSocketUser.getRoomId(), message);
+                Message disconnectionMessage = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserList(users));
+                simpMessagingTemplate.convertAndSend("/voting/" + webSocketUser.getRoomId(), disconnectionMessage);
+                // 방장의 연결이 끊긴 경우 권한 위임
+                boolean isVotingCaller = webSocketUser.getId() == targetRoomSessionStatus.getVotingCaller();
+                if (isVotingCaller) {
+                    String someoneInRoom = users.stream().findFirst().orElse(null);
+                    long someonesId = sessionMapper.get(someoneInRoom).getId();
+                    targetRoomSessionStatus.setVotingCaller(someonesId);
+                    Message promotionMessage = new Message("server", 0, "person", VotingStatus.PROMOTION, getUserNicknamesFromUserList(users));
+                    simpMessagingTemplate.convertAndSendToUser(someonesId + "", "/private", promotionMessage);
+                }
             }
         }
         // 연결이 끊긴 유저의 세션 정리
