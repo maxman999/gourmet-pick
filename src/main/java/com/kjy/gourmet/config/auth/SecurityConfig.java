@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+                .loginPage("/")
                 .successForwardUrl("/guest")
                 .failureForwardUrl("/logout")
                 .permitAll()
