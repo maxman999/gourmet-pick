@@ -3,6 +3,8 @@ package com.kjy.gourmet.service.menu;
 import com.kjy.gourmet.domain.menu.Menu;
 import com.kjy.gourmet.domain.menu.dto.MenuThumbnail;
 import com.kjy.gourmet.mapper.MenuMapper;
+import com.kjy.gourmet.service.voting.dto.Message;
+import com.kjy.gourmet.service.voting.dto.VotingStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnailator;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
@@ -32,7 +35,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class MenuServiceImpl implements MenuService {
+
     private final MenuMapper menuMapper;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Value("${gourmet.upload.path}")
     private String uploadPath;
@@ -54,7 +59,12 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public int deleteTodayPick(long roomId) {
-        return menuMapper.deleteTodayPick(roomId);
+        int deleteResult = menuMapper.deleteTodayPick(roomId);
+        if (deleteResult == 1) {
+            Message todayPickDeleteMessage = new Message("server", 0, "people", VotingStatus.RESET, 0);
+            simpMessagingTemplate.convertAndSend("/voting/" + roomId, todayPickDeleteMessage);
+        }
+        return deleteResult;
     }
 
     @Override
@@ -119,7 +129,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public ResponseEntity<byte[]> getMenuImageURL(String fileName) {
-        ResponseEntity<byte[]> result = null;
+        ResponseEntity<byte[]> result;
         try {
             String srcFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
             File file = new File(uploadPath + File.separator + srcFileName);

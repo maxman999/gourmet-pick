@@ -13,4 +13,5 @@ public enum VotingStatus {
     DENIED, // 방 접근 불가
     FAIL, // 투표 실패
     PROMOTION, // 방장 위임
+    RESET, // 투표 결과 초기화
 }

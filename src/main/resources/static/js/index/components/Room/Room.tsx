@@ -94,6 +94,12 @@ const Room = () => {
                 roomCtx.setVotingGourmets([]);
                 voteFinishingModalPopHandler(true);
                 break;
+            case 'RESET':
+                setTodayPickPopupFlag(false);
+                setIsTodayPickElected(false);
+                roomCtx.setTodayPick({} as IMenu);
+                CommonUtils.toaster("투표 결과가 초기화됐습니다.", 'top', 'info');
+                break
             case 'EXILE':
                 await Swal.fire({title: "방이 삭제되었습니다.", icon: 'warning'});
                 document.location.href = "/";
