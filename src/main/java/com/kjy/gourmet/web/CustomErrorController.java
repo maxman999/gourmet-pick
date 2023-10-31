@@ -3,6 +3,7 @@ package com.kjy.gourmet.web;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,12 @@ public class CustomErrorController implements ErrorController {
         int statusCode = Integer.parseInt(status.toString());
         String requestURI = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
         log.error("error ========>> requestURI : {}, httpStatus : {}", requestURI, statusCode);
+
+        // 주소에 '/' , ';' 포함된 경우 메인으로 리다이렉트
+        Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+        if (throwable instanceof RequestRejectedException) {
+            return "redirect:/";
+        }
 
         model.addAttribute("code", status.toString());
         model.addAttribute("msg", httpStatus.getReasonPhrase());
