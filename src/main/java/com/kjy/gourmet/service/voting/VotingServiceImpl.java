@@ -71,7 +71,6 @@ public class VotingServiceImpl implements VotingService {
         }
         votingSessions.put(roomId, new VotingSession());
         votingSessions.get(roomId).setVotingCaller(userId);
-
         // 오늘의 투표 메뉴 선정
         List<Menu> todayMenuList = menuService.getTodayMenuList(roomId);
         votingSessions.get(roomId).setTodayMenuList(todayMenuList);
@@ -177,34 +176,38 @@ public class VotingServiceImpl implements VotingService {
     public void disconnectSession(String sessionId) {
         WebSocketUser webSocketUser = sessionMapper.get(sessionId);
         if (webSocketUser == null) {
-            log.warn("cannot find webSocketUser");
+            log.warn("cannot find webSocketUser sessionId : {}", sessionId);
             return;
         }
         VotingSession targetRoomSessionStatus = votingSessions.get(webSocketUser.getRoomId());
-        // 해당 유저와 관련된 투표 세션이 있다면 정리해줌
-        if (targetRoomSessionStatus != null) {
-            HashSet<String> users = targetRoomSessionStatus.getUsers();
-            users.remove(sessionId);
-            // 투표 세션에 참여중인 유저의 연결이 모두 끊어지면 투표 세션 자체를 없애버림
-            if (users.isEmpty()) {
-                votingSessions.remove(webSocketUser.getRoomId());
-            } else {
-                Message disconnectionMessage = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserList(users));
-                simpMessagingTemplate.convertAndSend("/voting/" + webSocketUser.getRoomId(), disconnectionMessage);
-                // 방장의 연결이 끊긴 경우 권한 위임
-                boolean isVotingCaller = webSocketUser.getId() == targetRoomSessionStatus.getVotingCaller();
-                if (isVotingCaller) {
-                    String someoneInRoom = users.stream().findFirst().orElse(null);
-                    long someonesId = sessionMapper.get(someoneInRoom).getId();
-                    targetRoomSessionStatus.setVotingCaller(someonesId);
-                    Message promotionMessage = new Message("server", 0, "person", VotingStatus.PROMOTION, getUserNicknamesFromUserList(users));
-                    simpMessagingTemplate.convertAndSendToUser(someonesId + "", "/private", promotionMessage);
-                }
-            }
-        }
+        // 해당 유저와 관련된 투표세션이 있다면 정리해줌
+        if (targetRoomSessionStatus != null) cleanupRelativeSession(sessionId, targetRoomSessionStatus, webSocketUser);
         // 연결이 끊긴 유저의 세션 정리
         sessionMapper.remove(sessionId);
         log.info("Session disconnected : {}", sessionId);
+    }
+
+    private void cleanupRelativeSession(String sessionId, VotingSession targetRoomSessionStatus, WebSocketUser webSocketUser) {
+        HashSet<String> users = targetRoomSessionStatus.getUsers();
+        users.remove(sessionId);
+        // 투표 세션에 참여중인 유저의 연결이 모두 끊어지면 투표 세션 자체를 없애버림
+        if (users.isEmpty()) {
+            votingSessions.remove(webSocketUser.getRoomId());
+        } else {
+            Message disconnectionMessage = new Message("server", 0, "people", VotingStatus.DISCONNECT, getUserNicknamesFromUserList(users));
+            simpMessagingTemplate.convertAndSend("/voting/" + webSocketUser.getRoomId(), disconnectionMessage);
+            // 방장의 연결이 끊긴 경우 권한 위임
+            boolean isVotingCaller = webSocketUser.getId() == targetRoomSessionStatus.getVotingCaller();
+            if (isVotingCaller) delegateCallerGrant(targetRoomSessionStatus, users);
+        }
+    }
+
+    private void delegateCallerGrant(VotingSession targetRoomSessionStatus, HashSet<String> users) {
+        String someoneInRoom = users.stream().findFirst().orElse(null);
+        long someonesId = sessionMapper.get(someoneInRoom).getId();
+        targetRoomSessionStatus.setVotingCaller(someonesId);
+        Message promotionMessage = new Message("server", 0, "person", VotingStatus.PROMOTION, getUserNicknamesFromUserList(users));
+        simpMessagingTemplate.convertAndSendToUser(someonesId + "", "/private", promotionMessage);
     }
 
     private List<WebSocketUser> getUserNicknamesFromUserList(HashSet<String> users) {
