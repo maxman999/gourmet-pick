@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 public class Room {
     private long id;
     private String name;
@@ -14,6 +14,8 @@ public class Room {
     private long managerId;
     private Menu todayPick;
 
+    @Setter
     private boolean hasVotingSession;
+    @Setter
     private int currentVotingUserCnt;
 }

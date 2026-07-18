@@ -1,6 +1,5 @@
 package com.kjy.gourmet.config.auth;
 
-import com.kjy.gourmet.config.auth.LoginUser;
 import com.kjy.gourmet.config.auth.dto.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

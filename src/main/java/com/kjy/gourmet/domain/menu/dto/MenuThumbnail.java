@@ -1,12 +1,12 @@
 package com.kjy.gourmet.domain.menu.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class MenuThumbnail {
     private String uuid;

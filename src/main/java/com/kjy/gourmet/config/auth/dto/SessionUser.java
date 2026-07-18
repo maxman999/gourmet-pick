@@ -10,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Getter
 public class SessionUser implements Serializable {
+
     private final String email;
     private final String nickname;
     private final Role role;
