@@ -1,6 +1,6 @@
 import "./MyRoom.css";
 import {IRoom} from "../../types/IRoom";
-import {faStar, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCircleCheck, faStar, faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import MyRoomContainer from "./MyRoomContainer";
 import {useContext} from "react";
@@ -22,6 +22,7 @@ const MyRoom = (props: props) => {
     const roomCtx = useContext(roomContext);
     const navigate = useNavigate();
     const isManager = props.myRoom.managerId === props.userId;
+    const isTodayPickCompleted = !!props.myRoom.todayPick?.id;
 
     const enterRoomHandler = async () => {
         const room = await roomCtx.enterRoom(props.myRoom.invitationCode)
@@ -54,7 +55,7 @@ const MyRoom = (props: props) => {
     }
 
     return (
-        <MyRoomContainer>
+        <MyRoomContainer className={isTodayPickCompleted ? 'todayPickCompleted' : ''}>
             <div className={'roomInfo'}
                  data-room-id={props.myRoom.id}
                  onClick={enterRoomHandler}>
@@ -69,16 +70,30 @@ const MyRoom = (props: props) => {
                 </div>
                 <hr/>
                 <div className={'myRoomSessionInfo'}>
-                    {props.myRoom.hasVotingSession &&
-                        <>
-                            <div className={"mb-2"}>진행 가능한 투표가 있습니다! {props.myRoom.hasVotingSession}</div>
-                            <div className={"float-end"}>
+                    {isTodayPickCompleted &&
+                        <div className={'todayPickCompleteRow'}>
+                            <div className={'todayPickCompleteBadge'}>
+                                <FontAwesomeIcon icon={faCircleCheck}/>
+                                오늘의 픽
+                            </div>
+                            <div className={'todayPickMenuName'}>
+                                {CommonUtils.bringBackHtmlTags(props.myRoom.todayPick.name)}
+                            </div>
+                        </div>
+                    }
+                    {!isTodayPickCompleted && props.myRoom.hasVotingSession &&
+                        <div className={'votingSessionRow'}>
+                            <div className={'votingSessionBadge'}>
+                                <FontAwesomeIcon icon={faUser}/>
+                                투표 진행 중
+                            </div>
+                            <div className={'votingUserCount'}>
                                 <FontAwesomeIcon icon={faUser}
                                                  style={{color: "darkseagreen"}}/> x {props.myRoom.currentVotingUserCnt}
                             </div>
-                        </>
+                        </div>
                     }
-                    {!props.myRoom.hasVotingSession &&
+                    {!isTodayPickCompleted && !props.myRoom.hasVotingSession &&
                         <>
                             <div className={"mb-2"}>현재 진행중인 투표가 없습니다. {props.myRoom.hasVotingSession}</div>
                         </>

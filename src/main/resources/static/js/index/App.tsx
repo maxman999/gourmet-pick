@@ -12,11 +12,16 @@ import {IUser} from "./types/IUser";
 import {Navigate, Route, Routes, useNavigate, useParams} from "react-router-dom";
 import RoomPhase from "./types/RoomPhase";
 
-const Home = (props: { myRoomList: IRoom[], onRoomDelete: (roomId: number) => void }) => {
+const Home = (props: {
+    myRoomList: IRoom[],
+    onRoomDelete: (roomId: number) => void,
+    onRoomListRefresh: () => void,
+}) => {
     const roomCtx = useContext(roomContext);
 
     useEffect(() => {
         if (roomCtx.roomInfo) roomCtx.leaveRoom();
+        props.onRoomListRefresh();
     }, []);
 
     return (
@@ -61,24 +66,47 @@ const RoomRoute = (props: { mode: 'room' | 'new' | 'edit' }) => {
 }
 
 const App = () => {
+    const navigate = useNavigate();
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [myRoomList, setMyRoomList] = useState<IRoom[]>([]);
 
     const authenticateHandler = async () => {
-        const {data: user}: { data: IUser } = await axios.get("/getAuthenticatedUserId");
-        const isAuthenticated = !!user;
-        if (user) {
+        try {
+            const {data: user}: { data: IUser } = await axios.get("/getAuthenticatedUserId");
+            const hasValidUser = !!user && typeof user === 'object' && !!user.id;
+            if (!hasValidUser) {
+                sessionStorage.removeItem('user');
+                setIsAuthenticated(false);
+                navigate('/', {replace: true});
+                return;
+            }
+
             const {data: myRoomList}: { data: IRoom[] } = await axios.get(`/api/room/getMyRoomList?userId=${user.id}`);
             if (Array.isArray(myRoomList)) setMyRoomList(myRoomList);
             sessionStorage.setItem('user', JSON.stringify(user));
+            setIsAuthenticated(true);
+        } catch (error) {
+            sessionStorage.removeItem('user');
+            setMyRoomList([]);
+            setIsAuthenticated(false);
+            navigate('/', {replace: true});
         }
-        setIsAuthenticated(isAuthenticated);
     }
 
     const myRoomDeleteHandler = async (roomId: number) => {
         setMyRoomList((prevState => {
             return prevState.filter(room => room.id !== roomId);
         }));
+    }
+
+    const myRoomListRefreshHandler = async () => {
+        const user: IUser = JSON.parse(sessionStorage.getItem('user'));
+        if (!user?.id) return;
+
+        const {data: latestMyRoomList}: { data: IRoom[] } = await axios.get(
+            `/api/room/getMyRoomList?userId=${user.id}`
+        );
+        if (Array.isArray(latestMyRoomList)) setMyRoomList(latestMyRoomList);
     }
 
     useEffect(() => {
@@ -92,7 +120,11 @@ const App = () => {
                     {isAuthenticated &&
                         <MainFrame>
                             <Routes>
-                                <Route path={'/'} element={<Home myRoomList={myRoomList} onRoomDelete={myRoomDeleteHandler}/>}/>
+                                <Route path={'/'} element={
+                                    <Home myRoomList={myRoomList}
+                                          onRoomDelete={myRoomDeleteHandler}
+                                          onRoomListRefresh={myRoomListRefreshHandler}/>
+                                }/>
                                 <Route path={'/rooms/:invitationCode'} element={<RoomRoute mode={'room'}/>}/>
                                 <Route path={'/rooms/:invitationCode/menus/new'} element={<RoomRoute mode={'new'}/>}/>
                                 <Route path={'/rooms/:invitationCode/menus/:menuId/edit'} element={<RoomRoute mode={'edit'}/>}/>

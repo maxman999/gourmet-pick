@@ -128,7 +128,7 @@ const getRoomWithInspection = async (roomCode: string, userId: number) => {
             Swal.fire({title: '방이 존재하지 않습니다.', icon: 'warning'});
             break;
         case -3:
-            Swal.fire({title: '이미 투표가 시작된 방은 들어갈 수 없습니다.', icon: 'warning'});
+            Swal.fire({title: '투표가 시작된 방은 들어갈 수 없습니다.', icon: 'warning'});
             break;
         case -4:
             Swal.fire({title: '입장할 수 있는 정원을 초과했습니다.', icon: 'warning'});

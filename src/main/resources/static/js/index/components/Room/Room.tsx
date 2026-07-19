@@ -109,7 +109,7 @@ const Room = () => {
                 break
             case 'FAIL':
                 await Swal.fire({
-                    title: '투표 결과를 집계할 수 없습니다',
+                    title: '결과를 집계할 수 없습니다',
                     text: '아무도 투표하지 않은 것으로 보입니다.',
                     icon: 'warning',
                 });

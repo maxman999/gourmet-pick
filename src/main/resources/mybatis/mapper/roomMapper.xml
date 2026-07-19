@@ -33,11 +33,16 @@
         values (#{userId}, #{roomId});
     </insert>
 
-    <select id="selectFavoriteRoomList" parameterType="long" resultType="com.kjy.gourmet.domain.room.Room">
-        select user_id, room_id as id, name, invitation_code, manager_id
-        from room_favorites
-                 join room on room_favorites.room_id = room.id
-        where user_id = #{userId};
+    <select id="selectFavoriteRoomList" parameterType="long" resultMap="roomResultMap">
+        SELECT r.*, m.id AS menu_id, m.name AS menu_name, m.thumbnail,
+               m.sober_comment, m.longitude, m.latitude
+        FROM room_favorites rf
+                 JOIN room r ON rf.room_id = r.id
+                 LEFT JOIN today_pick tp
+                           ON r.id = tp.room_id
+                               AND DATE(tp.create_date) = CURDATE()
+                 LEFT JOIN menu m ON tp.menu_id = m.id
+        WHERE rf.user_id = #{userId};
     </select>
 
     <delete id="deleteFavoriteRoom" parameterType="long">
@@ -75,4 +80,3 @@
         </association>
     </resultMap>
 </mapper>
-
