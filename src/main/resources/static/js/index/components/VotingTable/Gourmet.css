@@ -1,23 +1,4 @@
-.gourmet-box {
-    text-align: center;
-}
-
-.gourmet-avatar {
-    color: gray;
-}
-
-.vote-light {
-    margin-top: 3px;
-    height: 10px;
-    border: 1px solid gray;
-}
-
-.nickName {
-    font-family: 'Arial', sans-serif;
-    font-weight: bold;
-    font-size: 10px;
-}
-
-.gourmet-avatar.active {
-    color: darkseagreen;
-}
+.gourmet-box { min-width: 54px; text-align: center; }
+.gourmet-avatar { display: grid; place-items: center; width: 30px; height: 30px; margin: 0 auto; border-radius: 50%; background: #f0ece8; color: #b7afa8; }
+.gourmet-avatar.active { background: rgba(56,138,100,.12); color: var(--gp-success); }
+.nickName { max-width: 68px; margin: 3px auto 0; overflow: hidden; color: var(--gp-muted); font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }

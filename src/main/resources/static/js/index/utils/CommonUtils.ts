@@ -93,11 +93,7 @@ class CommonUtils {
     }
 
     static copyInvitationCode = (invitationCode: string) => {
-        const hostname = window.location.hostname;
-        const port = window.location.port;
-        const protocol = window.location.protocol;
-        const fullCode = `${protocol}//${hostname}:${port}/?code=${invitationCode}`;
-        this.copyToClipboard(fullCode, '초대코드가 복사되었습니다.');
+        this.copyToClipboard(invitationCode, '초대코드가 복사되었습니다.');
     }
 
     static handleEnterKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>, callback: () => void) => {

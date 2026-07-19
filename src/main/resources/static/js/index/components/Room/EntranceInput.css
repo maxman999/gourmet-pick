@@ -1,5 +1,11 @@
-#entranceBtn {
-    border-color: cornflowerblue;
-    width: 100%;
+#invitationCodeInputWrapper { padding: clamp(20px, 4vw, 30px) !important; }
+#invitationCodeInputWrapper .form-label { margin-bottom: 12px; color: var(--gp-primary-dark); font-size: 12px; font-weight: 900; letter-spacing: .12em; }
+#invitationCodeInputWrapper .row { --bs-gutter-x: 10px; }
+#entranceBtn { width: 100%; border-color: var(--gp-primary); color: var(--gp-primary); }
+#entranceBtn:hover { background: var(--gp-primary-soft); }
+#emailHelp { margin-top: 10px; color: var(--gp-muted); }
+@media (max-width: 575.98px) {
+    #invitationCodeInputWrapper .row { display: grid; grid-template-columns: 1fr 52px; }
+    #invitationCodeInputWrapper [class*="col-sm"] { width: auto; }
+    #entranceBtn { height: 100%; }
 }
-

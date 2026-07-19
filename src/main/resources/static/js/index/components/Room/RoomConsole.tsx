@@ -1,5 +1,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowRightFromBracket, faEye} from "@fortawesome/free-solid-svg-icons";
+import {faArrowRightFromBracket, faBan, faEye, faPlay, faUsers} from "@fortawesome/free-solid-svg-icons";
+import "./RoomConsole.css";
 import {Tooltip} from "react-tooltip";
 import {useContext, useEffect, useState} from "react";
 import websocketContext from "../../store/websocket-context";
@@ -30,7 +31,7 @@ const RoomConsole = (props: props) => {
         roomCtx.setCallerFlag(true);
 
         Swal.fire({
-            title: '투표세션이 생성됐습니다',
+            title: '투표 세션이 생성됐습니다',
             text: '냉정한 미식가들을 불러주세요',
             icon: "success",
             timer: 2000,
@@ -71,40 +72,51 @@ const RoomConsole = (props: props) => {
 
     return (
         <>
-            <div className={"row"}>
-                <div className={"col"}>
-                    <button
-                        className='phaseBtn btn btn-sm btn-outline-success phase-call-btn'
-                        data-next-phase={RoomPhase.CALLING}
-                        disabled={!isGourmetCallPossible}
-                        onClick={gourmetCallHandler}> 미 식 콜
-                    </button>
-                </div>
-                <div className={"col"}>
-                    <button
-                        className='phaseBtn btn btn-sm btn-outline-success phase-start-btn'
-                        data-next-phase={RoomPhase.STARTING}
-                        disabled={!isVoteStartingPossible}
-                        onClick={gourmetVotingHandler}> 투 표 시 작
-                    </button>
-                </div>
-                {isVotingCancelPossible &&
-                    <div className={"col"}>
-                        <button
-                            className='phaseBtn btn btn-sm btn-outline-success phase-cancel-btn'
-                            data-next-phase={RoomPhase.STARTING}
-                            onClick={cancelVotingHandler}> 투 표 취 소
-                        </button>
-                    </div>
-                }
-                <div className={"col"}>
+            <div className={"roomConsole"}>
+                <div className={"roomConsoleItem roomConsoleExit"}>
                     <button
                         className={"phaseBtn btn btn-sm btn-outline-danger"}
                         onClick={exitHandler}
                     >
-                        나가기 <FontAwesomeIcon icon={faArrowRightFromBracket}/>
+                        <FontAwesomeIcon icon={faArrowRightFromBracket}/>
+                        <span>나가기</span>
                     </button>
                 </div>
+                {roomCtx.roomPhase !== RoomPhase.STARTING &&
+                    <>
+                        <div className={"roomConsoleItem"}>
+                            <button
+                                className='phaseBtn btn btn-sm btn-outline-success phase-call-btn'
+                                data-next-phase={RoomPhase.CALLING}
+                                disabled={!isGourmetCallPossible}
+                                onClick={gourmetCallHandler}>
+                                <FontAwesomeIcon icon={faUsers}/>
+                                <span>미식콜</span>
+                            </button>
+                        </div>
+                        <div className={"roomConsoleItem"}>
+                            <button
+                                className='phaseBtn btn btn-sm btn-outline-success phase-start-btn'
+                                data-next-phase={RoomPhase.STARTING}
+                                disabled={!isVoteStartingPossible}
+                                onClick={gourmetVotingHandler}>
+                                <FontAwesomeIcon icon={faPlay}/>
+                                <span>투표 시작</span>
+                            </button>
+                        </div>
+                    </>
+                }
+                {isVotingCancelPossible &&
+                    <div className={"roomConsoleItem"}>
+                        <button
+                            className='phaseBtn btn btn-sm btn-outline-secondary phase-cancel-btn'
+                            data-next-phase={RoomPhase.STARTING}
+                            onClick={cancelVotingHandler}>
+                            <FontAwesomeIcon icon={faBan}/>
+                            <span>투표 취소</span>
+                        </button>
+                    </div>
+                }
             </div>
             {roomCtx.roomPhase === RoomPhase.DEFAULT && !roomCtx.isMenuListEmpty && _.isEmpty(roomCtx.roomInfo.todayPick) &&
                 <Tooltip anchorSelect=".phase-call-btn"
@@ -112,7 +124,7 @@ const RoomConsole = (props: props) => {
                          isOpen={isPhaseCallTooltipOpen}
                          afterShow={() => setTimeout(() => setIsPhaseCallTooltipOpen(false), 4000)}
                          style={{zIndex: '1021'}}>
-                    투표 세션을 생성하고, 투표를 진행할 수 있게 됩니다.
+                    투표를 진행하기 위해, 미식가들을 호출합니다.
                 </Tooltip>
             }
             {roomCtx.roomPhase === RoomPhase.CALLING &&

@@ -9,7 +9,6 @@ import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, EffectCube} from "swiper";
 import MenuItem from "./MenuItem";
 import EmptyBox from "../UI/EmptyBox";
-import MenuInput from "./MenuInput";
 
 interface props {
     menuList: IMenu[];
@@ -55,7 +54,6 @@ const MenuDisplaySwiper = (props: props) => {
                             );
                         })}
                     </Swiper>
-                    <MenuInput/>
                 </>
             }
         </>

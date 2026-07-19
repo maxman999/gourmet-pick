@@ -1,0 +1,2 @@
+.roomInfo { height: 100%; }
+@media (max-width: 767.98px) { .roomWrapper { min-height: 150px; } }

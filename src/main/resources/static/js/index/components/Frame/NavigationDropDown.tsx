@@ -1,4 +1,3 @@
-import "./NavigationDropDown.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowRightFromBracket, faGear} from "@fortawesome/free-solid-svg-icons";
 import Modal from "../UI/Modal";

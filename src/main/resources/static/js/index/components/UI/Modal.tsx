@@ -27,10 +27,7 @@ const Backdrop = (props: BackdropProps) => {
 
 const ModalOverlay = (props: ModalOverlayProps) => {
     return (
-        <div className="custom-modal"
-             style={{
-                 top: props.top
-             }}>
+        <div className="custom-modal">
             <div className="content"
                  style={{
                      height: props.height,

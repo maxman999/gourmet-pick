@@ -1,78 +1,12 @@
-.signIn-wrap {
-    height: 100vh;
-    align-content: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.signIn-form {
-    align-items: center;
-    max-width: 390px;
-    margin-bottom: 100px;
-}
-
-.signIn-form hr {
-    width: 70%;
-}
-
-.signIn-header {
-    font-family: 'Roboto', sans-serif;
-    font-size: 30px;
-}
-
-.signIn-hint {
-    font-size: 13px;
-    color: gray;
-}
-
-.login-title-wrap{
-    margin-bottom: 40px;
-}
-
-.login-title {
-    font-family: 'Arial', sans-serif;
-    font-size: 3rem;
-    font-weight: bold;
-    color: #333333;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.login-title-sub{
-    font-size: 1.1rem;
-    color: gray;
-}
-
-.social-btn-wrap {
-    border-top: 1px solid gainsboro;
-    border-bottom: 1px solid gainsboro;
-    padding: 20px 0 20px 0;
-    margin: 20px 0 20px 0;
-}
-
-.social-btn {
-    padding: 13px;
-    margin-bottom: 5px;
-    background-color: transparent;
-    border: 1px solid black;
-    width: 80%;
-}
-
-.social-btn svg {
-    margin-right: 10px;
-}
-
-.social-btn-text {
-    font-size: 17px;
-}
-
-.google-btn {
-    color: red;
-}
-
-.kakao-btn {
-    color: #fabe43;
-}
-
-.guest-btn {
-    color: gray;
-}
+.signIn-wrap { min-height: 100dvh; margin: 0; padding: 40px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.signIn-form { width: min(100%, 410px); margin: 0; padding: clamp(20px, 5vw, 34px) !important; }
+.login-title-wrap { margin-bottom: 32px; }
+.login-title { color: var(--gp-ink); font-size: clamp(2.4rem, 9vw, 4rem); font-weight: 950; letter-spacing: -.07em; line-height: 1; }
+.login-title::after { content: "."; color: var(--gp-primary); }
+.login-title-sub { margin-top: 14px; color: var(--gp-muted); font-size: 1rem; }
+.social-btn-wrap { margin: 0 0 20px; padding: 0; border: 0; }
+.social-btn { width: 100%; min-height: 52px; margin-bottom: 10px; padding: 13px 16px; border: 1px solid var(--gp-line); border-radius: 13px; background: white; color: var(--gp-ink); font-weight: 600; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+.social-btn:hover { transform: translateY(-2px); border-color: #d7cec6; background: var(--gp-background); }
+.social-btn svg { margin-right: 10px; }.google-btn svg { color: #dc4e41; }.kakao-btn svg { color: #d49a00; }.guest-btn svg { color: var(--gp-muted); }
+.social-btn-text { font-size: 15px; }.signIn-hint { color: var(--gp-muted); font-size: 12px; }
+@media (max-width: 575.98px) { .signIn-wrap { justify-content: flex-start; padding-top: max(11vh, 54px); }.login-title-wrap { margin-bottom: 26px; } }

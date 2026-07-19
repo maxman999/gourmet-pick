@@ -29,8 +29,9 @@ const TodayPick = (props: props) => {
                     <div className={'todayPickResetBtn btn btn-sm btn-danger'}
                          onClick={todayPickResetHandler}>
                         <FontAwesomeIcon icon={faRotateLeft}/>
+                        <span>초기화</span>
                     </div>
-                    <Tooltip anchorSelect={'.todayPickResetBtn'} style={{background: '#dc3545'}}>
+                    <Tooltip anchorSelect={'.todayPickResetBtn'} style={{background: 'var(--gp-danger)'}}>
                         <small>오늘의 투표 결과를 삭제합니다.</small> <br/>
                         <small>다시 투표가 가능해집니다.</small>
                     </Tooltip>

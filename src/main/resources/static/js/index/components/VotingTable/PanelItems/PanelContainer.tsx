@@ -7,7 +7,7 @@ type props = {
 const PanelContainer = (props: props) => {
 
     return (
-        <div className='row mt-3 p-3'>
+        <div className='votePanelContainer card'>
             {props.children}
         </div>
     )

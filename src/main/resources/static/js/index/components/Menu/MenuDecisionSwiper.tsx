@@ -8,12 +8,15 @@ import "swiper/css/effect-cube";
 import "swiper/css/pagination";
 import GourmetTable from "../VotingTable/GourmetTable";
 import Timer from "../VotingTable/Timer";
-import {memo, useEffect, useState} from "react";
+import {memo, useContext, useEffect, useState} from "react";
 import axios from "axios";
 import * as _ from "lodash";
+import roomContext from "../../store/room-context";
+import VotingStatus from "../../types/VotingStatus";
 
 
 const MenuDecisionSwiper = () => {
+    const roomCtx = useContext(roomContext);
     const [candidateItems, setCandidateItems] = useState<IMenu[]>([]);
 
     const getTodayMenuList = async () => {
@@ -34,11 +37,10 @@ const MenuDecisionSwiper = () => {
         <>
             {(candidateItems.length > 0) &&
                 <Swiper
-                    key={Math.random()}
                     effect={"cube"}
                     loop={false}
                     lazy={true}
-                    allowTouchMove={false}
+                    allowTouchMove={roomCtx.votingStatus === VotingStatus.GATHERING}
                     modules={[EffectCube]}
                     className="menuDecisionSwiper slide-in"
                 >

@@ -6,7 +6,7 @@ type props = {
 
 const MyRoomContainer = (props: props) => {
     return (
-        <div className={'col-md-3 mt-3'}>
+        <div className={'col-12 col-sm-6 col-lg-4 mt-3'}>
             <div className={'roomWrapper card p-3'}>
                 {props.children}
             </div>

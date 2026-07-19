@@ -35,8 +35,13 @@ const MyRoomList = (props: props) => {
     }
 
     return (
-        <>
-            <div className={'row mt-3'}>
+        <section className={'myRoomSection'} aria-labelledby={'myRoomSectionTitle'}>
+            <div className={'myRoomSectionHeader'}>
+                <span className={'myRoomSectionLine'} aria-hidden={'true'}></span>
+                <h2 id={'myRoomSectionTitle'}>내가 참여 중인 모임</h2>
+                <span className={'myRoomSectionLine'} aria-hidden={'true'}></span>
+            </div>
+            <div className={'row myRoomGrid'}>
                 {props.myRoomList.map(myRoom => {
                     return <MyRoom key={myRoom.id}
                                    myRoom={myRoom}
@@ -47,7 +52,7 @@ const MyRoomList = (props: props) => {
                     <EmptyBox clickHandler={createRoomHandler} minHeight={"100%"} caption={"투표방 새로 만들기"}/>
                 </MyRoomContainer>
             </div>
-        </>
+        </section>
 
     )
 }

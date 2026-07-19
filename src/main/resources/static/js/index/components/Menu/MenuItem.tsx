@@ -56,7 +56,7 @@ const MenuItem = (props: props) => {
 
     return (
         <div className='menuItemWrapper card mt-3 p-3'>
-            <div className='row mb-2'>
+            <div className='row'>
                 <div className='col menu-title'>
                     <div>
                         <span dangerouslySetInnerHTML={{__html: props.menu.name}}></span>
@@ -64,13 +64,13 @@ const MenuItem = (props: props) => {
                 </div>
                 {isMenuConsoleActive &&
                     <div className='col text-end p-1'>
-                        <button className={'btn btn-sm btn-outline-secondary locationBtn'}
+                        <button className={'btn btn-sm gp-icon-button locationBtn'}
                                 onClick={getLocationHandler}
                         >
                             <FontAwesomeIcon icon={faMapLocationDot}/>
                         </button>
                         <button
-                            className='btn btn-sm btn-outline-secondary menuUpdateBtn'
+                            className='btn btn-sm gp-icon-button menuUpdateBtn'
                             data-id={props.menu.id}
                             data-thumbnail={props.menu.thumbnail}
                             ref={menuDeleteBtnRef}
@@ -78,7 +78,7 @@ const MenuItem = (props: props) => {
                             <FontAwesomeIcon icon={faPen}/>
                         </button>
                         <button
-                            className='btn btn-sm btn-outline-secondary menuDeleteBtn'
+                            className='btn btn-sm gp-icon-button menuDeleteBtn'
                             data-id={props.menu.id}
                             data-thumbnail={props.menu.thumbnail}
                             ref={menuUpdateBtnRef}
@@ -88,17 +88,17 @@ const MenuItem = (props: props) => {
                     </div>
                 }
             </div>
-            <div className={"row mt-2"}>
-                <div className='col text-center'>
+            <div className={'menuContent'}>
+                <div className='menuMedia'>
                     <img className='menuThumbnail'
                          src={`/api/menu/getMenuImageURL?fileName=${props.menu.thumbnail}`}
                          alt='메뉴 썸네일'
                          loading="lazy"/>
-                    <hr/>
+                </div>
+                <div className={'menuReview'}>
                     <div>
-                        <div id={'soberCommentTitle'}>냉정한 한줄평</div>
-                        <span id={'soberCommentInput'}
-                              className={'w-100'}
+                        <div className={'soberCommentTitle'}>냉정한 한줄 평</div>
+                        <span className={'soberCommentContent'}
                               dangerouslySetInnerHTML={{__html: props.menu.soberComment}}>
                         </span>
                     </div>

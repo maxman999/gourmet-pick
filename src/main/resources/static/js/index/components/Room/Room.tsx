@@ -1,4 +1,3 @@
-import './Room.css';
 import {useContext, useEffect, useState} from "react";
 import RoomHeader from "./RoomHeader";
 import MenuList from "../Menu/MenuList";

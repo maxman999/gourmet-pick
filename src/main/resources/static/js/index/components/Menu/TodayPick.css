@@ -1,74 +1,10 @@
-.ribbon {
-    position: absolute;
-    right: -5px;
-    top: -7px;
-    z-index: 1;
-    overflow: hidden;
-    width: 100px;
-    height: 100px;
-    text-align: right;
-}
-
-.ribbon span {
-    font-size: 12px;
-    font-weight: bold;
-    color: #FFF;
-    text-transform: uppercase;
-    text-align: center;
-    line-height: 24px;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-    width: 140px;
-    display: block;
-    background: #ff6f61;
-    box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
-    position: absolute;
-    top: 29px;
-    right: -31px;
-}
-
-.ribbon span::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 100%;
-    z-index: -1;
-    border-left: 5px solid #8F0808;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-top: 5px solid #8F0808;
-}
-
-.ribbon span::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 100%;
-    z-index: -1;
-    border-left: 5px solid transparent;
-    border-right: 5px solid #8F0808;
-    border-bottom: 5px solid transparent;
-    border-top: 5px solid #8F0808;
-}
-
-.todayPickResetBtn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    transform: none;
-    padding: 7px;
-}
-
-.votingEndTooltip:hover {
-    cursor: pointer;
-}
-
-.votingEndTooltip-title {
-    margin-right: 10px;
-}
-
-.votingEndTooltip-btn {
-    border: 1px solid white;
-    border-radius: 10px;
-    padding: 4px;
-}
+.todayPickWrap { position: relative; }
+.todayPickWrap .menuItemWrapper { height: auto; overflow: visible; }
+.todayPickWrap .menuContent { display: grid; grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 10px; }
+.todayPickWrap .menuMedia { container-type: inline-size; min-height: auto; }
+.todayPickWrap .menuThumbnail { width: min(100%, 380px); height: auto; aspect-ratio: 1 / 1; }
+.todayPickWrap .menuReview { width: 100%; }
+.ribbon { position: absolute; top: -8px; right: -8px; z-index: 2; overflow: hidden; width: 104px; height: 104px; border-radius: 0 18px 0 0; pointer-events: none; }
+.ribbon span { position: absolute; top: 24px; right: -34px; display: block; width: 145px; padding: 6px 0; transform: rotate(45deg); background: var(--gp-primary); box-shadow: 0 5px 14px rgba(228,81,32,.25); color: white; font-size: 11px; font-weight: 900; letter-spacing: .05em; text-align: center; text-transform: uppercase; }
+.todayPickResetBtn { position: relative; z-index: 3; display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: auto; min-height: 40px; margin: 10px auto 0 2px; padding: 7px 13px; border: 0; border-radius: 11px; background: var(--gp-danger); box-shadow: 0 8px 20px rgba(215,83,83,.22); color: white; font-size: 12px; font-weight: 800; }
+.votingEndTooltip { cursor: pointer; }.votingEndTooltip-title { margin-right: 10px; }.votingEndTooltip-btn { padding: 4px 7px; border: 1px solid white; border-radius: 8px; }

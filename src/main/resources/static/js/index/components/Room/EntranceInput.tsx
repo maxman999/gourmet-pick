@@ -14,7 +14,7 @@ const EntranceInput = () => {
     const clickHandler = async () => {
         const inputValue = invitationCodeRef.current.value.trim()
         if (inputValue.length === 0) {
-            await Swal.fire({title: '투표방 코드를 입력해주세요.', icon: 'warning'});
+            await Swal.fire({title: '초대 코드를 입력해주세요.', icon: 'warning'});
             return;
         }
         roomCtx.enterRoom(invitationCodeRef.current.value);
@@ -56,11 +56,11 @@ const EntranceInput = () => {
                     <button className='btn btn-outline-secondary' id="entranceBtn"
                             onClick={clickHandler}
                     >
-                        <FontAwesomeIcon icon={faDoorOpen} style={{color: 'cornflowerblue'}}/>
+                        <FontAwesomeIcon icon={faDoorOpen}/>
                     </button>
                 </div>
             </div>
-            <div id="emailHelp" className="form-text">enter room code for service</div>
+            <div id="emailHelp" className="form-text">공유 받은 초대 코드를 입력해주세요.</div>
         </div>
     );
 };

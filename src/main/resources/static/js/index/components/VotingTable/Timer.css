@@ -1,6 +1,3 @@
-.swiper-timer__wrapper {
-    z-index: 10;
-    position: absolute;
-    top: 5%;
-    right: 5%;
-}
+.swiper-timer__wrapper { z-index: 10; position: absolute; top: 16px; right: 16px; padding: 8px !important; border-color: rgba(255,107,53,.2); background: rgba(255,255,255,.92); }
+.swiper-timer__wrapper span { color: var(--gp-muted); font-size: 11px; font-weight: 800; }
+@media (max-width: 575.98px) { .swiper-timer__wrapper { top: 10px; right: 10px; transform: scale(.88); transform-origin: top right; } }

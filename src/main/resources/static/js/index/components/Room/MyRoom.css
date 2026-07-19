@@ -1,19 +1,9 @@
-.roomWrapper{
-    height: 100%;
-}
-
-.roomWrapper:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.3); /* 호버 시 그림자 스타일 변경 */
-    cursor: pointer;
-}
-
-.myRoomTitle {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.myRoomCode {
-    font-size: 13px;
-    color: gray;
-}
+.roomWrapper { height: 100%; padding: 20px !important; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.roomWrapper:hover { transform: translateY(-4px); border-color: rgba(255,107,53,.35); box-shadow: 0 16px 34px rgba(67,51,40,.12); cursor: pointer; }
+.myRoomTitle { display: flex; align-items: start; gap: 8px; font-size: 18px; font-weight: 800; }
+.myRoomTitle > button { margin-left: auto; }
+.myRoomCode { margin-top: 4px; color: var(--gp-muted); font-size: 12px; letter-spacing: .04em; }
+.roomWrapper hr { border-color: var(--gp-line); opacity: 1; }
+.myRoomSessionInfo { color: var(--gp-muted); font-size: 13px; line-height: 1.5; }
+.myRoomSessionInfo .fa-user { color: var(--gp-success) !important; }
+@media (hover: none) { .roomWrapper:hover { transform: none; } }

@@ -1,21 +1,10 @@
-.search-area {
-    max-height: 230px;
-    overflow: scroll;
-}
-
-#placeSearchInput {
-    font-size: 14px;
-}
-
-.search-item {
-    border: 1px solid gray;
-}
-
-.place-title {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.place-location {
-    font-size: 10px;
-}
+.map_wrap > .row:first-child > div { overflow: hidden; border: 1px solid var(--gp-line) !important; border-radius: 14px; }
+.search-area { max-height: 240px; overflow-y: auto; padding: 4px; scrollbar-width: thin; }
+#placeSearchInput { font-size: 14px; }
+#search-wrapper .input-group .btn { min-width: 48px; border-radius: 0 12px 12px 0; }
+.list-group { gap: 5px; }
+.list-group-item { border: 1px solid var(--gp-line) !important; border-radius: 10px !important; color: var(--gp-ink); cursor: pointer; }
+.list-group-item:hover { background: var(--gp-primary-soft); }
+.list-group-item.selected { border-color: rgba(255,107,53,.55) !important; background: var(--gp-primary-soft); box-shadow: inset 3px 0 0 var(--gp-primary); }
+.place-title { font-size: 14px; font-weight: 800; }.place-location { margin-top: 3px; color: var(--gp-muted); font-size: 11px; }
+@media (max-width: 575.98px) { .map_wrap > .row:first-child > div { height: 240px !important; }.search-area { max-height: 210px; } }

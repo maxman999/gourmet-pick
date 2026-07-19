@@ -28,7 +28,7 @@ const MyRoom = (props: props) => {
     const roomLikeHandler = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (isManager) {
-            await Swal.fire({title: '방장은 즐겨찾기를 해제할 수 없습니다.', icon: 'warning'});
+            await Swal.fire({title: '내가 만든 방은 즐겨찾기를 해제할 수 없습니다.', icon: 'warning'});
             return;
         }
         const confirmResult = await CommonUtils.confirm(
@@ -58,7 +58,7 @@ const MyRoom = (props: props) => {
                 <div className={'myRoomTitle'}>
                     {CommonUtils.bringBackHtmlTags(props.myRoom.name)}
                     <button className={'roomLikeBtn'} onClick={roomLikeHandler}>
-                        <FontAwesomeIcon icon={faStar} style={isManager && {color: 'cornflowerblue'}}/>
+                        <FontAwesomeIcon icon={faStar} className={isManager ? 'roomManagerStar' : ''}/>
                     </button>
                 </div>
                 <div className={'myRoomCode'}>

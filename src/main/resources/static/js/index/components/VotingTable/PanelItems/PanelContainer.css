@@ -1,0 +1,4 @@
+.votePanelContainer { margin-top: 8px; padding: 8px; }
+.votePanelContainer > .btn { min-height: 42px; }
+.votePanelContainer > .row { --bs-gutter-x: 8px; }
+@media (max-width: 420px) { .votePanelContainer { padding: 8px; }.votePanelContainer .btn { padding-inline: 6px; font-size: 13px; } }

@@ -4,6 +4,8 @@ import "./MapUploadTool.css"
 import {ILocationInfo} from "../../types/ILocationInfo";
 import CommonUtils from "../../utils/CommonUtils";
 import * as _ from "lodash";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 
 type props = {
     onLocationChange: (locationInfo: ILocationInfo) => void
@@ -16,40 +18,29 @@ const MapUploadTool = (props: props) => {
     const [map, setMap] = useState<any>();
     const [searchResult, setSearchResult] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState('이태원 맛집');
+    const [selectedLocation, setSelectedLocation] = useState<ILocationInfo>(null);
+    const [selectedPlaceIndex, setSelectedPlaceIndex] = useState<number>(null);
 
     const placeSearchInputRef = useRef(null);
-    const placeListRefs = useRef([]);
-    placeListRefs.current = [];
-
-    let selectedLocation: ILocationInfo;
-
-    const addToListRefs = (el: HTMLElement) => {
-        if (el && !placeListRefs.current.includes(el)) {
-            placeListRefs.current.push(el);
-        }
-    }
 
     const searchClickHandler = _.debounce(() => {
         const inputValue = placeSearchInputRef.current.value.trim();
         if (inputValue.length === 0) return;
+        setSelectedLocation(null);
+        setSelectedPlaceIndex(null);
         setSearchKeyword(inputValue);
     }, 300);
 
     const placeClickHandler = (index: number) => {
-        const targetEl = placeListRefs.current[index] as HTMLElement;
-        if (!targetEl) return;
+        const place = searchResult[index];
+        if (!place || !map) return;
 
-        placeListRefs.current.forEach(el => {
-            el.style.backgroundColor = '';
-        })
-        // cleanup
-        targetEl.style.backgroundColor = 'aliceblue';
-
-        const placeName = targetEl.dataset.placeName;
-        const roadAddressName = targetEl.dataset.roadAddressName;
-        const latitude = Number(targetEl.dataset.latitude);
-        const longitude = Number(targetEl.dataset.longitude);
-        selectedLocation = {placeName, roadAddressName, longitude, latitude};
+        const placeName = place.place_name;
+        const roadAddressName = place.road_address_name;
+        const latitude = Number(place.y);
+        const longitude = Number(place.x);
+        setSelectedLocation({placeName, roadAddressName, longitude, latitude});
+        setSelectedPlaceIndex(index);
         const moveLatLon = new kakao.maps.LatLng(latitude, longitude);
         map.setLevel(2);
         map.setCenter(moveLatLon);
@@ -57,6 +48,7 @@ const MapUploadTool = (props: props) => {
     }
 
     const mapSelectHandler = () => {
+        if (!selectedLocation) return;
         props.onLocationChange(selectedLocation);
         props.onModalClose();
     }
@@ -135,19 +127,18 @@ const MapUploadTool = (props: props) => {
                                ref={placeSearchInputRef}
                                onChange={searchClickHandler}
                         />
-                        <button className="btn btn-success btn-sm" onClick={searchClickHandler}>O</button>
+                        <button className="btn btn-primary btn-sm" onClick={searchClickHandler}
+                                aria-label={'장소 검색'} title={'장소 검색'}>
+                            <FontAwesomeIcon icon={faMagnifyingGlass}/>
+                        </button>
                     </div>
                     <div className="list-group">
                         {searchResult.map((place, index) => {
                             return (
-                                <a className={'list-group-item list-group-item-action list-group-item-light'}
+                                <a className={`list-group-item list-group-item-action list-group-item-light ${selectedPlaceIndex === index ? 'selected' : ''}`}
                                    key={index}
-                                   ref={addToListRefs}
                                    onClick={() => placeClickHandler(index)}
-                                   data-place-name={place.place_name}
-                                   data-road-address-name={place.road_address_name}
-                                   data-latitude={place.y}
-                                   data-longitude={place.x}
+                                   role={'button'}
                                 >
                                     <div className={'place-title'}>{place.place_name}</div>
                                     <div className={'place-location'}>{place.road_address_name}</div>
@@ -164,6 +155,7 @@ const MapUploadTool = (props: props) => {
             </div>
             <div className={"row p-2 mt-1"}>
                 <button className={'btn btn-sm btn-outline-success'}
+                        disabled={!selectedLocation}
                         onClick={mapSelectHandler}> 등록하기
                 </button>
             </div>

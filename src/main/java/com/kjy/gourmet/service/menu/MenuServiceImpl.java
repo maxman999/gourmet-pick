@@ -7,19 +7,20 @@ import com.kjy.gourmet.service.voting.dto.Message;
 import com.kjy.gourmet.service.voting.dto.VotingStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnailator;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -95,27 +96,44 @@ public class MenuServiceImpl implements MenuService {
     public ResponseEntity<List<MenuThumbnail>> uploadMenuImage(MultipartFile[] files) {
         List<MenuThumbnail> resultDTOList = new ArrayList<>();
         for (MultipartFile uploadFile : files) {
-            String originalName = uploadFile.getOriginalFilename();
-            String fileName = getFileName(originalName);
-            String fileExtension = StringUtils.getFilenameExtension(fileName);
+            if (uploadFile == null || uploadFile.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "빈 이미지 파일은 업로드할 수 없습니다.");
+            }
+
+            String fileExtension = getSupportedImageExtension(uploadFile);
 
             String folderPath = makeFolder();
             String uuid = UUID.randomUUID().toString();
             String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "." + fileExtension;
             try {
-                File thumbnailFile = new File(saveName); // 원본을 썸네일 파일로 저장
-                Thumbnailator.createThumbnail(uploadFile.getInputStream(), new FileOutputStream(thumbnailFile), 720, 720);
+                BufferedImage sourceImage = ImageIO.read(uploadFile.getInputStream());
+                if (sourceImage == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. JPEG 또는 PNG 파일을 사용해주세요.");
+                }
+
+                File thumbnailFile = new File(saveName);
+                Thumbnails.of(sourceImage)
+                        .size(720, 720)
+                        .outputFormat(fileExtension)
+                        .toFile(thumbnailFile);
                 resultDTOList.add(new MenuThumbnail(uuid, folderPath, fileExtension));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.error("메뉴 이미지 처리 실패: {}", uploadFile.getOriginalFilename(), e);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지를 저장하지 못했습니다.", e);
             }
         }
         return new ResponseEntity<>(resultDTOList, HttpStatus.OK);
     }
 
-    private String getFileName(String originalName) {
-        int indexOfSlash = originalName.lastIndexOf("\\");
-        return (indexOfSlash != -1) ? originalName.substring(indexOfSlash + 1) : originalName;
+    private String getSupportedImageExtension(MultipartFile uploadFile) {
+        String contentType = uploadFile.getContentType();
+        if ("image/jpeg".equalsIgnoreCase(contentType) || "image/jpg".equalsIgnoreCase(contentType)) {
+            return "jpg";
+        }
+        if ("image/png".equalsIgnoreCase(contentType)) {
+            return "png";
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. JPEG 또는 PNG 파일을 사용해주세요.");
     }
 
     private String makeFolder() {

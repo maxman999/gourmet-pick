@@ -41,12 +41,13 @@ const MenuUpdateForm = () => {
     const isMenuModify = roomCtx.updateTargetMenuId > 0;
     const isPlaceSelected = location?.longitude + location?.latitude > 0;
 
-    const menuNameChangeHandler = _.debounce(() => {
+    const menuNameChangeHandler = () => {
         const inputVal = menuNameInputRef.current.value.trim();
         const filteredInputVal = CommonUtils.filterHtmlTags(inputVal);
+        setMenuName(filteredInputVal);
 
         if (filteredInputVal.length === 0) {
-            setUploadBtnMessage('메뉴 이름이 입력되지 않았습니다.');
+            setUploadBtnMessage('메뉴 이름을 확인해주세요.');
             setIsMenuNameValid(false);
             return;
         }
@@ -58,39 +59,32 @@ const MenuUpdateForm = () => {
         }
 
         if (inputVal.length > 0) {
-            setMenuName(CommonUtils.filterHtmlTags(inputVal));
             setIsMenuNameValid(true);
             return;
         }
+    };
 
-        setIsMenuNameValid(false);
-        setMenuName('');
-    }, 300);
-
-    const soberCommentChangeHandler = _.debounce(() => {
+    const soberCommentChangeHandler = () => {
         const filteredInputVal = CommonUtils.filterHtmlTags(soberCommentInputRef.current.value.trim());
+        setSoberComment(filteredInputVal);
 
         if (filteredInputVal.length === 0) {
             setIsSoberCommentValid(false);
-            setUploadBtnMessage('냉정한 한줄평이 입력되지 않았습니다.');
+            setUploadBtnMessage('냉정한 한줄 평이 입력되지 않았습니다.');
             return;
         }
 
         if (filteredInputVal.length > 30) {
             setIsSoberCommentValid(false);
-            setUploadBtnMessage('한줄평에 허용되지 않은 문자가 있습니다.');
+            setUploadBtnMessage('한줄 평이 너무 길거나, 허용되지 않은 문자가 입력됐습니다.');
             return;
         }
 
         if (filteredInputVal.length > 0) {
             setIsSoberCommentValid(true);
-            setSoberComment(filteredInputVal);
             return;
         }
-
-        setIsSoberCommentValid(false);
-        setSoberComment('');
-    }, 300);
+    };
 
     const mapUploadHandler = () => {
         setIsUpdateModalPopped(true);
@@ -102,6 +96,19 @@ const MenuUpdateForm = () => {
 
     const thumbnailChangeHandler = async () => {
         const file = imageUploadRef.current.files[0];
+        if (!file) return;
+
+        const supportedTypes = ['image/jpeg', 'image/png'];
+        if (!supportedTypes.includes(file.type)) {
+            imageUploadRef.current.value = '';
+            await Swal.fire({
+                title: '지원하지 않는 이미지 형식입니다.',
+                text: 'JPEG 또는 PNG 파일을 선택해주세요.',
+                icon: 'warning'
+            });
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
             const imageData = e.target.result;
@@ -113,20 +120,29 @@ const MenuUpdateForm = () => {
 
     const locationChangeHandler = (locationInfo: ILocationInfo) => {
         setLocation(locationInfo);
+
+        const currentMenuName = menuNameInputRef.current.value.trim();
+        if (currentMenuName.length === 0 && locationInfo?.placeName) {
+            const suggestedMenuName = locationInfo.placeName.trim().slice(0, 15);
+            menuNameInputRef.current.value = suggestedMenuName;
+            setMenuName(CommonUtils.filterHtmlTags(suggestedMenuName));
+            setIsMenuNameValid(suggestedMenuName.length > 0);
+        }
     }
 
     const observeFormValidity = () => {
         let btnMsg = isMenuModify ? "수 정 하 기" : "등 록 하 기";
-        let isUploadPossible = true;
+        const isFormValid = isMenuNameValid
+            && isPlaceSelected
+            && !!thumbnail
+            && isSoberCommentValid;
 
         if (!isSoberCommentValid) {
-            btnMsg = "냉정한 한줄평을 확인해주세요.";
-            isUploadPossible = false;
+            btnMsg = "냉정한 한줄 평을 확인해주세요.";
         }
 
         if (!isPlaceSelected) {
             btnMsg = "위치 정보를 입력해주세요.";
-            isUploadPossible = false;
         }
 
         if (!thumbnail) {
@@ -135,11 +151,10 @@ const MenuUpdateForm = () => {
 
         if (!isMenuNameValid) {
             btnMsg = "메뉴 이름을 확인해주세요.";
-            isUploadPossible = false;
         }
 
         setUploadBtnMessage(btnMsg);
-        setIsUploadPossible(isUploadPossible);
+        setIsUploadPossible(isFormValid);
     }
 
     // 사진 스토리지에 저장
@@ -232,13 +247,13 @@ const MenuUpdateForm = () => {
 
     useEffect(() => {
         observeFormValidity();
-    }, [menuName, soberComment, location, thumbnail]);
+    }, [isMenuNameValid, isSoberCommentValid, isPlaceSelected, thumbnail]);
 
     return (
         <MenuContainer>
             <div className={"menu-update-active"}>
-                <div className='card mt-3 p-3'>
-                    <div className='row mb-2'>
+                <div className='card mt-1 p-3'>
+                    <div className='row'>
                         <div className='col menu-title'>
                             <div className="input-group">
                                 <input id='menuNameInput'
@@ -253,7 +268,7 @@ const MenuUpdateForm = () => {
                         </div>
                     </div>
                     <div className='row mt-2'>
-                        <div id={'mapWrapper'} className='col mb-2'>
+                        <div id={'mapWrapper'} className='menuMapColumn col mb-2'>
                             {isPlaceSelected &&
                                 < Map
                                     center={{lat: location.latitude, lng: location.longitude}}
@@ -272,7 +287,7 @@ const MenuUpdateForm = () => {
                                 />
                             }
                         </div>
-                        <div className='col-md-5'>
+                        <div className='menuDetailsColumn col-md-5'>
                             <>
                                 {thumbnail &&
                                     <img className='menuThumbnailUpdateForm'
@@ -290,16 +305,14 @@ const MenuUpdateForm = () => {
                                 }
                                 <input onChange={thumbnailChangeHandler}
                                        type={'file'}
-                                       accept={"image/*"}
+                                       accept={"image/jpeg,image/png"}
                                        ref={imageUploadRef}
                                        style={{display: 'none'}}/>
                             </>
                             <hr/>
                             <div className={"mb-2"}>
-                                <div id={'soberCommentTitle'}>냉정한 한줄평</div>
-                                <textarea id={'soberCommentInput'}
-                                          className={'w-100'}
-                                          placeholder={"냉정한 미식가의 평가를 입력해주세요."}
+                                <textarea className={'soberCommentInput w-100'}
+                                          placeholder={"냉정한 미식가의 한 줄 평가를 입력해주세요."}
                                           maxLength={30}
                                           onChange={soberCommentChangeHandler}
                                           onFocus={soberCommentChangeHandler}
@@ -311,7 +324,7 @@ const MenuUpdateForm = () => {
                 </div>
                 <div className="row mt-2">
                     <div id={'updateSubmitBtnWrap'} className={'col-md-10 mt-2'}>
-                        <button className="btn btn-outline-primary w-100"
+                        <button className="btn btn-primary menuSubmitBtn w-100"
                                 onClick={submitClickHandler}
                                 ref={submitButtonRef}
                                 disabled={!isUploadPossible || isSubmitting}

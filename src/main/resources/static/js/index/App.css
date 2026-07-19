@@ -1,10 +1,85 @@
-#roomEntranceContainer {
-    align-content: center;
-    width: 80%;
-    height: 100%;
-    margin-top: 7vh;
+:root {
+    --gp-primary: #ff6b35;
+    --gp-primary-dark: #e45120;
+    --gp-primary-soft: #fff1eb;
+    --gp-ink: #25221f;
+    --gp-muted: #77716b;
+    --gp-line: #ebe5df;
+    --gp-surface: #ffffff;
+    --gp-background: #faf8f5;
+    --gp-success: #388a64;
+    --gp-danger: #d75353;
+    --gp-info: #527da8;
+    --gp-warning: #d69534;
+    --gp-shadow: 0 12px 32px rgba(67, 51, 40, 0.08);
+    --gp-transition: .18s ease;
+    --gp-radius: 18px;
 }
 
-#roomEntranceWrapper {
+* { box-sizing: border-box; }
 
+html, body, #root { min-height: 100%; }
+
+body {
+    margin: 0;
+    color: var(--gp-ink);
+    background:
+        radial-gradient(circle at 8% 0%, rgba(255, 107, 53, .09), transparent 28rem),
+        var(--gp-background);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+button, input, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+
+.card {
+    border: 1px solid rgba(235, 229, 223, .9);
+    border-radius: var(--gp-radius);
+    background: rgba(255,255,255,.96);
+    box-shadow: var(--gp-shadow);
+}
+
+.btn {
+    min-height: 42px;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.btn:not(:disabled):active { transform: scale(.98); }
+:where(.gp-icon-button) {
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--gp-line);
+    background: var(--gp-surface);
+    transition: transform var(--gp-transition), border-color var(--gp-transition), background var(--gp-transition);
+}
+:where(.gp-icon-button):hover { transform: translateY(-2px); border-color: #d9d0c8; background: var(--gp-background); }
+.btn-primary, .btn-success { border-color: var(--gp-primary); background-color: var(--gp-primary); }
+.btn-primary:hover, .btn-success:hover { border-color: var(--gp-primary-dark); background-color: var(--gp-primary-dark); }
+.btn-outline-primary, .btn-outline-success { border-color: var(--gp-primary); color: var(--gp-primary-dark); }
+.btn-outline-primary:hover, .btn-outline-success:hover { border-color: var(--gp-primary); background: var(--gp-primary); color: white; }
+.btn-outline-danger { border-color: rgba(215,83,83,.55); color: var(--gp-danger); }
+.btn-outline-danger:hover { border-color: var(--gp-danger); background: var(--gp-danger); }
+.text-success { color: var(--gp-success) !important; }
+.form-control { min-height: 46px; border-radius: 12px; border-color: var(--gp-line); }
+.form-control:focus { border-color: var(--gp-primary); box-shadow: 0 0 0 .22rem rgba(255,107,53,.14); }
+
+#roomEntranceContainer {
+    width: min(1080px, calc(100% - 32px));
+    min-height: calc(100vh - 84px);
+    margin: 0 auto;
+    padding: clamp(28px, 7vh, 72px) 0 48px;
+}
+
+@media (max-width: 575.98px) {
+    #roomEntranceContainer { width: min(100% - 24px, 1080px); padding-top: 24px; }
+    .card { border-radius: 16px; }
+    .btn { min-height: 46px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

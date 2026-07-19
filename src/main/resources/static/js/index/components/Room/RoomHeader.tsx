@@ -3,7 +3,7 @@ import {useContext, useState} from "react";
 import RoomConsole from "./RoomConsole";
 import Modal from "../UI/Modal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faLink, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faLink, faPen, faPlus, faTrash} from "@fortawesome/free-solid-svg-icons";
 import roomContext from "../../store/room-context";
 import axios from "axios";
 import CommonUtils from "../../utils/CommonUtils";
@@ -12,7 +12,7 @@ import SimpleUpdateForm from "../UI/SimpleUpdateForm";
 import {IUser} from "../../types/IUser";
 import Swal from "sweetalert2";
 import * as _ from "lodash";
-import {text} from "@fortawesome/fontawesome-svg-core";
+import Gourmet from "../VotingTable/Gourmet";
 
 interface props {
     isConsoleActive: boolean;
@@ -28,6 +28,7 @@ const RoomHeader = (props: props) => {
 
     const user = CommonUtils.getUserFromSession();
     const isManager = roomCtx.roomInfo.managerId === user.id;
+    const gourmetSeats = [0, 1, 2, 3, 4];
 
     const nameUpdatePopUpHandler = async () => {
         setIsTitleUpdateModalPopped(true);
@@ -84,22 +85,51 @@ const RoomHeader = (props: props) => {
         CommonUtils.copyInvitationCode(roomCtx.roomInfo.invitationCode);
     }, 200);
 
+    const menuAddHandler = async () => {
+        const {data: totalCount} = await axios.get(`api/room/menuCount/${roomCtx.roomInfo.id}`);
+        if (Number(totalCount) > 15) {
+            await Swal.fire({title: '메뉴는 15개 이상 등록할 수 없습니다.', icon: 'warning'});
+            return;
+        }
+        roomCtx.changeRoomPhase(RoomPhase.UPDATING);
+    }
+
     return (
         <>
-            <div className='row'>
-                <div className='col-md-7 mt-2'>
-                    <div data-room-id={roomCtx.roomInfo.id}>
-                        <span className='room-title'> # {CommonUtils.bringBackHtmlTags(currentRoomName)} </span>
-                        <span className='room-code'>({roomCtx.roomInfo?.invitationCode})</span>
+            <header className='roomHeader card'>
+                <div className='roomHeading' data-room-id={roomCtx.roomInfo.id}>
+                    <div className='roomHeadingText'>
+                        <div className={'roomTitleRow'}>
+                            <h1 className='room-title'>{CommonUtils.bringBackHtmlTags(currentRoomName)}</h1>
+                            <button className={'roomTitleLinkBtn'}
+                                    title={'초대 코드 복사'} aria-label={'초대 코드 복사'}
+                                    onClick={linkClipHandler}>
+                                <FontAwesomeIcon icon={faLink}/>
+                            </button>
+                        </div>
+                        <span className='room-code'>초대 코드 · {roomCtx.roomInfo?.invitationCode}</span>
+                        {roomCtx.roomPhase !== RoomPhase.DEFAULT && roomCtx.roomPhase !== RoomPhase.UPDATING &&
+                            <div className={'roomTitleGourmets'} aria-label={'투표 참여자'}>
+                                {gourmetSeats.map((seat, index) =>
+                                    <Gourmet key={seat}
+                                             isActive={index < roomCtx.votingGourmets?.length}
+                                             nickname={roomCtx.votingGourmets[index]?.nickname}/>
+                                )}
+                            </div>
+                        }
+                    </div>
+                    <div className='roomManagementActions'>
                         {roomCtx.roomPhase === RoomPhase.DEFAULT &&
                             <>
                                 {isManager &&
                                     <>
-                                        <button className={'roomManagementBtn roomTitleUpdateBtn'}
+                                        <button className={'gp-icon-button roomManagementBtn roomTitleUpdateBtn'}
+                                                title={'방 이름 수정'} aria-label={'방 이름 수정'}
                                                 onClick={nameUpdatePopUpHandler}>
                                             <FontAwesomeIcon icon={faPen}/>
                                         </button>
-                                        <button className={'roomManagementBtn roomDeleteBtn'}
+                                        <button className={'gp-icon-button roomManagementBtn roomDeleteBtn'}
+                                                title={'방 삭제'} aria-label={'방 삭제'}
                                                 onClick={roomDeleteHandler}>
                                             <FontAwesomeIcon icon={faTrash}/>
                                         </button>
@@ -107,19 +137,26 @@ const RoomHeader = (props: props) => {
                                 }
                             </>
                         }
-                        <button className={'roomManagementBtn linkClipBtn'}
-                                onClick={linkClipHandler}>
-                            <FontAwesomeIcon icon={faLink}/>
-                        </button>
+                        {roomCtx.roomPhase === RoomPhase.DEFAULT &&
+                            <>
+                                <span className={'roomManagementDivider'} aria-hidden={'true'}></span>
+                                <button className={'gp-icon-button roomManagementBtn menuAddHeaderBtn'}
+                                        title={'메뉴 추가'} aria-label={'메뉴 추가'}
+                                        onClick={menuAddHandler}>
+                                    <FontAwesomeIcon icon={faPlus}/>
+                                    <span>메뉴 추가</span>
+                                </button>
+                            </>
+                        }
                     </div>
                 </div>
                 {props.isConsoleActive &&
-                    <div className={"col mt-2 text-end"}>
+                    <div className={"roomConsoleWrapper"}>
                         <RoomConsole todayPickPopupFlag={props.todayPickPopupFlag}
                                      todayPickPopupFlagHandler={props.todayPickPopupFlagHandler}/>
                     </div>
                 }
-            </div>
+            </header>
             {isTitleUpdateModalPopped &&
                 <Modal onClose={modalCloseHandler} height={"140px"}>
                     <SimpleUpdateForm title={'변경할 방 이름을 입력해주세요.'}
