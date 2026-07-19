@@ -46,7 +46,7 @@ const MenuDisplaySwiper = (props: props) => {
             {isEmpty &&
                 <div className='menuEmptyBox card mt-5 p-3'>
                     <div className='row mb-2 align-self-center w-100'>
-                        <EmptyBox minHeight={"400px"}
+                        <EmptyBox minHeight={"100%"}
                                   width={"100%"}
                                   clickHandler={menuAddingHandler}
                                   caption={"등록된 메뉴가 없습니다."}/>

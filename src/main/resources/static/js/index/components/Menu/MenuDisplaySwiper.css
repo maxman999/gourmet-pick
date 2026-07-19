@@ -3,9 +3,10 @@
 .menuDisplaySwiper .menuItemWrapper { height: 100%; margin-top: 0 !important; }
 .menuEmptyBox { padding: 16px !important; transition: transform .2s ease; }
 .menuEmptyBox:hover { transform: translateY(-3px); cursor: pointer; }
-.menuContainer > .menuEmptyBox { flex: 1; min-height: 0; margin-top: 0 !important; }
+.menuContainer > .menuEmptyBox { flex: 0 0 auto; height: clamp(190px, 30vh, 250px); min-height: 0; margin-top: 0 !important; }
 .menuEmptyBox > .row, .menuEmptyBox .empty-box { height: 100%; min-height: 0 !important; }
 @media (max-width: 575.98px) {
+    .menuContainer > .menuEmptyBox { height: clamp(160px, 24vh, 200px); }
     .menuEmptyBox { padding: 10px !important; }
     .menuDisplaySwiper { height: auto; }
 }
