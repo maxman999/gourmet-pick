@@ -24,14 +24,15 @@ const SignIn = () => {
             password: guestLoginInputPwRef.current.value,
         });
 
-        const response = await fetch('/login', {
+        await fetch('/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: credentials,
             credentials: 'same-origin',
+            redirect: 'manual',
         });
 
-        window.location.replace(response.redirected ? response.url : '/');
+        window.location.replace('/');
     }
 
     const generateGuest = () => {
