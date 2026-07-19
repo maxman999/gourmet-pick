@@ -10,6 +10,7 @@ import VotingStatus from "../../types/VotingStatus";
 import * as _ from "lodash";
 import CommonUtils from "../../utils/CommonUtils";
 import Swal from "sweetalert2";
+import {useNavigate} from "react-router-dom";
 
 type props = {
     todayPickPopupFlag: boolean;
@@ -19,6 +20,7 @@ type props = {
 const RoomConsole = (props: props) => {
     const websocketAPIs = useContext(websocketContext);
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
     const [isPhaseCallTooltipOpen, setIsPhaseCallTooltipOpen] = useState(true);
     const [isPhaseStartTooltipOpen, setIsPhaseStartTooltipOpen] = useState(true);
     const isTodayPickTooltipShow = (roomCtx.roomPhase === RoomPhase.DEFAULT
@@ -63,7 +65,7 @@ const RoomConsole = (props: props) => {
         && roomCtx.callerFlag;
 
     const exitHandler = () => {
-        document.location.href = "/";
+        navigate('/', {replace: true});
     }
 
     const todayPickPopupHandler = () => {

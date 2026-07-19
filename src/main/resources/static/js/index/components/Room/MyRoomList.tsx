@@ -8,6 +8,7 @@ import {useContext} from "react";
 import roomContext from "../../store/room-context";
 import CommonUtils from "../../utils/CommonUtils";
 import Swal from "sweetalert2";
+import {useNavigate} from "react-router-dom";
 
 type props = {
     myRoomList: IRoom[],
@@ -16,6 +17,7 @@ type props = {
 
 const MyRoomList = (props: props) => {
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
     const user = CommonUtils.getUserFromSession();
 
     const createRoomHandler = async () => {
@@ -29,7 +31,8 @@ const MyRoomList = (props: props) => {
             managerId: user.id
         });
         if (invitationCode) {
-            roomCtx.enterRoom(invitationCode);
+            const room = await roomCtx.enterRoom(invitationCode);
+            if (room) navigate(`/rooms/${room.invitationCode}`);
             await CommonUtils.toaster('투표방이 생성되었습니다.', 'top');
         }
     }

@@ -2,18 +2,36 @@ import './SignIn.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGoogle} from "@fortawesome/free-brands-svg-icons";
 import {faChildReaching, faK} from "@fortawesome/free-solid-svg-icons";
-import {useEffect, useRef} from "react";
+import {FormEvent, useEffect, useRef} from "react";
 
 const SignIn = () => {
     const guestLoginIdInputRef = useRef(null);
     const guestLoginInputPwRef = useRef(null);
 
     const googleLoginHandler = async () => {
-        document.location = "/oauth2/authorization/google";
+        window.location.replace("/oauth2/authorization/google");
     }
 
     const kakaoLoginHandler = async () => {
-        document.location = "/oauth2/authorization/kakao";
+        window.location.replace("/oauth2/authorization/kakao");
+    }
+
+    const guestLoginHandler = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const credentials = new URLSearchParams({
+            username: guestLoginIdInputRef.current.value,
+            password: guestLoginInputPwRef.current.value,
+        });
+
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: credentials,
+            credentials: 'same-origin',
+        });
+
+        window.location.replace(response.redirected ? response.url : '/');
     }
 
     const generateGuest = () => {
@@ -67,7 +85,7 @@ const SignIn = () => {
                         </button>
                     </div>
                     <div>
-                        <form className="form-group" action="/login" method="post">
+                        <form className="form-group" onSubmit={guestLoginHandler}>
                             <input type="hidden" name="username" ref={guestLoginIdInputRef}/>
                             <input type="hidden" name="password" ref={guestLoginInputPwRef}/>
                             <button className="social-btn guest-btn" type={"submit"}>

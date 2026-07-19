@@ -13,6 +13,7 @@ import {IUser} from "../../types/IUser";
 import Swal from "sweetalert2";
 import * as _ from "lodash";
 import Gourmet from "../VotingTable/Gourmet";
+import {useNavigate} from "react-router-dom";
 
 interface props {
     isConsoleActive: boolean;
@@ -22,6 +23,7 @@ interface props {
 
 const RoomHeader = (props: props) => {
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
 
     const [isTitleUpdateModalPopped, setIsTitleUpdateModalPopped] = useState(false);
     const [currentRoomName, setCurrentRoomName] = useState(roomCtx.roomInfo.name);
@@ -86,12 +88,12 @@ const RoomHeader = (props: props) => {
     }, 200);
 
     const menuAddHandler = async () => {
-        const {data: totalCount} = await axios.get(`api/room/menuCount/${roomCtx.roomInfo.id}`);
+        const {data: totalCount} = await axios.get(`/api/room/menuCount/${roomCtx.roomInfo.id}`);
         if (Number(totalCount) > 15) {
             await Swal.fire({title: '메뉴는 15개 이상 등록할 수 없습니다.', icon: 'warning'});
             return;
         }
-        roomCtx.changeRoomPhase(RoomPhase.UPDATING);
+        navigate(`/rooms/${roomCtx.roomInfo.invitationCode}/menus/new`);
     }
 
     return (

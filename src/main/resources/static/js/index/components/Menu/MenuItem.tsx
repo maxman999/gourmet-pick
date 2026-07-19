@@ -8,6 +8,7 @@ import Modal from "../UI/Modal";
 import roomContext from "../../store/room-context";
 import RoomPhase from "../../types/RoomPhase";
 import CommonUtils from "../../utils/CommonUtils";
+import {useNavigate} from "react-router-dom";
 
 interface props {
     menu: IMenu;
@@ -17,6 +18,7 @@ interface props {
 
 const MenuItem = (props: props) => {
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
     const [isMapModalOpened, setIsMapModalOpened] = useState(false);
 
     const menuDeleteBtnRef = useRef(null);
@@ -43,7 +45,7 @@ const MenuItem = (props: props) => {
     const menuUpdateClickHandler = () => {
         const targetMenuId = Number(menuUpdateBtnRef.current.dataset.id);
         roomCtx.setUpdateTargetMenu(targetMenuId);
-        roomCtx.changeRoomPhase(RoomPhase.UPDATING);
+        navigate(`/rooms/${roomCtx.roomInfo.invitationCode}/menus/${targetMenuId}/edit`);
     }
 
     const roadAddressCopyHandler = () => {

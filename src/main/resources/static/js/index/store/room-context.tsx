@@ -17,7 +17,9 @@ const RoomContext = React.createContext({
     setRoomInfo: (room: IRoom) => {
     },
 
-    enterRoom: (roomCode: string) => {
+    enterRoom: async (roomCode: string): Promise<IRoom> => null,
+
+    leaveRoom: () => {
     },
 
     isMenuListEmpty: null,

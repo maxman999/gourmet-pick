@@ -9,6 +9,7 @@ import {IUser} from "../../types/IUser";
 import axios from "axios";
 import Swal from 'sweetalert2'
 import CommonUtils from "../../utils/CommonUtils";
+import {useNavigate} from "react-router-dom";
 
 
 type props = {
@@ -19,10 +20,12 @@ type props = {
 
 const MyRoom = (props: props) => {
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
     const isManager = props.myRoom.managerId === props.userId;
 
-    const enterRoomHandler = () => {
-        roomCtx.enterRoom(props.myRoom.invitationCode)
+    const enterRoomHandler = async () => {
+        const room = await roomCtx.enterRoom(props.myRoom.invitationCode)
+        if (room) navigate(`/rooms/${room.invitationCode}`);
     }
 
     const roomLikeHandler = async (e: React.MouseEvent) => {

@@ -39,7 +39,9 @@ const MenuList = () => {
     }, []);
 
     useEffect(() => {
-        roomCtx.setMenuEmptyFlag(_.isEmpty(menuList))
+        if (menuList !== null) {
+            roomCtx.setMenuEmptyFlag(_.isEmpty(menuList));
+        }
     }, [menuList]);
 
     return (

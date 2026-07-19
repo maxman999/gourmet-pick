@@ -30,12 +30,16 @@ type roomAction =
     | { type: "SET_VOTING_GOURMETS"; votingGourmets: IUser[]; }
     | { type: "SET_TODAY_PICK"; menu: IMenu; }
     | { type: "DELETE_TODAY_PICK"; roomId: number; }
+    | { type: "RESET_ROOM"; }
 
 type props = {
     children: React.ReactNode;
 }
 
 const roomReducer = (state: roomState, roomAction: roomAction) => {
+    if (roomAction.type === "RESET_ROOM") {
+        return {...defaultRoomState};
+    }
     if (roomAction.type === "DEFAULT_ROOM_SETTING") {
         return {
             ...state,
@@ -115,7 +119,7 @@ const defaultRoomState: roomState = {
 }
 
 const getRoomWithInspection = async (roomCode: string, userId: number) => {
-    const {data: resultMap} = await axios.post(`api/room/enterWithInspection/${userId}/${roomCode}`);
+    const {data: resultMap} = await axios.post(`/api/room/enterWithInspection/${userId}/${roomCode}`);
     switch (resultMap.code) {
         case -1:
             Swal.fire({title: '이미 사용 중인 투표 세션이 있습니다. 먼저 해당 세션을 종료해주세요.', icon: 'warning'});
@@ -156,10 +160,16 @@ const RoomProvider = (props: props) => {
     const enterRoomHandler = async (roomCode: string) => {
         const user = CommonUtils.getUserFromSession();
         const room = await getRoomWithInspection(roomCode, user.id);
+        if (!room) return null;
         dispatchMenuActions({
             type: 'DEFAULT_ROOM_SETTING',
             roomInfo: room,
         });
+        return room;
+    }
+
+    const leaveRoomHandler = () => {
+        dispatchMenuActions({type: 'RESET_ROOM'});
     }
 
     const menuEmptyFlagSettingHandler = (isMenuListEmpty: boolean) => {
@@ -239,6 +249,7 @@ const RoomProvider = (props: props) => {
         updateTargetMenuId: roomState.updateTargetMenuId,
         setUpdateTargetMenu: setUpdateTargetMenuHandler,
         enterRoom: enterRoomHandler,
+        leaveRoom: leaveRoomHandler,
         setTodayPick: setTodayPickHandler,
         deleteTodayPick: deleteTodayPickHandler,
     }

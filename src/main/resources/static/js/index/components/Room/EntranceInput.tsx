@@ -5,10 +5,12 @@ import Swal from "sweetalert2";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDoorOpen} from "@fortawesome/free-solid-svg-icons";
 import CommonUtils from "../../utils/CommonUtils";
+import {useNavigate} from "react-router-dom";
 
 
 const EntranceInput = () => {
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
     const invitationCodeRef = useRef(null);
 
     const clickHandler = async () => {
@@ -17,13 +19,15 @@ const EntranceInput = () => {
             await Swal.fire({title: '초대 코드를 입력해주세요.', icon: 'warning'});
             return;
         }
-        roomCtx.enterRoom(invitationCodeRef.current.value);
+        const room = await roomCtx.enterRoom(invitationCodeRef.current.value);
+        if (room) navigate(`/rooms/${room.invitationCode}`);
     };
 
-    const inspectInvitationCode = () => {
+    const inspectInvitationCode = async () => {
         const invitationCodeInSession = sessionStorage.getItem('invitationCode')
         if (invitationCodeInSession) {
-            roomCtx.enterRoom(invitationCodeInSession);
+            const room = await roomCtx.enterRoom(invitationCodeInSession);
+            if (room) navigate(`/rooms/${room.invitationCode}`, {replace: true});
             sessionStorage.removeItem('invitationCode');
             return;
         }
@@ -31,7 +35,8 @@ const EntranceInput = () => {
         const params = new URLSearchParams(window.location.search);
         const invitationCode = params.get('code');
         if (invitationCode) {
-            roomCtx.enterRoom(invitationCode);
+            const room = await roomCtx.enterRoom(invitationCode);
+            if (room) navigate(`/rooms/${room.invitationCode}`, {replace: true});
             return;
         }
     }

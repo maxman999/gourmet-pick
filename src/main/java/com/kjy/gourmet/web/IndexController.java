@@ -28,7 +28,12 @@ public class IndexController {
     private final UserService userService;
     private final HttpSession httpSession;
 
-    @GetMapping("/")
+    @GetMapping({
+            "/",
+            "/rooms/{invitationCode}",
+            "/rooms/{invitationCode}/menus/new",
+            "/rooms/{invitationCode}/menus/{menuId}/edit"
+    })
     public String index() {
         return "index";
     }

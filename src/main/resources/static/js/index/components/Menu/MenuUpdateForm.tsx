@@ -10,14 +10,15 @@ import CommonUtils from "../../utils/CommonUtils";
 import {IMenu} from "../../types/IMenu";
 import axios from "axios";
 import MenuContainer from "./MenuContainer";
-import RoomPhase from "../../types/RoomPhase";
 import {ILocationInfo} from "../../types/ILocationInfo";
 import Swal from "sweetalert2";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router-dom";
 
 const MenuUpdateForm = () => {
     const roomCtx = useContext(roomContext);
+    const navigate = useNavigate();
 
     const [menuName, setMenuName] = useState('');
     const [isMenuNameValid, setIsMenuNameValid] = useState(false);
@@ -202,11 +203,11 @@ const MenuUpdateForm = () => {
             await Swal.fire({title: '요청을 처리하지 못했습니다.', text: '잠시 후 다시 시도해주세요.', icon: 'error'});
             setIsSubmitting(false);
         }
-        roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
+        navigate(`/rooms/${roomCtx.roomInfo.invitationCode}`, {replace: true});
     }, 300);
 
     const updateCancelHandler = () => {
-        roomCtx.changeRoomPhase(RoomPhase.DEFAULT);
+        navigate(`/rooms/${roomCtx.roomInfo.invitationCode}`, {replace: true});
     }
 
     const modalCloseHandler = () => {
@@ -214,7 +215,7 @@ const MenuUpdateForm = () => {
     }
 
     const setTargetMenuInfo = async (menuId: number) => {
-        const {data:menu}:{data:IMenu} = await axios.get(`api/menu/${menuId}`);
+        const {data:menu}:{data:IMenu} = await axios.get(`/api/menu/${menuId}`);
         menu.name = CommonUtils.bringBackHtmlTags(menu.name);
         setMenuName(menu.name);
         setIsMenuNameValid(true);
@@ -244,6 +245,21 @@ const MenuUpdateForm = () => {
             roomCtx.setUpdateTargetMenu(0)
         };
     }, []);
+
+    useEffect(() => {
+        if (isMenuModify) return;
+
+        const removeMenuAddHistory = () => {
+            const roomPath = `/rooms/${roomCtx.roomInfo.invitationCode}`;
+
+            // 뒤로가기로 도착한 방 화면을 새 기록으로 넣어
+            // 메뉴 추가 화면이 앞으로가기 기록에 남지 않도록 한다.
+            navigate(roomPath);
+        };
+
+        window.addEventListener('popstate', removeMenuAddHistory);
+        return () => window.removeEventListener('popstate', removeMenuAddHistory);
+    }, [isMenuModify, navigate, roomCtx.roomInfo.invitationCode]);
 
     useEffect(() => {
         observeFormValidity();

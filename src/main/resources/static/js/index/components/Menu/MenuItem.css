@@ -17,7 +17,7 @@
 .menuReview { display: flex; min-width: 0; align-items: stretch; }
 .menuReview > div { width: 100%; }
 .soberCommentTitle { margin-bottom: 5px; color: var(--gp-muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
-.soberCommentContent { display: block; width: 100%; padding: 9px 11px; border: 1px solid #e2dad3; border-radius: 10px; background: #f0ece7; box-shadow: inset 0 1px 2px rgba(67,51,40,.05); font-size: clamp(12px, 1.7cqw, 14px); line-height: 1.4; }
+.soberCommentContent { display: block; width: 100%; padding: 9px 11px; border: 1px solid #e2dad3; border-radius: 10px; background: #f0ece7; box-shadow: inset 0 1px 2px rgba(67,51,40,.05); font-size: clamp(12px, 1.7cqw, 14px); line-height: 1.4; text-align: center; }
 .roadAddressCopyBtn { margin-left: 8px; padding: 6px; border: 0; background: transparent; color: var(--gp-info); }
 
 @container (max-width: 560px) {
