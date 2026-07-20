@@ -65,7 +65,6 @@ const EntranceInput = () => {
                     <input type="text"
                            className="form-control"
                            id="invitationCodeInput"
-                           placeholder="초대 코드 또는 미식방 링크"
                            onKeyDown={(e) => CommonUtils.handleEnterKeyPress(e, clickHandler)}
                            ref={invitationCodeRef}
                     />
@@ -78,7 +77,7 @@ const EntranceInput = () => {
                     </button>
                 </div>
             </div>
-            <div id="emailHelp" className="form-text">공유 받은 초대 코드 또는 미식방 링크를 입력해주세요.</div>
+            <div id="emailHelp" className="form-text">공유 받은 초대코드를 입력해주세요.</div>
         </div>
     );
 };
