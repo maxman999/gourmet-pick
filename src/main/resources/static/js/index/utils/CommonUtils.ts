@@ -42,6 +42,9 @@ class CommonUtils {
             timer: 2000,
             toast: true,
             text: content,
+            customClass: {
+                htmlContainer: 'gp-toast-message',
+            },
             showConfirmButton: false,
         });
     }

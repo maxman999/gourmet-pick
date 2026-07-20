@@ -2,37 +2,50 @@ import './SignIn.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGoogle} from "@fortawesome/free-brands-svg-icons";
 import {faChildReaching, faK} from "@fortawesome/free-solid-svg-icons";
-import {FormEvent, useEffect, useRef} from "react";
+import {FormEvent, useEffect, useRef, useState} from "react";
+
+type LoginType = 'google' | 'kakao' | 'guest';
 
 const SignIn = () => {
     const guestLoginIdInputRef = useRef(null);
     const guestLoginInputPwRef = useRef(null);
+    const [loadingLogin, setLoadingLogin] = useState<LoginType | null>(null);
 
-    const googleLoginHandler = async () => {
+    const googleLoginHandler = () => {
+        if (loadingLogin) return;
+        setLoadingLogin('google');
         window.location.replace("/oauth2/authorization/google");
     }
 
-    const kakaoLoginHandler = async () => {
+    const kakaoLoginHandler = () => {
+        if (loadingLogin) return;
+        setLoadingLogin('kakao');
         window.location.replace("/oauth2/authorization/kakao");
     }
 
     const guestLoginHandler = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (loadingLogin) return;
+        setLoadingLogin('guest');
 
         const credentials = new URLSearchParams({
             username: guestLoginIdInputRef.current.value,
             password: guestLoginInputPwRef.current.value,
         });
 
-        await fetch('/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: credentials,
-            credentials: 'same-origin',
-            redirect: 'manual',
-        });
+        try {
+            await fetch('/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: credentials,
+                credentials: 'same-origin',
+                redirect: 'manual',
+            });
 
-        window.location.replace('/');
+            window.location.replace('/');
+        } catch (error) {
+            setLoadingLogin(null);
+        }
     }
 
     const generateGuest = () => {
@@ -69,19 +82,31 @@ const SignIn = () => {
                 <div className="row social-btn-wrap">
                     <div>
                         <button className={"social-btn google-btn"}
+                                type={'button'}
+                                disabled={loadingLogin !== null}
+                                aria-busy={loadingLogin === 'google'}
                                 onClick={googleLoginHandler}>
-                            <FontAwesomeIcon icon={faGoogle}/>
+                            {loadingLogin === 'google'
+                                ? <span className={'login-spinner'} aria-hidden={'true'}/>
+                                : <FontAwesomeIcon icon={faGoogle}/>
+                            }
                             <span className={"social-btn-text"}>
-                                    Sign in with <b>Google</b>
+                                    {loadingLogin === 'google' ? '로그인 중...' : <>Sign in with <b>Google</b></>}
                                 </span>
                         </button>
                     </div>
                     <div>
                         <button className="social-btn kakao-btn"
+                                type={'button'}
+                                disabled={loadingLogin !== null}
+                                aria-busy={loadingLogin === 'kakao'}
                                 onClick={kakaoLoginHandler}>
-                            <FontAwesomeIcon icon={faK}/>
+                            {loadingLogin === 'kakao'
+                                ? <span className={'login-spinner'} aria-hidden={'true'}/>
+                                : <FontAwesomeIcon icon={faK}/>
+                            }
                             <span className={"social-btn-text"}>
-                                    Sign in with <b>Kakao</b>
+                                    {loadingLogin === 'kakao' ? '로그인 중...' : <>Sign in with <b>Kakao</b></>}
                                 </span>
                         </button>
                     </div>
@@ -89,10 +114,16 @@ const SignIn = () => {
                         <form className="form-group" onSubmit={guestLoginHandler}>
                             <input type="hidden" name="username" ref={guestLoginIdInputRef}/>
                             <input type="hidden" name="password" ref={guestLoginInputPwRef}/>
-                            <button className="social-btn guest-btn" type={"submit"}>
-                                <FontAwesomeIcon icon={faChildReaching}/>
+                            <button className="social-btn guest-btn"
+                                    type={"submit"}
+                                    disabled={loadingLogin !== null}
+                                    aria-busy={loadingLogin === 'guest'}>
+                                {loadingLogin === 'guest'
+                                    ? <span className={'login-spinner'} aria-hidden={'true'}/>
+                                    : <FontAwesomeIcon icon={faChildReaching}/>
+                                }
                                 <span className={"social-btn-text"}>
-                                    Use as a <b>GUEST</b>
+                                    {loadingLogin === 'guest' ? '로그인 중...' : <>Use as a <b>GUEST</b></>}
                                     </span>
                             </button>
                         </form>

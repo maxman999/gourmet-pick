@@ -33,6 +33,11 @@ body {
 button, input, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
+:where(button, a, input, textarea, select):focus-visible {
+    outline: 3px solid rgba(255, 107, 53, .28);
+    outline-offset: 2px;
+}
+
 .card {
     border: 1px solid rgba(235, 229, 223, .9);
     border-radius: var(--gp-radius);
@@ -48,6 +53,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .btn:not(:disabled):active { transform: scale(.98); }
+.btn:disabled { cursor: not-allowed; opacity: .52; }
 :where(.gp-icon-button) {
     display: inline-grid;
     place-items: center;
@@ -66,6 +72,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .text-success { color: var(--gp-success) !important; }
 .form-control { min-height: 46px; border-radius: 12px; border-color: var(--gp-line); }
 .form-control:focus { border-color: var(--gp-primary); box-shadow: 0 0 0 .22rem rgba(255,107,53,.14); }
+.form-control::placeholder { color: #817a74; opacity: 1; }
+
+.gp-toast-message {
+    color: var(--gp-ink) !important;
+    font-size: 16px !important;
+    font-weight: 650 !important;
+    line-height: 1.55 !important;
+    letter-spacing: -.01em;
+    white-space: pre-line !important;
+}
 
 #roomEntranceContainer {
     width: min(1080px, calc(100% - 32px));

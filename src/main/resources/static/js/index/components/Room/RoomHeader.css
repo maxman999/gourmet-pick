@@ -10,7 +10,7 @@
 .roomTitleRow { display: flex; min-width: 0; align-items: center; gap: 7px; }
 .room-title { margin: 0; overflow: hidden; font-size: clamp(21px, 4vw, 27px); font-weight: 900; letter-spacing: -.04em; text-overflow: ellipsis; white-space: nowrap; }
 .room-title::before { content: "#"; margin-right: 7px; color: var(--gp-primary); }
-.room-code { grid-column: 1; display: block; margin: 4px 0 0 24px; color: #aaa39d; font-size: 11px; letter-spacing: .03em; }
+.room-code { grid-column: 1; display: block; margin: 4px 0 0 24px; color: var(--gp-muted); font-size: 11px; letter-spacing: .03em; }
 .roomManagementActions { display: flex; flex-shrink: 0; gap: 5px; margin-left: auto; }
 .roomManagementDivider { align-self: center; width: 1px; height: 24px; margin: 0 3px; background: var(--gp-line); }
 .roomManagementBtn { width: 38px; height: 38px; border-radius: 11px; }
@@ -30,15 +30,15 @@
     .roomHeader { padding: 11px 12px; }
     .roomHeading { align-items: flex-start; }
     .roomHeadingText { flex: 1; grid-template-columns: minmax(0, 1fr); padding-top: 2px; }
-    .room-title { font-size: 21px; }
+    .room-title { font-size: 19px; }
     .room-code { margin-left: 21px; }
     .roomManagementActions { gap: 4px; }
     .roomManagementDivider { height: 22px; margin: 0 1px; }
-    .menuAddHeaderBtn { width: auto; min-width: 70px; gap: 5px; padding: 0 8px; font-size: 10px; }
+    .menuAddHeaderBtn { width: auto; min-width: 58px; gap: 4px; padding: 0 7px; font-size: 11px; }
     .menuAddLabelFull { display: none; }
     .menuAddLabelCompact { display: inline; }
     .roomTitleGourmets { grid-column: 1; grid-row: 3; grid-template-columns: repeat(5, 1fr); width: 100%; margin: 8px 0 0; padding: 7px 4px 0; border-top: 1px solid var(--gp-line); }
-    .roomManagementBtn { width: 35px; height: 35px; }
+    .roomManagementBtn { width: 33px; height: 33px; }
     .roomConsoleWrapper { margin-top: 9px; padding-top: 9px; }
 }
 @media (max-width: 380px) {

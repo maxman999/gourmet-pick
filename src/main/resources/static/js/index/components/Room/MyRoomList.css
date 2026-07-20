@@ -13,9 +13,9 @@
 
 .myRoomSectionHeader h2 {
     margin: 0;
-    color: #aaa39d;
+    color: var(--gp-muted);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: .01em;
 }
 
@@ -29,5 +29,5 @@
 @media (max-width: 575.98px) {
     .myRoomSection { margin-top: 30px; }
     .myRoomSectionHeader { gap: 12px; }
-    .myRoomSectionHeader h2 { font-size: 12px; }
+    .myRoomSectionHeader h2 { font-size: 12px; white-space: nowrap; }
 }

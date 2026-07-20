@@ -14,10 +14,12 @@ import * as _ from "lodash";
 import Swal from 'sweetalert2'
 import CommonUtils from "../../utils/CommonUtils";
 import {IUser} from "../../types/IUser";
+import {useNavigate} from "react-router-dom";
 
 const Room = () => {
     const roomCtx = useContext(roomContext);
     const websocketAPIs = useContext(websocketContext);
+    const navigate = useNavigate();
 
     const [isTodayPickElected, setIsTodayPickElected] = useState(false)
     const [todayPickPopupFlag, setTodayPickPopupFlag] = useState(!_.isEmpty(roomCtx.roomInfo.todayPick));
@@ -100,8 +102,8 @@ const Room = () => {
                 CommonUtils.toaster("투표 결과가 초기화됐습니다.", 'top', 'info');
                 break
             case 'EXILE':
-                await Swal.fire({title: "방이 삭제되었습니다.", icon: 'warning'});
-                document.location.href = "/";
+                CommonUtils.toaster('방이 삭제되었습니다.', 'top', 'warning');
+                navigate('/', {replace: true});
                 break
             case 'DISCONNECT':
                 const users = payloadData.data;

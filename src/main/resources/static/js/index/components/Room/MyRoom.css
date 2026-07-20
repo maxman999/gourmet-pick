@@ -9,7 +9,7 @@
 .roomWrapper.todayPickCompleted { border-color: rgba(255,107,53,.28); background: linear-gradient(145deg, #fff 55%, #fff3eb); }
 .todayPickCompleteRow { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .todayPickCompleteBadge { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; background: rgba(255,107,53,.12); color: var(--gp-primary); font-size: 11px; font-weight: 800; }
-.todayPickMenuName { min-width: 0; overflow: hidden; color: var(--gp-text); font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.todayPickMenuName { min-width: 0; overflow: hidden; color: var(--gp-ink); font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .votingSessionRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
 .votingSessionBadge { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 999px; background: rgba(74,139,92,.12); color: var(--gp-success); font-size: 11px; font-weight: 800; }
 .votingUserCount { flex: 0 0 auto; color: var(--gp-muted); font-weight: 700; }

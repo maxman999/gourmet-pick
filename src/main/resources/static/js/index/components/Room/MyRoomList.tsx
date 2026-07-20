@@ -33,7 +33,7 @@ const MyRoomList = (props: props) => {
         if (invitationCode) {
             const room = await roomCtx.enterRoom(invitationCode);
             if (room) navigate(`/rooms/${room.invitationCode}`);
-            await CommonUtils.toaster('투표방이 생성되었습니다.', 'top');
+            await CommonUtils.toaster('방이 생성되었습니다.\n 메뉴를 등록해주세요!', 'top');
         }
     }
 
