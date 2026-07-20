@@ -1,7 +1,7 @@
 import "./Timer.css"
-import {CountdownCircleTimer} from 'react-countdown-circle-timer'
+import {useCountdown} from 'react-countdown-circle-timer'
 import {useSwiper} from "swiper/react";
-import {useContext} from "react";
+import {CSSProperties, useContext} from "react";
 import websocketContext from "../../store/websocket-context";
 import roomContext from "../../store/room-context";
 import VotingStatus from "../../types/VotingStatus";
@@ -11,6 +11,7 @@ type props = {
 }
 
 const Timer = (props: props) => {
+    const duration = 5;
     const swiper = useSwiper();
     const websocketAPIs = useContext(websocketContext);
     const roomCtx = useContext(roomContext)
@@ -28,21 +29,23 @@ const Timer = (props: props) => {
         return {shouldRepeat: shouldRepeat, delay: 0.5}
     }
 
+    const {elapsedTime, remainingTime} = useCountdown({
+        isPlaying: websocketAPIs.websocketState.isVotingPossible,
+        duration: duration,
+        colors: '#ff6b35',
+        onComplete: timerCompleteHandler,
+    });
+
+    const progress = Math.max(0, ((duration - elapsedTime) / duration) * 100);
+    const remainingItems = Math.max(props.listSize - swiper.realIndex, 0);
+
     return (
-        <div className='swiper-timer__wrapper card shadow shadow-sm p-2 text-center'>
-            <CountdownCircleTimer
-                isPlaying={websocketAPIs.websocketState.isVotingPossible}
-                duration={5}
-                strokeWidth={10}
-                size={50}
-                colors={['#05f348', '#9dbb17', '#be8231', '#A30000']}
-                colorsTime={[9, 5, 2, 0]}
-                onComplete={timerCompleteHandler}
-            >
-                {({remainingTime}) => remainingTime}
-            </CountdownCircleTimer>
-            <div>
-                <span>{swiper.realIndex + 1} / {props.listSize}</span>
+        <div className='swiperProgressOverlay' aria-label={`남은 시간 ${remainingTime}초`}>
+            <div className={`swiperRemainingBadge ${remainingTime <= 2 ? 'isUrgent' : ''}`}
+                 style={{'--progress-angle': `${progress * 3.6}deg`} as CSSProperties}>
+                <div className='swiperRemainingBadgeInner'>
+                    남은 메뉴 <strong>{remainingItems}</strong>개
+                </div>
             </div>
         </div>
     );

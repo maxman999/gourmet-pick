@@ -1,3 +1,13 @@
-.swiper-timer__wrapper { z-index: 10; position: absolute; top: 16px; right: 16px; padding: 8px !important; border-color: rgba(255,107,53,.2); background: rgba(255,255,255,.92); }
-.swiper-timer__wrapper span { color: var(--gp-muted); font-size: 11px; font-weight: 800; }
-@media (max-width: 575.98px) { .swiper-timer__wrapper { top: 10px; right: 10px; transform: scale(.88); transform-origin: top right; } }
+.swiperProgressOverlay { position: absolute; z-index: 30; top: 12px; right: 12px; height: 0; pointer-events: none; }
+.swiperRemainingBadge { --progress-color: var(--gp-primary); padding: 3px; border-radius: 999px; background: conic-gradient(from -90deg, var(--progress-color) var(--progress-angle), rgba(67,51,40,.14) 0); box-shadow: 0 5px 15px rgba(67,51,40,.1); }
+.swiperRemainingBadge.isUrgent { --progress-color: var(--gp-danger); }
+.swiperRemainingBadgeInner { padding: 7px 13px; border-radius: inherit; background: rgba(255,255,255,.95); color: var(--gp-muted); font-size: 13px; font-weight: 750; backdrop-filter: blur(6px); }
+.swiperRemainingBadge strong { margin: 0 2px 0 4px; color: var(--gp-primary-dark); font-size: 16px; }
+.swiperRemainingBadge.isUrgent strong { color: var(--gp-danger); }
+
+@media (max-width: 575.98px) {
+    .swiperProgressOverlay { top: 9px; right: 9px; }
+    .swiperRemainingBadge { padding: 2px; }
+    .swiperRemainingBadgeInner { padding: 6px 10px; font-size: 12px; }
+    .swiperRemainingBadge strong { font-size: 14px; }
+}
