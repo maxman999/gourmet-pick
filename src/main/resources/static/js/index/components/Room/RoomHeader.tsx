@@ -144,9 +144,10 @@ const RoomHeader = (props: props) => {
                                 <span className={'roomManagementDivider'} aria-hidden={'true'}></span>
                                 <button className={'gp-icon-button roomManagementBtn menuAddHeaderBtn'}
                                         title={'메뉴 추가'} aria-label={'메뉴 추가'}
-                                        onClick={menuAddHandler}>
+                                    onClick={menuAddHandler}>
                                     <FontAwesomeIcon icon={faPlus}/>
-                                    <span>메뉴 추가</span>
+                                    <span className={'menuAddLabelFull'}>메뉴 추가</span>
+                                    <span className={'menuAddLabelCompact'}>메뉴</span>
                                 </button>
                             </>
                         }

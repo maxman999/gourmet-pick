@@ -206,7 +206,14 @@ const MenuUpdateForm = () => {
         navigate(`/rooms/${roomCtx.roomInfo.invitationCode}`, {replace: true});
     }, 300);
 
-    const updateCancelHandler = () => {
+    const updateCancelHandler = async () => {
+        const confirmResult = await CommonUtils.confirm(
+            '취소하시겠습니까?',
+            '입력한 내용은 저장되지 않습니다.',
+            '취 소'
+        );
+        if (!confirmResult.isConfirmed) return;
+
         navigate(`/rooms/${roomCtx.roomInfo.invitationCode}`, {replace: true});
     }
 
@@ -339,7 +346,14 @@ const MenuUpdateForm = () => {
                     </div>
                 </div>
                 <div className="row mt-2">
-                    <div id={'updateSubmitBtnWrap'} className={'col-md-10 mt-2'}>
+                    <div id={'updateCancelBtnWrap'} className={'col-md-2 mt-2'}>
+                        <button id={'updateCancelBtn'}
+                                className={'btn btn-outline-danger w-100'}
+                                onClick={updateCancelHandler}
+                                disabled={isSubmitting}> 취소
+                        </button>
+                    </div>
+                    <div id={'updateSubmitBtnWrap'} className={'col-md-10 mt-2 mb-3'}>
                         <button className="btn btn-primary menuSubmitBtn w-100"
                                 onClick={submitClickHandler}
                                 ref={submitButtonRef}
@@ -351,13 +365,6 @@ const MenuUpdateForm = () => {
                                     <FontAwesomeIcon icon={faSpinner} spinPulse size={'lg'}/>
                                 </>
                             }
-                        </button>
-                    </div>
-                    <div id={'updateCancelBtnWrap'} className={'col-md-2 mt-2 mb-3'}>
-                        <button id={'updateCancelBtn'}
-                                className={'btn btn-outline-danger w-100'}
-                                onClick={updateCancelHandler}
-                                disabled={isSubmitting}> 취소
                         </button>
                     </div>
                 </div>

@@ -97,7 +97,7 @@ const MenuItem = (props: props) => {
                          alt='메뉴 썸네일'
                          loading="lazy"/>
                 </div>
-                <div className={'menuReview'}>
+                <div className={'menuReview mt-3'}>
                     <div>
                         <div className={'soberCommentTitle'}>냉정한 한줄 평</div>
                         <span className={'soberCommentContent'}

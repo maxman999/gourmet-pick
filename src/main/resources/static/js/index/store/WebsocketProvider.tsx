@@ -40,8 +40,15 @@ type websocketAction =
     | { type: "FINISH" }
     | { type: "DISCONNECT" };
 
-const WEBSOCKET_SERVER_URL: string = `${window.location.origin}/ws`;
+const isLocalWebpackDevServer = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    && window.location.port === '3000';
+const websocketOrigin = isLocalWebpackDevServer
+    ? `${window.location.protocol}//${window.location.hostname}:8080`
+    : window.location.origin;
+const WEBSOCKET_SERVER_URL: string = `${websocketOrigin}/ws`;
 let stompClient: Client = null;
+
+const isWebsocketConnected = () => !!stompClient?.connected;
 
 const onError = (err: any) => {
     alert("서버와 통신이 끊겼습니다. 잠시 후 다시 시도해주세요.");
@@ -73,21 +80,25 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "CREATE") {
+        if (!isWebsocketConnected()) return state;
         const {topic, roomId, user} = state.sessionInfo
         stompClient.send(`/app/${topic}/create/${user.id}/${roomId}`, {});
     }
 
     if (action.type === "CANCEL") {
+        if (!isWebsocketConnected()) return state;
         const {topic, roomId} = state.sessionInfo
         stompClient.send(`/app/${topic}/cancel/${roomId}`, {});
     }
 
     if (action.type === "SEAT") {
+        if (!isWebsocketConnected()) return state;
         const {topic, roomId, user} = state.sessionInfo
         stompClient.send(`/app/${topic}/seating/${user.id}/${roomId}`, {});
     }
 
     if (action.type === "BOOTING") {
+        if (!isWebsocketConnected()) return state;
         const {topic, roomId} = state.sessionInfo
         stompClient.send(`/app/${topic}/start/${roomId}`, {});
     }
@@ -100,6 +111,7 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "VOTE") {
+        if (!isWebsocketConnected()) return state;
         const {topic, roomId, user} = state.sessionInfo
         const ballot = {
             menuId: action.menuId,
@@ -112,6 +124,7 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "FINISH") {
+        if (!isWebsocketConnected()) return state;
         const {topic, roomId} = state.sessionInfo;
         stompClient.send(`/app/${topic}/finish/${roomId}`);
         return {
@@ -121,8 +134,10 @@ const websocketReducer = (state: websocketState, action: websocketAction): webso
     }
 
     if (action.type === "DISCONNECT") {
-        stompClient.disconnect(() => {
-        });
+        if (isWebsocketConnected()) {
+            stompClient.disconnect(() => {
+            });
+        }
     }
 
     return state;

@@ -9,4 +9,7 @@
 .social-btn:hover { transform: translateY(-2px); border-color: #d7cec6; background: var(--gp-background); }
 .social-btn svg { margin-right: 10px; }.google-btn svg { color: #dc4e41; }.kakao-btn svg { color: #d49a00; }.guest-btn svg { color: var(--gp-muted); }
 .social-btn-text { font-size: 15px; }.signIn-hint { color: var(--gp-muted); font-size: 12px; }
-@media (max-width: 575.98px) { .signIn-wrap { justify-content: flex-start; padding-top: max(11vh, 54px); }.login-title-wrap { margin-bottom: 26px; } }
+@media (max-width: 575.98px) {
+    .signIn-wrap { min-height: 100svh; justify-content: center; padding: 24px 14px; }
+    .login-title-wrap { margin-bottom: 26px; }
+}
