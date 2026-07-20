@@ -46,16 +46,16 @@ class CommonUtils {
         });
     }
 
-    static confirm = (title: string, text: string, confirmButtonText: string) => {
+    static confirm = (title: string, text: string, confirmButtonText: string, cancelButtonText: string = '취 소') => {
         return Swal.fire({
             title: title,
             text: text,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
             confirmButtonText: confirmButtonText,
-            cancelButtonText: '취 소',
+            cancelButtonText: cancelButtonText,
         })
     }
 

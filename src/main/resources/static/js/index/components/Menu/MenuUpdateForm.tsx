@@ -210,7 +210,9 @@ const MenuUpdateForm = () => {
         const confirmResult = await CommonUtils.confirm(
             '취소하시겠습니까?',
             '입력한 내용은 저장되지 않습니다.',
-            '취 소'
+            '취소하기',
+            '이어서 작성하기'
+
         );
         if (!confirmResult.isConfirmed) return;
 
