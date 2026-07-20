@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -100,7 +102,8 @@ public class MenuServiceImpl implements MenuService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "빈 이미지 파일은 업로드할 수 없습니다.");
             }
 
-            String fileExtension = getSupportedImageExtension(uploadFile);
+            String sourceExtension = getSupportedImageExtension(uploadFile);
+            String fileExtension = "webp".equals(sourceExtension) ? "jpg" : sourceExtension;
 
             String folderPath = makeFolder();
             String uuid = UUID.randomUUID().toString();
@@ -108,11 +111,15 @@ public class MenuServiceImpl implements MenuService {
             try {
                 BufferedImage sourceImage = ImageIO.read(uploadFile.getInputStream());
                 if (sourceImage == null) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. JPEG 또는 PNG 파일을 사용해주세요.");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. JPEG, PNG 또는 WebP 파일을 사용해주세요.");
                 }
 
+                BufferedImage thumbnailSource = "webp".equals(sourceExtension)
+                        ? convertToRgb(sourceImage)
+                        : sourceImage;
+
                 File thumbnailFile = new File(saveName);
-                Thumbnails.of(sourceImage)
+                Thumbnails.of(thumbnailSource)
                         .size(720, 720)
                         .outputFormat(fileExtension)
                         .toFile(thumbnailFile);
@@ -133,7 +140,27 @@ public class MenuServiceImpl implements MenuService {
         if ("image/png".equalsIgnoreCase(contentType)) {
             return "png";
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. JPEG 또는 PNG 파일을 사용해주세요.");
+        if ("image/webp".equalsIgnoreCase(contentType)) {
+            return "webp";
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 형식입니다. JPEG, PNG 또는 WebP 파일을 사용해주세요.");
+    }
+
+    private BufferedImage convertToRgb(BufferedImage sourceImage) {
+        BufferedImage rgbImage = new BufferedImage(
+                sourceImage.getWidth(),
+                sourceImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB
+        );
+        Graphics2D graphics = rgbImage.createGraphics();
+        try {
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, rgbImage.getWidth(), rgbImage.getHeight());
+            graphics.drawImage(sourceImage, 0, 0, null);
+        } finally {
+            graphics.dispose();
+        }
+        return rgbImage;
     }
 
     private String makeFolder() {

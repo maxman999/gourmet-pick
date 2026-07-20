@@ -24,6 +24,7 @@ const MenuUpdateForm = () => {
     const [isMenuNameValid, setIsMenuNameValid] = useState(false);
     const [location, setLocation] = useState<ILocationInfo>(null);
     const [thumbnail, setThumbnail] = useState<any>();
+    const [thumbnailUploadFile, setThumbnailUploadFile] = useState<File>();
     const [prevThumbnailFileName, setPrevThumbnailFileName] = useState('');
     const [isThumbnailChanged, setIsThumbnailChanged] = useState(false);
     const [soberComment, setSoberComment] = useState('');
@@ -99,24 +100,54 @@ const MenuUpdateForm = () => {
         const file = imageUploadRef.current.files[0];
         if (!file) return;
 
-        const supportedTypes = ['image/jpeg', 'image/png'];
-        if (!supportedTypes.includes(file.type)) {
+        const supportedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const hasHeicExtension = /\.(heic|heif)$/i.test(file.name);
+        let isHeicFile = hasHeicExtension || ['image/heic', 'image/heif'].includes(file.type);
+        if (!isHeicFile && !supportedTypes.includes(file.type)) {
+            try {
+                const {isHeic} = await import('heic-to');
+                isHeicFile = await isHeic(file);
+            } catch (error) {
+                isHeicFile = false;
+            }
+        }
+
+        if (!supportedTypes.includes(file.type) && !isHeicFile) {
             imageUploadRef.current.value = '';
             await Swal.fire({
                 title: '지원하지 않는 이미지 형식입니다.',
-                text: 'JPEG 또는 PNG 파일을 선택해주세요.',
+                text: 'JPEG, PNG, WebP 또는 HEIC 파일을 선택해주세요.',
                 icon: 'warning'
             });
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const imageData = e.target.result;
-            setThumbnail(imageData);
-            setIsThumbnailChanged(true);
+        try {
+            const heicConverter = isHeicFile ? await import('heic-to') : null;
+            const uploadFile = isHeicFile
+                ? new File(
+                    [await heicConverter.heicTo({blob: file, type: 'image/jpeg', quality: .9})],
+                    file.name.replace(/\.(heic|heif)$/i, '') + '.jpg',
+                    {type: 'image/jpeg'},
+                )
+                : file;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setThumbnail(e.target.result);
+                setThumbnailUploadFile(uploadFile);
+                setIsThumbnailChanged(true);
+            }
+            reader.readAsDataURL(uploadFile);
+        } catch (error) {
+            imageUploadRef.current.value = '';
+            setThumbnailUploadFile(undefined);
+            await Swal.fire({
+                title: 'HEIC 이미지를 변환하지 못했습니다.',
+                text: '다른 이미지를 선택하거나 JPEG로 변환한 뒤 다시 시도해주세요.',
+                icon: 'warning',
+            });
         }
-        reader.readAsDataURL(file);
     }
 
     const locationChangeHandler = (locationInfo: ILocationInfo) => {
@@ -161,7 +192,7 @@ const MenuUpdateForm = () => {
     // 사진 스토리지에 저장
     const uploadThumbnail = async () => {
         const formData = new FormData();
-        formData.append('uploadFiles', imageUploadRef.current.files[0]);
+        formData.append('uploadFiles', thumbnailUploadFile || imageUploadRef.current.files[0]);
         const {data: result} = await axios.post('/api/menu/uploadMenuImageFile', formData);
         if (result) {
             return result[0].thumbnailURL;
@@ -330,7 +361,7 @@ const MenuUpdateForm = () => {
                                 }
                                 <input onChange={thumbnailChangeHandler}
                                        type={'file'}
-                                       accept={"image/jpeg,image/png"}
+                                       accept={"image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"}
                                        ref={imageUploadRef}
                                        style={{display: 'none'}}/>
                             </>

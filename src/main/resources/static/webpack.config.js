@@ -22,8 +22,9 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        publicPath: '/dist',
+        publicPath: '/dist/',
         filename: '[name].bundle.js',
+        chunkFilename: '[name].[contenthash:8].bundle.js',
     },
     devServer: {
         static: './dist',
