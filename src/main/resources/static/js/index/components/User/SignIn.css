@@ -7,8 +7,8 @@
 .social-btn-wrap { margin: 0 0 20px; padding: 0; border: 0; }
 .social-btn { width: 100%; min-height: 52px; margin-bottom: 10px; padding: 13px 16px; border: 1px solid var(--gp-line); border-radius: 13px; background: white; color: var(--gp-ink); font-weight: 600; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
 .social-btn:hover { transform: translateY(-2px); border-color: #d7cec6; background: var(--gp-background); }
-.social-btn:disabled { cursor: wait; transform: none; background: var(--gp-background); opacity: .62; }
-.social-btn[aria-busy="true"] { border-color: rgba(255,107,53,.42); background: var(--gp-primary-soft); color: var(--gp-primary-dark); opacity: 1; }
+.social-btn:disabled { cursor: wait; transform: none; background: white; opacity: .62; }
+.social-btn[aria-busy="true"] { opacity: 1; }
 .social-btn svg { margin-right: 10px; }.google-btn svg { color: #dc4e41; }.kakao-btn svg { color: #d49a00; }.guest-btn svg { color: var(--gp-muted); }
 .login-spinner { display: inline-block; width: 17px; height: 17px; margin-right: 10px; border: 2px solid rgba(228,81,32,.25); border-top-color: var(--gp-primary-dark); border-radius: 50%; vertical-align: -3px; animation: loginSpinner .7s linear infinite; }
 .social-btn-text { font-size: 15px; }.signIn-hint { color: var(--gp-muted); font-size: 12px; }

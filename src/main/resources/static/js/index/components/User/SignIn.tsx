@@ -91,7 +91,7 @@ const SignIn = () => {
                                 : <FontAwesomeIcon icon={faGoogle}/>
                             }
                             <span className={"social-btn-text"}>
-                                    {loadingLogin === 'google' ? '로그인 중...' : <>Sign in with <b>Google</b></>}
+                                    {loadingLogin === 'google' ? '' : <>Sign in with <b>Google</b></>}
                                 </span>
                         </button>
                     </div>
@@ -106,7 +106,7 @@ const SignIn = () => {
                                 : <FontAwesomeIcon icon={faK}/>
                             }
                             <span className={"social-btn-text"}>
-                                    {loadingLogin === 'kakao' ? '로그인 중...' : <>Sign in with <b>Kakao</b></>}
+                                    {loadingLogin === 'kakao' ? '' : <>Sign in with <b>Kakao</b></>}
                                 </span>
                         </button>
                     </div>
@@ -123,7 +123,7 @@ const SignIn = () => {
                                     : <FontAwesomeIcon icon={faChildReaching}/>
                                 }
                                 <span className={"social-btn-text"}>
-                                    {loadingLogin === 'guest' ? '로그인 중...' : <>Use as a <b>GUEST</b></>}
+                                    {loadingLogin === 'guest' ? '' : <>Use as a <b>GUEST</b></>}
                                     </span>
                             </button>
                         </form>
