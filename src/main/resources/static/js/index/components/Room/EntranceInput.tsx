@@ -7,6 +7,17 @@ import {faDoorOpen} from "@fortawesome/free-solid-svg-icons";
 import CommonUtils from "../../utils/CommonUtils";
 import {useNavigate} from "react-router-dom";
 
+const extractInvitationCode = (inputValue: string) => {
+    const trimmedValue = inputValue.trim();
+    const roomPathMatch = trimmedValue.match(/(?:^|\/)rooms\/([^/?#]+)/i);
+    if (!roomPathMatch) return trimmedValue;
+
+    try {
+        return decodeURIComponent(roomPathMatch[1]);
+    } catch (error) {
+        return roomPathMatch[1];
+    }
+};
 
 const EntranceInput = () => {
     const roomCtx = useContext(roomContext);
@@ -14,12 +25,13 @@ const EntranceInput = () => {
     const invitationCodeRef = useRef(null);
 
     const clickHandler = async () => {
-        const inputValue = invitationCodeRef.current.value.trim()
-        if (inputValue.length === 0) {
+        const invitationCode = extractInvitationCode(invitationCodeRef.current.value);
+        if (invitationCode.length === 0) {
             await Swal.fire({title: '초대 코드를 입력해주세요.', icon: 'warning'});
             return;
         }
-        const room = await roomCtx.enterRoom(invitationCodeRef.current.value);
+        invitationCodeRef.current.value = invitationCode;
+        const room = await roomCtx.enterRoom(invitationCode);
         if (room) navigate(`/rooms/${room.invitationCode}`);
     };
 
@@ -53,6 +65,7 @@ const EntranceInput = () => {
                     <input type="text"
                            className="form-control"
                            id="invitationCodeInput"
+                           placeholder="초대 코드 또는 미식방 링크"
                            onKeyDown={(e) => CommonUtils.handleEnterKeyPress(e, clickHandler)}
                            ref={invitationCodeRef}
                     />
@@ -65,7 +78,7 @@ const EntranceInput = () => {
                     </button>
                 </div>
             </div>
-            <div id="emailHelp" className="form-text">공유 받은 초대 코드를 입력해주세요.</div>
+            <div id="emailHelp" className="form-text">공유 받은 초대 코드 또는 미식방 링크를 입력해주세요.</div>
         </div>
     );
 };

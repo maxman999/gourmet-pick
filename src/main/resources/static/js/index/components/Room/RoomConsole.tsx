@@ -39,7 +39,7 @@ const RoomConsole = (props: props) => {
             timer: 2000,
             timerProgressBar: true,
             didClose() {
-                CommonUtils.copyInvitationCode(roomCtx.roomInfo.invitationCode);
+                CommonUtils.copyRoomLink(roomCtx.roomInfo.invitationCode);
             }
         });
     }

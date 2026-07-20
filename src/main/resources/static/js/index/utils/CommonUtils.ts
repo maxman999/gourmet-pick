@@ -95,8 +95,9 @@ class CommonUtils {
         }
     }
 
-    static copyInvitationCode = (invitationCode: string) => {
-        this.copyToClipboard(invitationCode, '초대코드가 복사되었습니다.');
+    static copyRoomLink = (invitationCode: string) => {
+        const roomUrl = new URL(`/rooms/${encodeURIComponent(invitationCode)}`, window.location.origin).toString();
+        this.copyToClipboard(roomUrl, '미식방 링크가 복사되었습니다.');
     }
 
     static handleEnterKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>, callback: () => void) => {

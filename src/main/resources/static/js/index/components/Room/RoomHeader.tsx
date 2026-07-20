@@ -84,7 +84,7 @@ const RoomHeader = (props: props) => {
     }
 
     const linkClipHandler = _.debounce(() => {
-        CommonUtils.copyInvitationCode(roomCtx.roomInfo.invitationCode);
+        CommonUtils.copyRoomLink(roomCtx.roomInfo.invitationCode);
     }, 200);
 
     const menuAddHandler = async () => {
@@ -104,7 +104,7 @@ const RoomHeader = (props: props) => {
                         <div className={'roomTitleRow'}>
                             <h1 className='room-title'>{CommonUtils.bringBackHtmlTags(currentRoomName)}</h1>
                             <button className={'roomTitleLinkBtn'}
-                                    title={'초대 코드 복사'} aria-label={'초대 코드 복사'}
+                                    title={'미식방 링크 복사'} aria-label={'미식방 링크 복사'}
                                     onClick={linkClipHandler}>
                                 <FontAwesomeIcon icon={faLink}/>
                             </button>
