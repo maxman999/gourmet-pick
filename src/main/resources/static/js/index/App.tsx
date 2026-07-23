@@ -70,11 +70,23 @@ const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
     const [myRoomList, setMyRoomList] = useState<IRoom[]>([]);
 
+    const rememberInvitationCodeFromPath = () => {
+        const roomPathMatch = window.location.pathname.match(/^\/rooms\/([^/?#]+)/i);
+        if (!roomPathMatch) return;
+
+        try {
+            sessionStorage.setItem('invitationCode', decodeURIComponent(roomPathMatch[1]));
+        } catch (error) {
+            sessionStorage.setItem('invitationCode', roomPathMatch[1]);
+        }
+    };
+
     const authenticateHandler = async () => {
         try {
             const {data: user}: { data: IUser } = await axios.get("/getAuthenticatedUserId");
             const hasValidUser = !!user && typeof user === 'object' && !!user.id;
             if (!hasValidUser) {
+                rememberInvitationCodeFromPath();
                 sessionStorage.removeItem('user');
                 setIsAuthenticated(false);
                 navigate('/', {replace: true});
@@ -86,6 +98,7 @@ const App = () => {
             sessionStorage.setItem('user', JSON.stringify(user));
             setIsAuthenticated(true);
         } catch (error) {
+            rememberInvitationCodeFromPath();
             sessionStorage.removeItem('user');
             setMyRoomList([]);
             setIsAuthenticated(false);

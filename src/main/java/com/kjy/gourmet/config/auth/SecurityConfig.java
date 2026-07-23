@@ -3,6 +3,7 @@ package com.kjy.gourmet.config.auth;
 import com.kjy.gourmet.domain.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,6 +36,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/", "/getAuthenticatedUserId", "/dist/**", "/css/**", "/images/**", "/js/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/rooms/**").permitAll()
                 .antMatchers("/api/**", "/ws/**").hasAnyRole(Role.USER.name(), Role.GUEST.name())
                 .anyRequest().authenticated()
                 .and()
